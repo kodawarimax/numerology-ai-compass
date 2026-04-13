@@ -1,0 +1,4 @@
+.omc/
+screenshots/
+*.pdf
+.playwright-mcp/

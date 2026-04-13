@@ -1,0 +1,1984 @@
+<!DOCTYPE html>
+<html lang="ja" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>数秘AIライフコンパス</title>
+  <meta name="description" content="数秘術とAIを融合したパーソナライズ学習プラットフォーム">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Lora:wght@400;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+  <script>
+    tailwind.config = {
+      theme: { extend: { fontFamily: { lora: ['Lora','serif'], sans: ['Inter','system-ui','sans-serif'] } } }
+    }
+  </script>
+  <style>
+    body { font-family: 'Inter', system-ui, sans-serif; font-size: 14px; }
+    .gradient-header { background: linear-gradient(135deg, #f3e8ff 0%, #fce7f3 50%, #e0e7ff 100%); }
+    .gradient-cta { background: linear-gradient(to right, #ec4899, #f43f5e); }
+    .gradient-cta:hover { background: linear-gradient(to right, #db2777, #e11d48); }
+
+    /* ===== Numerology Chart ===== */
+    .chart-area { position: relative; }
+    .chart-row {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 12px;
+      position: relative;
+      z-index: 1;
+    }
+    .chart-box {
+      background: rgba(255,255,255,0.9);
+      border: 1px solid #d8b4fe;
+      border-radius: 6px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: transform 0.15s ease, box-shadow 0.15s ease;
+      padding: 4px 16px;
+      min-width: 74px;
+    }
+    .chart-box:hover { transform: scale(1.05); box-shadow: 0 3px 10px rgba(168,85,247,0.15); }
+    .chart-box .cb-num {
+      font-family: 'Lora', serif;
+      font-weight: 700;
+      font-size: 1.15rem;
+      color: #6b21a8;
+      line-height: 1.2;
+    }
+    .chart-box .cb-lbl {
+      font-size: 9px;
+      color: #9333ea;
+      font-weight: 500;
+      margin-top: 1px;
+      white-space: nowrap;
+    }
+    .period-lbl {
+      font-size: 8px;
+      color: #a78bfa;
+      text-align: center;
+      padding: 3px 8px;
+      border: 1px solid #e9d5ff;
+      border-radius: 5px;
+      background: rgba(255,255,255,0.6);
+      white-space: nowrap;
+      line-height: 1.3;
+    }
+    .chart-connector {
+      width: 1px;
+      background: #d8b4fe;
+      margin: 0 auto;
+      position: relative;
+      z-index: 0;
+    }
+    .chart-branch {
+      position: relative;
+      display: flex;
+      justify-content: center;
+    }
+    .chart-branch::before,
+    .chart-branch::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      width: 1.5px;
+      height: 100%;
+      background: #d8b4fe;
+    }
+    /* SVG lines for diagonal connections */
+    .chart-svg {
+      position: absolute;
+      top: 0; left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 0;
+    }
+    .chart-svg line { stroke: #d8b4fe; stroke-width: 1.2; }
+
+    .fade-in { animation: fadeIn 0.4s ease-out; }
+    @keyframes fadeIn { from { opacity:0; transform:translateY(8px); } to { opacity:1; transform:translateY(0); } }
+    /* Scroll offset for sticky nav */
+    #section-chart, #section-palm, #section-cycles { scroll-margin-top: 48px; }
+
+    /* Welcome modal */
+    .modal-overlay { background: rgba(0,0,0,0.45); backdrop-filter: blur(3px); }
+  </style>
+</head>
+<body class="bg-gray-50 min-h-screen">
+
+  <!-- ===== FORM VIEW ===== -->
+  <div id="view-form">
+    <!-- Header gradient -->
+    <div class="gradient-header pt-6 pb-8 px-4 text-center">
+      <div class="flex items-center justify-center gap-3 mb-3">
+        <h1 class="text-xl font-bold text-gray-800">数秘AIライフコンパス</h1>
+        <button id="lang-en" class="text-xs text-purple-500 border border-purple-300 rounded-full px-3 py-0.5 hover:bg-purple-50 transition">English</button>
+      </div>
+      <h2 class="text-base font-semibold text-purple-700 mb-2">あなたの輝きを見つける旅へ</h2>
+      <p class="text-xs text-gray-500 leading-relaxed max-w-sm mx-auto">
+        ご入力いただいた情報は、あなただけのパーソナルな数秘プロファイルと、AIによる深い洞察をお届けするために大切に扱わせていただきます。あなたの新たな一歩を、心から応援しています。
+      </p>
+    </div>
+
+    <!-- Form -->
+    <div class="max-w-md mx-auto px-4 -mt-3">
+      <form id="birth-form" class="bg-white rounded-xl shadow-md p-5 space-y-4">
+        <!-- Last Name -->
+        <div>
+          <label class="block text-xs text-gray-500 mb-1">姓 (Last Name) <span class="text-gray-400">(任意)</span></label>
+          <input type="text" id="lastName" placeholder=""
+            class="w-full border border-gray-200 rounded-lg px-3 py-2.5 text-sm focus:ring-2 focus:ring-purple-300 focus:border-purple-400 outline-none">
+        </div>
+        <!-- First Name -->
+        <div>
+          <label class="block text-xs text-gray-500 mb-1">名 (First Name) <span class="text-pink-400">*</span></label>
+          <input type="text" id="firstName" required placeholder=""
+            class="w-full border border-gray-200 rounded-lg px-3 py-2.5 text-sm focus:ring-2 focus:ring-purple-300 focus:border-purple-400 outline-none">
+        </div>
+        <!-- Birth Date -->
+        <div>
+          <label class="block text-xs text-gray-500 mb-1">生年月日 <span class="text-pink-400">*</span></label>
+          <div class="grid grid-cols-3 gap-2">
+            <input type="number" id="birthYear" required min="1900" max="2200" placeholder="年"
+              class="w-full border border-gray-200 rounded-lg px-3 py-2.5 text-sm text-center focus:ring-2 focus:ring-purple-300 outline-none">
+            <input type="number" id="birthMonth" required min="1" max="12" placeholder="月"
+              class="w-full border border-gray-200 rounded-lg px-3 py-2.5 text-sm text-center focus:ring-2 focus:ring-purple-300 outline-none">
+            <input type="number" id="birthDay" required min="1" max="31" placeholder="日"
+              class="w-full border border-gray-200 rounded-lg px-3 py-2.5 text-sm text-center focus:ring-2 focus:ring-purple-300 outline-none">
+          </div>
+        </div>
+        <!-- Email -->
+        <div>
+          <label class="block text-xs text-gray-500 mb-1">メールアドレス <span class="text-gray-400">(任意)</span></label>
+          <input type="email" id="email" placeholder=""
+            class="w-full border border-gray-200 rounded-lg px-3 py-2.5 text-sm focus:ring-2 focus:ring-purple-300 outline-none">
+        </div>
+        <!-- Divination Date -->
+        <div>
+          <label class="block text-xs text-gray-500 mb-1">占う年月日 <span class="text-gray-400">(任意)</span></label>
+          <div class="grid grid-cols-3 gap-2">
+            <input type="number" id="divYear" placeholder="年"
+              class="w-full border border-gray-200 rounded-lg px-3 py-2.5 text-sm text-center focus:ring-2 focus:ring-purple-300 outline-none">
+            <input type="number" id="divMonth" placeholder="月"
+              class="w-full border border-gray-200 rounded-lg px-3 py-2.5 text-sm text-center focus:ring-2 focus:ring-purple-300 outline-none">
+            <input type="number" id="divDay" placeholder="日"
+              class="w-full border border-gray-200 rounded-lg px-3 py-2.5 text-sm text-center focus:ring-2 focus:ring-purple-300 outline-none">
+          </div>
+        </div>
+        <!-- IT Level -->
+        <div>
+          <label class="block text-xs text-gray-500 mb-1">IT知識レベル <span class="text-gray-400">(任意)</span></label>
+          <select class="w-full border border-gray-200 rounded-lg px-3 py-2.5 text-sm focus:ring-2 focus:ring-purple-300 outline-none bg-white text-gray-600">
+            <option>初心者 (AIやプログラミングにほとんど触れたことがない)</option>
+            <option>中級者</option>
+            <option>上級者</option>
+          </select>
+        </div>
+        <!-- Gender -->
+        <div>
+          <label class="block text-xs text-gray-500 mb-1">性別 <span class="text-gray-400">(任意)</span></label>
+          <select class="w-full border border-gray-200 rounded-lg px-3 py-2.5 text-sm focus:ring-2 focus:ring-purple-300 outline-none bg-white text-gray-600">
+            <option>性別を選択してください</option>
+            <option>男性</option>
+            <option>女性</option>
+            <option>その他</option>
+          </select>
+        </div>
+        <!-- Gemini API Key (for palm reading AI) -->
+        <div>
+          <label class="block text-xs text-gray-500 mb-1">Gemini API Key <span class="text-gray-400">(手相AI分析に使用)</span></label>
+          <input type="password" id="geminiApiKey" placeholder="AIzaSy..." value="AIzaSyBOACATQt2uLZx7GR4Bn8HWHrShqka2UKI"
+            class="w-full border border-gray-200 rounded-lg px-3 py-2.5 text-sm focus:ring-2 focus:ring-purple-300 outline-none font-mono">
+          <p class="text-[9px] text-gray-300 mt-0.5">※ キーはブラウザ内のみで使用され、外部に送信されません（Gemini API直接通信）</p>
+        </div>
+        <!-- Submit -->
+        <button type="submit"
+          class="w-full gradient-cta text-white rounded-full py-3 font-semibold text-sm shadow-lg hover:shadow-xl transition-all">
+          輝く私への第一歩
+        </button>
+      </form>
+
+      <footer class="text-center py-6">
+        <p class="text-[10px] text-gray-300">&copy; 2026 数秘AIライフコンパス. あなたの輝く人生を心から応援しています。</p>
+        <p class="text-[9px] text-gray-300 mt-0.5">Powered by Gemini.</p>
+      </footer>
+    </div>
+  </div>
+
+  <!-- ===== RESULT VIEW (hidden until submit) ===== -->
+  <div id="view-result" class="hidden">
+    <!-- Header with back button -->
+    <div class="gradient-header pt-5 pb-4 px-4">
+      <div class="flex items-center justify-between mb-2">
+        <button id="btn-back-form" class="flex items-center gap-1 text-xs text-purple-600 hover:text-purple-800 transition-colors">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
+          戻る
+        </button>
+        <h1 class="text-lg font-bold text-gray-800">数秘AIライフコンパス</h1>
+        <button class="text-xs text-purple-500 border border-purple-300 rounded-full px-3 py-0.5">English</button>
+      </div>
+      <div class="text-center">
+        <p class="text-sm font-bold text-gray-700" id="result-name">太郎</p>
+        <p class="text-[10px] text-gray-400">レベル 1: 数秘の使者</p>
+        <div class="flex items-center justify-between max-w-xs mx-auto mt-1 text-[10px] text-gray-400">
+          <span>XP: 0</span>
+          <span>次のレベルまで: 100 XP</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Section Navigation Tabs -->
+    <div class="sticky top-0 z-30 bg-white/90 backdrop-blur-sm border-b border-gray-100 shadow-sm">
+      <div class="max-w-md mx-auto flex">
+        <button class="nav-tab flex-1 py-2.5 text-[10px] font-medium text-purple-600 border-b-2 border-purple-500" data-target="section-chart">数秘チャート</button>
+        <button class="nav-tab flex-1 py-2.5 text-[10px] font-medium text-gray-400 border-b-2 border-transparent" data-target="section-palm">手相占い</button>
+        <button class="nav-tab flex-1 py-2.5 text-[10px] font-medium text-gray-400 border-b-2 border-transparent" data-target="section-cycles">サイクル</button>
+      </div>
+    </div>
+
+    <div class="max-w-md mx-auto px-4 py-4 space-y-5">
+
+      <!-- ===== SECTION: 数秘チャート ===== -->
+      <div id="section-chart">
+      <!-- Chart Title -->
+      <div class="text-center mb-4">
+        <h2 class="text-base font-bold text-purple-700" id="chart-title">太郎さんの数秘チャート</h2>
+        <p class="text-[10px] text-gray-400" id="chart-birthdate">生年月日: 5/15/1990</p>
+      </div>
+
+      <!-- ===== NUMEROLOGY DIAMOND CHART [LAYOUT LOCKED — DO NOT MODIFY POSITIONS] ===== -->
+      <!--
+        FIXED LAYOUT (2026-04-13):
+        Row 0: 成熟数 (center)
+        Row 1: 第4目標期間 (center)
+        Row 2: 第3目標数 (center)
+        Row 3: 第3目標期間 (center)
+        Row 4: 成長数 (left, gap-16) / 第2目標数 (right)
+        Row 5: 第1目標期間 (left, gap-8) / 第2目標期間 (right)
+        Row 6: 人格数 (left) / 誕生数 (center) / 社会数 (right) — justify-between w-full px-1
+               運命数 hidden (計算のみ)
+        Row 7: 第1挑戦期間 (left, gap-8) / 第2挑戦期間 (right)
+        Row 8: 克服数 (left, gap-16) / 第2挑戦数 (right)
+        Row 9: 第3挑戦期間 (center)
+        Row 10: 第3挑戦数 (center)
+        Row 11: 第4挑戦期間 (center)
+        Row 12: 第4挑戦数 (center)
+        DO NOT change box order, gap values, or justify rules.
+      -->
+      <div class="bg-fuchsia-50/60 border border-fuchsia-200 rounded-xl p-6 pt-8 pb-8 shadow-sm">
+        <div class="chart-area flex flex-col items-center gap-0">
+
+          <!-- ========== GOALS (上半分: 逆ピラミッド) ========== -->
+
+          <!-- 成熟数 (top) -->
+          <div class="chart-row">
+            <div class="chart-box" id="cell-maturity">
+              <span class="cb-num">-</span><span class="cb-lbl">成熟数</span>
+            </div>
+          </div>
+          <div class="chart-connector h-3"></div>
+
+          <!-- 第4目標期間 -->
+          <div class="chart-row">
+            <div class="period-lbl" id="gp4-label">第4目標期間<br><span id="gp4-age"></span></div>
+          </div>
+          <div class="chart-connector h-3"></div>
+
+          <!-- 第3目標数 -->
+          <div class="chart-row">
+            <div class="chart-box" id="cell-target3">
+              <span class="cb-num">-</span><span class="cb-lbl">第3目標数</span>
+            </div>
+          </div>
+          <div class="chart-connector h-3"></div>
+
+          <!-- 第3目標期間 -->
+          <div class="chart-row">
+            <div class="period-lbl" id="gp3-label">第3目標期間<br><span id="gp3-age"></span></div>
+          </div>
+          <div class="chart-connector h-2"></div>
+
+          <!-- 魂の数 / 第2目標数 (split) -->
+          <div class="chart-row gap-16">
+            <div class="chart-box" id="cell-spirit">
+              <span class="cb-num">-</span><span class="cb-lbl">成長数</span>
+            </div>
+            <div class="chart-box" id="cell-target2">
+              <span class="cb-num">-</span><span class="cb-lbl">第2目標数</span>
+            </div>
+          </div>
+          <div class="chart-connector h-2"></div>
+
+          <!-- 第1目標期間 / 第2目標期間 -->
+          <div class="chart-row gap-8">
+            <div class="period-lbl" id="gp1-label">第1目標期間<br><span id="gp1-age"></span></div>
+            <div class="period-lbl" id="gp2-label">第2目標期間<br><span id="gp2-age"></span></div>
+          </div>
+          <div class="chart-connector h-2"></div>
+
+          <!-- ========== CENTER ROW: 人格数 / 誕生数 / 社会数 ========== -->
+          <div class="chart-row justify-between w-full px-1">
+            <div class="chart-box" id="cell-persona">
+              <span class="cb-num">-</span><span class="cb-lbl">人格数</span>
+            </div>
+            <div class="chart-box" id="cell-destiny">
+              <span class="cb-num">-</span><span class="cb-lbl">誕生数</span>
+            </div>
+            <div class="chart-box" id="cell-ground">
+              <span class="cb-num">-</span><span class="cb-lbl">社会数</span>
+            </div>
+          </div>
+          <!-- 運命数 (center, below center row) -->
+          <div class="chart-connector h-2"></div>
+          <div class="chart-row">
+            <div class="chart-box" id="cell-lifepath">
+              <span class="cb-num">-</span><span class="cb-lbl">運命数</span>
+            </div>
+          </div>
+          <div class="chart-connector h-2"></div>
+
+          <!-- ========== CHALLENGES (下半分: ピラミッド) ========== -->
+
+          <!-- 第1挑戦期間 / 第2挑戦期間 -->
+          <div class="chart-row gap-8">
+            <div class="period-lbl" id="cp1-label">第1挑戦期間<br><span id="cp1-age"></span></div>
+            <div class="period-lbl" id="cp2-label">第2挑戦期間<br><span id="cp2-age"></span></div>
+          </div>
+          <div class="chart-connector h-2"></div>
+
+          <!-- 混沌数 / 第2挑戦数 -->
+          <div class="chart-row gap-16">
+            <div class="chart-box" id="cell-ch1">
+              <span class="cb-num">-</span><span class="cb-lbl">克服数</span>
+            </div>
+            <div class="chart-box" id="cell-ch2">
+              <span class="cb-num">-</span><span class="cb-lbl">第2挑戦数</span>
+            </div>
+          </div>
+          <div class="chart-connector h-3"></div>
+
+          <!-- 第3挑戦期間 -->
+          <div class="chart-row">
+            <div class="period-lbl" id="cp3-label">第3挑戦期間<br><span id="cp3-age"></span></div>
+          </div>
+          <div class="chart-connector h-3"></div>
+
+          <!-- 第3挑戦数 -->
+          <div class="chart-row">
+            <div class="chart-box" id="cell-ch3">
+              <span class="cb-num">-</span><span class="cb-lbl">第3挑戦数</span>
+            </div>
+          </div>
+          <div class="chart-connector h-3"></div>
+
+          <!-- 第4挑戦期間 -->
+          <div class="chart-row">
+            <div class="period-lbl" id="cp4-label">第4挑戦期間<br><span id="cp4-age"></span></div>
+          </div>
+          <div class="chart-connector h-3"></div>
+
+          <!-- 第4挑戦数 (bottom) -->
+          <div class="chart-row">
+            <div class="chart-box" id="cell-ch4">
+              <span class="cb-num">-</span><span class="cb-lbl">第4挑戦数</span>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- Note -->
+        <p class="text-[9px] text-gray-400 mt-4 leading-relaxed text-center">
+          各数字のボックスをクリックすると、その数字が持つ意味や、あなたの人生における役割についての詳しい解説が表示されます。あなたの隠れた才能や可能性を探求しましょう。
+        </p>
+      </div>
+
+      <!-- PDF Download -->
+      <button id="btn-download-pdf"
+        class="w-full bg-gray-800 text-white rounded-xl py-3 text-sm font-semibold hover:bg-gray-700 transition-all flex items-center justify-center gap-2 shadow-md">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+        数秘レポートPDFをダウンロード
+      </button>
+
+      </div><!-- /section-chart -->
+
+      <!-- ===== SECTION: 手相占い ===== -->
+      <div id="section-palm" class="space-y-5">
+      <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+        <div class="gradient-header p-4 text-center">
+          <h3 class="text-base font-bold text-gray-800 flex items-center justify-center gap-2">
+            <span>🖐️</span> 手相占い
+          </h3>
+          <p class="text-[10px] text-gray-500 mt-1">あなたの手のひらの線から運勢を読み解きます</p>
+        </div>
+        <div class="p-5 space-y-4">
+          <!-- Palm Photo Upload -->
+          <div class="bg-fuchsia-50/60 border border-dashed border-fuchsia-300 rounded-xl p-4 text-center space-y-3">
+            <!-- Captured image preview -->
+            <div id="palm-preview-area" class="hidden relative">
+              <img id="palm-preview-img" class="w-full max-h-64 object-contain rounded-lg" alt="手のひら画像">
+              <button id="palm-remove-img" class="absolute top-1 right-1 w-6 h-6 bg-black/50 text-white rounded-full text-xs flex items-center justify-center hover:bg-black/70">&times;</button>
+            </div>
+            <!-- Live camera preview -->
+            <div id="palm-camera-area" class="hidden relative">
+              <video id="palm-video" autoplay playsinline class="w-full max-h-72 rounded-lg bg-black object-cover"></video>
+              <canvas id="palm-canvas" class="hidden"></canvas>
+              <div class="flex gap-2 justify-center mt-3">
+                <button id="btn-capture" class="gradient-cta text-white rounded-full px-6 py-2.5 text-xs font-semibold shadow-lg flex items-center gap-1.5">
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" stroke-width="2"/><circle cx="12" cy="12" r="4" fill="currentColor"/></svg>
+                  シャッター
+                </button>
+                <button id="btn-cancel-camera" class="bg-gray-200 text-gray-600 rounded-full px-4 py-2.5 text-xs font-semibold">
+                  キャンセル
+                </button>
+              </div>
+            </div>
+            <!-- Initial prompt -->
+            <div id="palm-upload-prompt">
+              <div class="w-12 h-12 mx-auto bg-purple-100 rounded-full flex items-center justify-center mb-2">
+                <svg class="w-6 h-6 text-purple-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+              </div>
+              <p class="text-xs font-medium text-purple-700 mb-1">手のひらの写真を撮影・アップロード</p>
+              <p class="text-[10px] text-gray-400 mb-3">手のひら全体が写るように撮影してください</p>
+              <div class="flex gap-2 justify-center">
+                <button id="btn-open-camera" class="gradient-cta text-white rounded-full px-4 py-2 text-xs font-semibold hover:shadow-lg transition-all flex items-center gap-1.5">
+                  <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                  撮影する
+                </button>
+                <label class="bg-white text-purple-600 border border-purple-300 rounded-full px-4 py-2 text-xs font-semibold cursor-pointer hover:bg-purple-50 transition-all flex items-center gap-1.5">
+                  <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+                  画像を選択
+                  <input type="file" accept="image/*" id="palm-upload" class="hidden">
+                </label>
+              </div>
+            </div>
+            <div id="palm-ai-analysis" class="hidden">
+              <div class="bg-white rounded-lg p-3 text-left space-y-2">
+                <p class="text-[11px] font-semibold text-purple-700 flex items-center gap-1">
+                  <svg class="w-3.5 h-3.5 text-purple-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/></svg>
+                  AI画像分析
+                </p>
+                <p class="text-[10px] text-gray-400">アップロードされた画像を元に、線の特徴を自動判定しました。結果を確認して、必要に応じて修正してください。</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="flex items-center gap-3">
+            <div class="flex-1 h-px bg-gray-200"></div>
+            <span class="text-[10px] text-gray-400">または手動で選択</span>
+            <div class="flex-1 h-px bg-gray-200"></div>
+          </div>
+
+          <!-- 6 Lines Selection -->
+          <p class="text-xs text-gray-500 text-center">各線の特徴を選択してください</p>
+
+          <!-- 1. 生命線 -->
+          <div class="space-y-1.5">
+            <label class="text-xs font-semibold text-purple-700">1. 生命線（体力・生命力）</label>
+            <select id="palm-lifeline" class="w-full border border-gray-200 rounded-lg px-3 py-2 text-xs focus:ring-2 focus:ring-purple-300 outline-none bg-white">
+              <option value="">選択してください</option>
+              <option value="long-deep">濃く長い（手首まで到達）</option>
+              <option value="big-curve">大きくカーブしている</option>
+              <option value="double">二重生命線</option>
+              <option value="broken">途切れている・キレギレ</option>
+              <option value="branch-out">末端が外側に枝分かれ</option>
+              <option value="upward">上向きの支線がある</option>
+              <option value="thin-short">薄い・短い</option>
+            </select>
+          </div>
+
+          <!-- 2. 頭脳線 -->
+          <div class="space-y-1.5">
+            <label class="text-xs font-semibold text-purple-700">2. 頭脳線（思考力・才能）</label>
+            <select id="palm-headline" class="w-full border border-gray-200 rounded-lg px-3 py-2 text-xs focus:ring-2 focus:ring-purple-300 outline-none bg-white">
+              <option value="">選択してください</option>
+              <option value="long">長い（熟考型）</option>
+              <option value="short">短い（即決即断型）</option>
+              <option value="double">二重頭脳線</option>
+              <option value="separated">離れ型（KY線）</option>
+              <option value="straight">まっすぐ（理系線）</option>
+              <option value="curved-down">下向きにカーブ（文系線）</option>
+              <option value="forked">末端が枝分かれ</option>
+            </select>
+          </div>
+
+          <!-- 3. 感情線 -->
+          <div class="space-y-1.5">
+            <label class="text-xs font-semibold text-purple-700">3. 感情線（愛情・対人関係）</label>
+            <select id="palm-heartline" class="w-full border border-gray-200 rounded-lg px-3 py-2 text-xs focus:ring-2 focus:ring-purple-300 outline-none bg-white">
+              <option value="">選択してください</option>
+              <option value="long-up">上向き・長い</option>
+              <option value="fork-2">末端が二股</option>
+              <option value="fork-3">末端が三股（幸運の女神線）</option>
+              <option value="double">二重感情線</option>
+              <option value="wavy">波打っている・キレギレ</option>
+              <option value="downward-branches">下向きの支線が多い</option>
+              <option value="straight-short">まっすぐ・短い</option>
+            </select>
+          </div>
+
+          <!-- 4. 運命線 -->
+          <div class="space-y-1.5">
+            <label class="text-xs font-semibold text-purple-700">4. 運命線（仕事運・人生の目標）</label>
+            <select id="palm-fateline" class="w-full border border-gray-200 rounded-lg px-3 py-2 text-xs focus:ring-2 focus:ring-purple-300 outline-none bg-white">
+              <option value="">選択してください</option>
+              <option value="deep-long">太く濃く長い</option>
+              <option value="late-bloom">途中から濃くなる</option>
+              <option value="from-moon">月丘から伸びる（人気型）</option>
+              <option value="from-lifeline">生命線から伸びる（努力型）</option>
+              <option value="double">二重運命線</option>
+              <option value="broken">途切れている</option>
+              <option value="none">運命線がない/薄い</option>
+            </select>
+          </div>
+
+          <!-- 5. 太陽線 -->
+          <div class="space-y-1.5">
+            <label class="text-xs font-semibold text-purple-700">5. 太陽線（成功・金運・人気）</label>
+            <select id="palm-sunline" class="w-full border border-gray-200 rounded-lg px-3 py-2 text-xs focus:ring-2 focus:ring-purple-300 outline-none bg-white">
+              <option value="">選択してください</option>
+              <option value="deep-long">濃く長い</option>
+              <option value="thin-short">短い・薄い</option>
+              <option value="multiple">複数ある</option>
+              <option value="fork-vy">末端がV字・Y字</option>
+              <option value="trident">三股（トライデント）</option>
+              <option value="from-emotion">感情線上から伸びる</option>
+              <option value="none">太陽線がない</option>
+            </select>
+          </div>
+
+          <!-- 6. 財運線 -->
+          <div class="space-y-1.5">
+            <label class="text-xs font-semibold text-purple-700">6. 財運線（金運・商才）</label>
+            <select id="palm-moneyline" class="w-full border border-gray-200 rounded-lg px-3 py-2 text-xs focus:ring-2 focus:ring-purple-300 outline-none bg-white">
+              <option value="">選択してください</option>
+              <option value="deep-long">濃く長い</option>
+              <option value="multiple">複数ある</option>
+              <option value="thin-short">薄い・短い</option>
+              <option value="none">財運線がない</option>
+            </select>
+          </div>
+
+          <!-- 7. 特殊相チェックリスト -->
+          <div class="space-y-2 mt-2">
+            <div class="flex items-center gap-2">
+              <div class="w-1 h-4 bg-purple-400 rounded-full"></div>
+              <label class="text-xs font-semibold text-purple-700">7. 特殊な相（当てはまるものをチェック）</label>
+            </div>
+            <div class="grid grid-cols-2 gap-1.5">
+              <label class="flex items-center gap-1.5 text-[11px] text-gray-600 bg-white rounded-lg px-2 py-1.5 border border-gray-100 hover:border-purple-200 cursor-pointer transition-colors">
+                <input type="checkbox" class="palm-special accent-purple-500" value="masukake"> ますかけ線
+              </label>
+              <label class="flex items-center gap-1.5 text-[11px] text-gray-600 bg-white rounded-lg px-2 py-1.5 border border-gray-100 hover:border-purple-200 cursor-pointer transition-colors">
+                <input type="checkbox" class="palm-special accent-purple-500" value="butsugan"> 仏眼相
+              </label>
+              <label class="flex items-center gap-1.5 text-[11px] text-gray-600 bg-white rounded-lg px-2 py-1.5 border border-gray-100 hover:border-purple-200 cursor-pointer transition-colors">
+                <input type="checkbox" class="palm-special accent-purple-500" value="shinpi"> 神秘十字線
+              </label>
+              <label class="flex items-center gap-1.5 text-[11px] text-gray-600 bg-white rounded-lg px-2 py-1.5 border border-gray-100 hover:border-purple-200 cursor-pointer transition-colors">
+                <input type="checkbox" class="palm-special accent-purple-500" value="haou"> 覇王線
+              </label>
+              <label class="flex items-center gap-1.5 text-[11px] text-gray-600 bg-white rounded-lg px-2 py-1.5 border border-gray-100 hover:border-purple-200 cursor-pointer transition-colors">
+                <input type="checkbox" class="palm-special accent-purple-500" value="solomon"> ソロモンの環
+              </label>
+              <label class="flex items-center gap-1.5 text-[11px] text-gray-600 bg-white rounded-lg px-2 py-1.5 border border-gray-100 hover:border-purple-200 cursor-pointer transition-colors">
+                <input type="checkbox" class="palm-special accent-purple-500" value="star"> スター線（星紋）
+              </label>
+              <label class="flex items-center gap-1.5 text-[11px] text-gray-600 bg-white rounded-lg px-2 py-1.5 border border-gray-100 hover:border-purple-200 cursor-pointer transition-colors">
+                <input type="checkbox" class="palm-special accent-purple-500" value="fish"> フィッシュ（魚紋）
+              </label>
+              <label class="flex items-center gap-1.5 text-[11px] text-gray-600 bg-white rounded-lg px-2 py-1.5 border border-gray-100 hover:border-purple-200 cursor-pointer transition-colors">
+                <input type="checkbox" class="palm-special accent-purple-500" value="lucky-m"> ラッキーM線
+              </label>
+              <label class="flex items-center gap-1.5 text-[11px] text-gray-600 bg-white rounded-lg px-2 py-1.5 border border-gray-100 hover:border-purple-200 cursor-pointer transition-colors">
+                <input type="checkbox" class="palm-special accent-purple-500" value="senkin"> 千金紋（成り上がり線）
+              </label>
+              <label class="flex items-center gap-1.5 text-[11px] text-gray-600 bg-white rounded-lg px-2 py-1.5 border border-gray-100 hover:border-purple-200 cursor-pointer transition-colors">
+                <input type="checkbox" class="palm-special accent-purple-500" value="chokkan"> 直感線
+              </label>
+              <label class="flex items-center gap-1.5 text-[11px] text-gray-600 bg-white rounded-lg px-2 py-1.5 border border-gray-100 hover:border-purple-200 cursor-pointer transition-colors">
+                <input type="checkbox" class="palm-special accent-purple-500" value="charisma"> カリスマ線
+              </label>
+              <label class="flex items-center gap-1.5 text-[11px] text-gray-600 bg-white rounded-lg px-2 py-1.5 border border-gray-100 hover:border-purple-200 cursor-pointer transition-colors">
+                <input type="checkbox" class="palm-special accent-purple-500" value="taiyou-cross"> 太陽十字線
+              </label>
+            </div>
+          </div>
+
+          <!-- 8. 丘（マウント）の発達 -->
+          <div class="space-y-2 mt-2">
+            <div class="flex items-center gap-2">
+              <div class="w-1 h-4 bg-purple-400 rounded-full"></div>
+              <label class="text-xs font-semibold text-purple-700">8. 発達している丘（最大3つ選択）</label>
+            </div>
+            <div class="grid grid-cols-2 gap-1.5">
+              <label class="flex items-center gap-1.5 text-[11px] text-gray-600 bg-white rounded-lg px-2 py-1.5 border border-gray-100 hover:border-purple-200 cursor-pointer transition-colors">
+                <input type="checkbox" class="palm-mount accent-purple-500" value="jupiter"> 木星丘（人差し指下）
+              </label>
+              <label class="flex items-center gap-1.5 text-[11px] text-gray-600 bg-white rounded-lg px-2 py-1.5 border border-gray-100 hover:border-purple-200 cursor-pointer transition-colors">
+                <input type="checkbox" class="palm-mount accent-purple-500" value="saturn"> 土星丘（中指下）
+              </label>
+              <label class="flex items-center gap-1.5 text-[11px] text-gray-600 bg-white rounded-lg px-2 py-1.5 border border-gray-100 hover:border-purple-200 cursor-pointer transition-colors">
+                <input type="checkbox" class="palm-mount accent-purple-500" value="sun"> 太陽丘（薬指下）
+              </label>
+              <label class="flex items-center gap-1.5 text-[11px] text-gray-600 bg-white rounded-lg px-2 py-1.5 border border-gray-100 hover:border-purple-200 cursor-pointer transition-colors">
+                <input type="checkbox" class="palm-mount accent-purple-500" value="mercury"> 水星丘（小指下）
+              </label>
+              <label class="flex items-center gap-1.5 text-[11px] text-gray-600 bg-white rounded-lg px-2 py-1.5 border border-gray-100 hover:border-purple-200 cursor-pointer transition-colors">
+                <input type="checkbox" class="palm-mount accent-purple-500" value="venus"> 金星丘（親指付け根）
+              </label>
+              <label class="flex items-center gap-1.5 text-[11px] text-gray-600 bg-white rounded-lg px-2 py-1.5 border border-gray-100 hover:border-purple-200 cursor-pointer transition-colors">
+                <input type="checkbox" class="palm-mount accent-purple-500" value="moon"> 月丘（小指下手首側）
+              </label>
+            </div>
+          </div>
+
+          <!-- Submit -->
+          <button id="btn-palm-read"
+            class="w-full gradient-cta text-white rounded-full py-3 font-semibold text-sm shadow-lg hover:shadow-xl transition-all mt-3">
+            手相を鑑定する
+          </button>
+
+          <!-- Result Area (hidden until submit) -->
+          <div id="palm-result" class="hidden space-y-3 pt-2"></div>
+        </div>
+      </div>
+
+      </div><!-- /section-palm -->
+
+      <!-- ===== SECTION: パーソナルサイクル ===== -->
+      <div id="section-cycles" class="space-y-5">
+
+      <!-- 個人年/月/日 -->
+      <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+        <div class="gradient-header p-4 text-center">
+          <h3 class="text-base font-bold text-gray-800">パーソナルサイクル</h3>
+          <p class="text-[10px] text-gray-500 mt-1">今のあなたのエネルギーの流れ</p>
+        </div>
+        <div class="p-5">
+          <div class="grid grid-cols-3 gap-3 mb-4">
+            <div class="bg-teal-50 rounded-xl p-3 text-center">
+              <p class="text-[10px] text-teal-500 font-medium">個人年</p>
+              <p class="font-lora text-2xl font-bold text-teal-700" id="display-pyear">-</p>
+            </div>
+            <div class="bg-teal-50 rounded-xl p-3 text-center">
+              <p class="text-[10px] text-teal-500 font-medium">個人月</p>
+              <p class="font-lora text-2xl font-bold text-teal-700" id="display-pmonth">-</p>
+            </div>
+            <div class="bg-teal-50 rounded-xl p-3 text-center">
+              <p class="text-[10px] text-teal-500 font-medium">個人日</p>
+              <p class="font-lora text-2xl font-bold text-teal-700" id="display-pday">-</p>
+            </div>
+          </div>
+          <div class="bg-gray-50 rounded-lg p-3 text-center">
+            <p class="text-[10px] text-gray-400 mb-1">現在の年齢</p>
+            <p class="text-sm font-bold text-gray-700" id="display-age">-</p>
+          </div>
+          <div id="cycle-description" class="mt-3 bg-purple-50 rounded-xl p-4 hidden">
+            <p class="text-[11px] font-semibold text-purple-700 mb-1">個人年のテーマ</p>
+            <p class="text-xs text-gray-600 leading-relaxed" id="cycle-desc-text"></p>
+          </div>
+        </div>
+      </div>
+
+      <!-- ライフサイクル期間 -->
+      <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-5">
+        <h3 class="text-sm font-bold text-gray-700 mb-3 text-center">ライフサイクル期間</h3>
+        <div class="space-y-2" id="lifecycle-display">
+          <div class="flex items-center gap-2 text-xs text-gray-500">
+            <span class="w-2 h-2 rounded-full bg-pink-300"></span>
+            <span>第1期: 0〜<strong id="lc-p1" class="text-gray-700">-</strong>歳</span>
+          </div>
+          <div class="flex items-center gap-2 text-xs text-gray-500">
+            <span class="w-2 h-2 rounded-full bg-purple-300"></span>
+            <span>第2期: <strong id="lc-p2" class="text-gray-700">-</strong>歳</span>
+          </div>
+          <div class="flex items-center gap-2 text-xs text-gray-500">
+            <span class="w-2 h-2 rounded-full bg-indigo-300"></span>
+            <span>第3期: <strong id="lc-p3" class="text-gray-700">-</strong>歳</span>
+          </div>
+          <div class="flex items-center gap-2 text-xs text-gray-500">
+            <span class="w-2 h-2 rounded-full bg-teal-300"></span>
+            <span>第4期: <strong id="lc-p4" class="text-gray-700">-</strong>歳〜</span>
+          </div>
+          <div id="current-period-badge" class="mt-2 text-center hidden">
+            <span class="inline-block bg-purple-100 text-purple-700 rounded-full px-3 py-1 text-[10px] font-semibold" id="current-period-text"></span>
+          </div>
+        </div>
+      </div>
+
+      </div><!-- /section-cycles -->
+
+      <footer class="text-center py-4">
+        <p class="text-[10px] text-gray-300">&copy; 2026 数秘AIライフコンパス. あなたの輝く人生を心から応援しています。</p>
+        <p class="text-[9px] text-gray-300 mt-0.5">Powered by Gemini.</p>
+      </footer>
+    </div>
+
+    <!-- ===== Welcome Modal ===== -->
+    <div id="welcome-modal" class="fixed inset-0 z-50 modal-overlay flex items-center justify-center p-6">
+      <div class="bg-white rounded-2xl shadow-2xl p-6 max-w-sm w-full text-center fade-in space-y-4">
+        <h2 class="text-lg font-bold text-purple-700" id="modal-greeting">太郎さん、ようこそ！</h2>
+        <p class="text-xs text-gray-500 leading-relaxed">
+          あなたの輝きを読み解く準備が整いました。
+        </p>
+        <p class="text-xs text-gray-500 leading-relaxed">
+          あなたの数秘プロファイルには、才能、可能性、そして未来へのヒントが詰まっています。AIとの対話を通じて、新しい自分を発見し、あなたらしい素敵な毎日を創造していきましょう。
+        </p>
+        <button id="btn-close-welcome"
+          class="w-full gradient-cta text-white rounded-full py-3 font-semibold text-sm shadow-lg">
+          セッションを始める
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== JavaScript ===== -->
+  <script>
+    // =========================================================
+    // Numerology Engine (extracted from original app)
+    // =========================================================
+    const Numerology = (() => {
+      const sumDigits = (num) =>
+        String(Math.abs(num)).split('').reduce((acc, d) => acc + parseInt(d, 10), 0);
+
+      const reduceNumber = (num) => {
+        let n = num;
+        while (n > 9 && n !== 11 && n !== 22 && n !== 33) { n = sumDigits(n); }
+        return n;
+      };
+
+      const reduceToSingleDigit = (num) => {
+        let n = num;
+        while (n > 9) { n = sumDigits(n); }
+        return n;
+      };
+
+      // r = reduceToSingleDigit (全て1桁), rm = reduceNumber (11/22/33保持, 誕生数のみ)
+      const r = reduceToSingleDigit;
+      const rm = reduceNumber;
+
+      return {
+        lifePath(d) { return r(sumDigits(d.getFullYear()) + sumDigits(d.getMonth()+1) + sumDigits(d.getDate())); },
+        destiny(d) { return rm(d.getDate()); },  // 誕生数のみマスターナンバー保持
+        spirit(d) { return r(sumDigits(d.getMonth()+1) + sumDigits(d.getDate())); },
+        maturity(d) { return r(sumDigits(d.getMonth()+1) + sumDigits(d.getFullYear())); },
+        ground(d) { return r(sumDigits(d.getFullYear())); },
+        persona(d) { return r(sumDigits(d.getMonth()+1)); },
+        secondTarget(d) { return r(r(d.getDate()) + r(sumDigits(d.getFullYear()))); },
+        thirdTarget(sp, t2) { return r(sp + t2); },
+        challenge1(d) { return r(Math.abs(r(d.getMonth()+1) - r(d.getDate()))); },
+        challenge2(destiny, ground) { return r(Math.abs(destiny - ground)); },
+        challenge3(ch1, ch2) { return r(Math.abs(ch1 - ch2)); },        // |混沌数 - 第2挑戦数|
+        challenge4(persona, ground) { return r(Math.abs(persona - ground)); },  // |人格数 - 社会数|
+        personalYear(bd, td) { return r(sumDigits(td.getFullYear()) + sumDigits(bd.getMonth()+1) + sumDigits(bd.getDate())); },
+        personalMonth(td, py) { return r(py + sumDigits(td.getMonth()+1)); },
+        personalDay(td, pm) { return r(pm + sumDigits(td.getDate())); },
+        periodAges(lp) { const f = 36 - lp; return { first: f, second: f + 9, third: f + 18 }; },
+        age(bd) {
+          const t = new Date(); let a = t.getFullYear() - bd.getFullYear();
+          const m = t.getMonth() - bd.getMonth();
+          if (m < 0 || (m === 0 && t.getDate() < bd.getDate())) a--;
+          return a;
+        }
+      };
+    })();
+
+    // =========================================================
+    // DOM references & state
+    // =========================================================
+    const viewForm = document.getElementById('view-form');
+    const viewResult = document.getElementById('view-result');
+    const welcomeModal = document.getElementById('welcome-modal');
+    let lastResults = null;
+    let isPremium = false;
+
+    // =========================================================
+    // Form submit → calculate & show result view
+    // =========================================================
+    document.getElementById('birth-form').addEventListener('submit', (e) => {
+      e.preventDefault();
+      const year = parseInt(document.getElementById('birthYear').value);
+      const month = parseInt(document.getElementById('birthMonth').value);
+      const day = parseInt(document.getElementById('birthDay').value);
+      const firstName = document.getElementById('firstName').value || 'ゲスト';
+      if (!year || !month || !day) return;
+
+      const birthDate = new Date(year, month - 1, day);
+
+      // Divination date (optional)
+      const dy = document.getElementById('divYear').value;
+      const dm = document.getElementById('divMonth').value;
+      const dd = document.getElementById('divDay').value;
+      const targetDate = (dy && dm && dd) ? new Date(parseInt(dy), parseInt(dm)-1, parseInt(dd)) : new Date();
+
+      // Calculate all numbers
+      const lp = Numerology.lifePath(birthDate);
+      const sp = Numerology.spirit(birthDate);
+      const dest = Numerology.destiny(birthDate);
+      const grnd = Numerology.ground(birthDate);
+      const ch1 = Numerology.challenge1(birthDate);
+      const ch2 = Numerology.challenge2(dest, grnd);
+      const t2 = Numerology.secondTarget(birthDate);
+      const pYear = Numerology.personalYear(birthDate, targetDate);
+      const pMonth = Numerology.personalMonth(targetDate, pYear);
+
+      const r = {
+        lifePath: lp,
+        destiny: dest,
+        maturity: Numerology.maturity(birthDate),
+        spirit: sp,
+        persona: Numerology.persona(birthDate),
+        ground: grnd,
+        ch1, ch2,
+        ch3: Numerology.challenge3(ch1, ch2),
+        ch4: Numerology.challenge4(Numerology.persona(birthDate), grnd),
+        target2: t2,
+        target3: Numerology.thirdTarget(sp, t2),
+        pYear, pMonth,
+        pDay: Numerology.personalDay(targetDate, pMonth),
+        periods: Numerology.periodAges(lp),
+        age: Numerology.age(birthDate),
+      };
+
+      // Update header
+      document.getElementById('result-name').textContent = firstName;
+      document.getElementById('chart-title').textContent = firstName + 'さんの数秘チャート';
+      document.getElementById('chart-birthdate').textContent = '生年月日: ' + month + '/' + day + '/' + year;
+      document.getElementById('modal-greeting').textContent = firstName + 'さん、ようこそ！';
+
+      // Update chart boxes
+      const boxMap = {
+        'cell-maturity': r.maturity, 'cell-spirit': r.spirit,
+        'cell-target2': r.target2, 'cell-target3': r.target3,
+        'cell-persona': r.persona, 'cell-destiny': r.destiny,
+        'cell-ground': r.ground, 'cell-lifepath': r.lifePath,
+        'cell-ch1': r.ch1, 'cell-ch2': r.ch2,
+        'cell-ch3': r.ch3, 'cell-ch4': r.ch4,
+      };
+      for (const [id, val] of Object.entries(boxMap)) {
+        const el = document.getElementById(id);
+        if (el) el.querySelector('.cb-num').textContent = val;
+      }
+
+      // Update period ages
+      const pa = r.periods;
+      // Goals
+      document.getElementById('gp1-age').textContent = '(0〜' + pa.first + '歳)';
+      document.getElementById('gp2-age').textContent = '(' + (pa.first+1) + '〜' + pa.second + '歳)';
+      document.getElementById('gp3-age').textContent = '(' + (pa.second+1) + '〜' + pa.third + '歳)';
+      document.getElementById('gp4-age').textContent = '(' + pa.third + '歳〜)';
+      // Challenges
+      document.getElementById('cp1-age').textContent = '(0〜' + pa.first + '歳)';
+      document.getElementById('cp2-age').textContent = '(' + (pa.first+1) + '〜' + pa.second + '歳)';
+      document.getElementById('cp3-age').textContent = '(' + (pa.second+1) + '〜' + pa.third + '歳)';
+      document.getElementById('cp4-age').textContent = '(' + pa.third + '歳〜)';
+
+      // Store results for detail modal
+      r.birthDay = day;
+      lastResults = r;
+
+      // Update personal cycles display
+      document.getElementById('display-pyear').textContent = r.pYear;
+      document.getElementById('display-pmonth').textContent = r.pMonth;
+      document.getElementById('display-pday').textContent = r.pDay;
+      document.getElementById('display-age').textContent = r.age + '歳';
+
+      // Cycle description
+      const cdesc = cycleDescriptions[r.pYear] || cycleDescriptions[Math.min(r.pYear, 9)];
+      if (cdesc) {
+        document.getElementById('cycle-desc-text').textContent = cdesc;
+        document.getElementById('cycle-description').classList.remove('hidden');
+      }
+
+      // Lifecycle display
+      document.getElementById('lc-p1').textContent = pa.first;
+      document.getElementById('lc-p2').textContent = (pa.first + 1) + '〜' + pa.second;
+      document.getElementById('lc-p3').textContent = (pa.second + 1) + '〜' + pa.third;
+      document.getElementById('lc-p4').textContent = pa.third;
+
+      // Show current period
+      const age = r.age;
+      let currentPeriod = '';
+      if (age <= pa.first) currentPeriod = '現在: 第1期（成長期）';
+      else if (age <= pa.second) currentPeriod = '現在: 第2期（発展期）';
+      else if (age <= pa.third) currentPeriod = '現在: 第3期（成熟期）';
+      else currentPeriod = '現在: 第4期（完成期）';
+      document.getElementById('current-period-text').textContent = currentPeriod;
+      document.getElementById('current-period-badge').classList.remove('hidden');
+
+      // Save to localStorage
+      try {
+        localStorage.setItem('numerology_data', JSON.stringify({
+          firstName, year, month, day, results: r, savedAt: new Date().toISOString()
+        }));
+        const apiKey = document.getElementById('geminiApiKey').value;
+        if (apiKey) localStorage.setItem('gemini_api_key', apiKey);
+      } catch(e) {}
+
+      // Switch views
+      viewForm.classList.add('hidden');
+      viewResult.classList.remove('hidden');
+      window.scrollTo(0, 0);
+    });
+
+    // Close welcome modal
+    document.getElementById('btn-close-welcome').addEventListener('click', () => {
+      welcomeModal.classList.add('hidden');
+    });
+
+    // Restore from localStorage on page load
+    try {
+      const saved = JSON.parse(localStorage.getItem('numerology_data'));
+      if (saved && saved.results) {
+        document.getElementById('firstName').value = saved.firstName || '';
+        document.getElementById('birthYear').value = saved.year || '';
+        document.getElementById('birthMonth').value = saved.month || '';
+        document.getElementById('birthDay').value = saved.day || '';
+      }
+      const savedKey = localStorage.getItem('gemini_api_key');
+      if (savedKey) document.getElementById('geminiApiKey').value = savedKey;
+    } catch(e) {}
+
+    // Back button
+    document.getElementById('btn-back-form').addEventListener('click', () => {
+      viewResult.classList.add('hidden');
+      viewForm.classList.remove('hidden');
+      window.scrollTo(0, 0);
+    });
+
+    // Navigation tabs
+    document.querySelectorAll('.nav-tab').forEach(tab => {
+      tab.addEventListener('click', () => {
+        // Update tab styles
+        document.querySelectorAll('.nav-tab').forEach(t => {
+          t.classList.remove('text-purple-600', 'border-purple-500');
+          t.classList.add('text-gray-400', 'border-transparent');
+        });
+        tab.classList.remove('text-gray-400', 'border-transparent');
+        tab.classList.add('text-purple-600', 'border-purple-500');
+        // Scroll to section
+        const target = document.getElementById(tab.dataset.target);
+        if (target) target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      });
+    });
+
+    // Personal cycle descriptions
+    const cycleDescriptions = {
+      1: '新しい始まりの年。種まきの時期です。新しいプロジェクトや目標を立てるのに最適。自分の意志で未来を切り開きましょう。',
+      2: '忍耐と協力の年。急がず、じっくりと関係を育む時期。パートナーシップや協力関係が鍵となります。',
+      3: '自己表現と創造の年。才能を発揮し、楽しむ時期。社交的な活動やクリエイティブな取り組みが実を結びます。',
+      4: '基盤構築の年。計画を立て、着実に実行する時期。努力と規律が将来の成功の土台を作ります。',
+      5: '変化と冒険の年。新しい経験や旅行のチャンス。柔軟に変化を受け入れ、自由を楽しみましょう。',
+      6: '愛と責任の年。家庭やコミュニティに集中する時期。人間関係を深め、奉仕の心で周囲を支えましょう。',
+      7: '内省と探求の年。自分自身と向き合い、学びを深める時期。スピリチュアルな成長と知識の獲得に最適。',
+      8: '達成と豊穣の年。ビジネスや経済面での成功が期待できる時期。これまでの努力が報われます。',
+      9: '完成と手放しの年。一つのサイクルの締めくくり。古いものを手放し、新たな始まりに備えましょう。',
+    };
+
+    // =========================================================
+    // Position & Number Detail Data (from original app)
+    // =========================================================
+    const positionData = {
+      'cell-maturity': { name: '成熟数', theme: '人生の最終的な到達点や将来の展望、社会貢献の方向性を示す数字。', premium: false },
+      'cell-spirit':   { name: '成長数', theme: '幼少期の環境や教育によって形成される性質。魂の成長を育むが、本質とは異なる条件付けを示す。', premium: false },
+      'cell-persona':  { name: '人格数', theme: '外面的な自分、人に見せている姿。第一印象や対人関係での振る舞いに影響する。', premium: false },
+      'cell-destiny':  { name: '誕生数', theme: '内面的な自分、魂の願望や衝動を示す。恋愛観や私生活に影響し、自分らしさの源となる。', premium: false },
+      'cell-ground':   { name: '社会数', theme: '生まれた時代背景や世代全体の傾向を示す。個人の行動特性や価値観に影響を与える。', premium: true },
+      'cell-lifepath': { name: '運命数', theme: 'ライフパスナンバー。人生の目的、使命、天命を示す最も重要な数字。魂の軌道や自己実現のテーマ。', premium: true },
+      'cell-ch1':      { name: '克服数', theme: '魂の成長を阻む弱点やカルマ。幼少期の環境で育ちにくかった性質や、内なる怖れを示す。', premium: false },
+      'cell-target2':  { name: '第2目標数', theme: '人生の2番目の9年サイクルにおける目標。', premium: true },
+      'cell-target3':  { name: '第3目標数', theme: '人生の3番目の9年サイクルにおける目標。', premium: true },
+      'cell-ch2':      { name: '第2挑戦数', theme: '人生の2番目の9年サイクルにおける挑戦・課題。', premium: true },
+      'cell-ch3':      { name: '第3挑戦数', theme: '人生の3番目の9年サイクルにおける挑戦・課題。', premium: true },
+      'cell-ch4':      { name: '第4挑戦数', theme: '人生の4番目（最終）のサイクルにおける挑戦・課題。', premium: true },
+    };
+    const numDB = {
+      0: { core: '無限の可能性と自由。全ての制限から解放され、方向性を自分自身で見出す力を持つ。', traits: '潜在力、新たな始まり、無限の選択肢。', color: 'クリア' },
+      1: { core: '開拓、種まき、父親との関係。新しい価値の創造、新しい道を開拓する。開始、目標、構想計画、積極性、独創性、開拓精神、独立願望、開業、試験、資格取得。新しいサイクルの始まりです。自らの意志で未来を切り開き、独自の道を進む時。', traits: '【創始・独立】\n開拓精神、リーダーシップ、独創性、自立心、強い意志、行動力、パイオニア精神、決断力、自信、勇気。', color: 'レッド' },
+      2: { core: '自己の内的な成長、心触れ合う真の関わり。育成、親愛、研究、支援、感受性、受容性、心の交流、出逢い、共同事業、情報収集。自然の流れに身を任せ、じっくり物事を育てる時。', traits: '【協調・受容】\n繊細さ、共感力、調和、外交力、パートナーシップ、忍耐、受容性、直感力、サポート力、平和。', color: 'オレンジ' },
+      3: { core: '発展、歓び、内なる子どもとの関係。人生の展望を開き、ワクワクと歓びに生きる。鋭い発想、希望、表現力、社交性、創造性、創作意欲、熱意、勇気づけ、好奇心。才能が開花し、自己表現を通じて喜びとインスピレーションを届ける時。', traits: '【表現・創造】\n創造性、社交性、楽観性、表現力、芸術的才能、コミュニケーション力、ユーモア、想像力、情熱、魅力。', color: 'イエロー' },
+      4: { core: '維持、安定、母親との関係。堅実な基盤を築き、着実に成果を上げる。計画、管理、組織、実務、忍耐、誠実、努力、継続、規律、秩序。地に足をつけて積み上げていく時期。', traits: '【安定・基盤】\n忍耐力、規律、実用性、堅実さ、計画性、信頼性、勤勉、組織力、秩序、責任感。', color: 'グリーン' },
+      5: { core: '活動、息づく、環境との関係。新しい世界へ挑み、自由を満喫する。変化、冒険、自由、若さ、探求心、自発性、新しい体験、発想の転換、交流、変身。才能が開花し、新しさや変化を求めて大胆に動く時。', traits: '【自由・変化】\n適応力、好奇心、多才、冒険心、エネルギッシュ、柔軟性、探求心、変革力、コミュニケーション、活力。', color: 'ターコイズ' },
+      6: { core: '開花、花開く、内なる魂との関係。美と調和をもたらし、心の繋がりを深める。責任、慈愛、信頼、評価、感受性、関係性、魂の繋がり、優雅、気品、豊かさ、経済力。親密さが深まる時。感謝と奉仕の心を持って信頼関係を深める時。', traits: '【内なる平安・和（ハーモニー）】\n深い絆、無条件の愛、魂のやすらぎ、慈愛の心、正直さ、美と調和、高貴、気品、優雅さ、寛容さ、誠実さ、親密さ、深い癒し、バランス、感受性、理解力、献身的。', color: 'ロイヤルブルー' },
+      7: { core: '休息、内省、精神性との関係。内なる世界を深く探求し、真理を見出す。研究、分析、洞察、直感、瞑想、哲学、専門性、孤独、静寂、叡智。自分自身と向き合い、物事の本質を見極める時。', traits: '【探求・内省】\n知性、直感力、精神性、研究心、分析力、洞察力、神秘性、完璧主義、独立心、哲学的思考。', color: 'パープル' },
+      8: { core: '充実、豊穣、物質世界との関係。豊かさと成功を実現し、社会的な影響力を発揮する。達成、権威、経営、財力、統率、決断、実行力、組織力、社会的地位、影響力。', traits: '【達成・権威】\n統率力、ビジネス感覚、野心、実行力、経済力、組織力、決断力、戦略的思考、カリスマ性、影響力。', color: 'ゴールド' },
+      9: { core: '完結、統合、宇宙との関係。全てを包み込む博愛の精神で世界に貢献する。人道主義、寛容、芸術性、叡智、慈悲、手放し、完成、奉仕、普遍的な愛、精神的成長。一つのサイクルを完成させ、叡智を還元する時。', traits: '【博愛・完成】\n人道主義、寛容、芸術性、普遍的な愛、叡智、慈悲、奉仕精神、インスピレーション、理想主義、包容力。', color: 'マゼンタ' },
+      11: { core: 'マスターナンバー。高い直感力とスピリチュアルな洞察力で人々を導く啓示者。内なる声を信じ、高い理想を掲げてインスピレーションを与える使命。', traits: '【マスター直感】\n高い直感力、霊性、インスピレーション、ビジョン、啓示、精神的リーダーシップ、感受性、理想主義。', color: 'シルバー' },
+      22: { core: 'マスターナンバー。壮大なビジョンを現実に変える力を持つマスタービルダー。理想と現実を橋渡しし、大規模なプロジェクトを形にする使命。', traits: '【マスター建設者】\n壮大なビジョン、実現力、実務的霊性、グローバルな視野、組織構築力、大規模な達成。', color: 'プラチナ' },
+      33: { core: 'マスターナンバー。究極の奉仕と癒しの力で世界に貢献するマスターティーチャー。深い共感と無条件の愛で人々を導く使命。', traits: '【マスター教師】\n究極の奉仕、無条件の愛、霊的教師、深い共感力、癒しの力、普遍的な愛。', color: 'ダイヤモンド' },
+    };
+
+    // =========================================================
+    // 誕生日別の詳細説明 (1〜31日)
+    // =========================================================
+    const birthDayDB = {
+      1: '独立心があり情熱的。何事にも直観的に挑む勇気と意志の強さを持っています。自尊心や向上心が強く、人の真似は嫌いで、斬新な発想で物事を展開します。気高きリーダーとしての資質があり、人から指示や命令されるのを嫌います。自主独立の精神が強く甘えることができない。独自の世界を大事にしますが、時に折れやすい一面も。',
+      2: '協調性があり受動的、外交的な能力を持ち、親切で相手思いの面を持っています。誰に対しても柔和な態度で感受性豊か、人や動植物を育てる能力があります。豊かな愛情と思いやりがあり、愛する人や仲間のサポートを惜しみません。想像力豊かで直感的。美しいものや目に見えない世界を大切にしています。音に敏感なところがあります。',
+      3: '自由な発想と研ぎ澄まされた感性。鋭い閃きと遊び心に溢れた芸術家肌です。楽天的で社交的。楽しく愉快でユーモアのセンスに溢れた好感度の高い人気者。人生を心から愛し自由を愛します。多芸多才で天性の芸術的センスを持ち、明るい笑顔と無邪気さが魅力です。共感する仲間と共に最高のパフォーマンスを発揮します。',
+      4: '真面目で几帳面。現実的で堅実な面と穏和でゆったりした面を合わせ持ちます。安定志向で型にはまりがち。確固とした基盤を欲し、安心して暮らしたいと願います。何事にも誠実で揺るぎない信念と忍耐力を持っています。職人気質で本物志向。あらゆる状況の変化は苦手で、安定した人生を強く望むマイペース型です。',
+      5: '爽やかで、好奇心や探求心が旺盛。鋭い勘と冒険心に溢れ、変化と自由を享受します。開放的で官能的。新しい刺激や体験を求め続け、進歩的な生き方を好みます。頭の回転が早く、すべてに機転が利き、真の自由を求めて彷徨う自由人。すべてに先進的で人並み以上の結果を生み出す、多趣味で多芸多才な人です。',
+      6: '正義感が強く頼り甲斐があり、心の繋がりや信頼を大切にする優しい人です。責任感が強く、真面目に取組む一方で、逸脱することへの怖れを持っています。感受性が豊かで包容力があり、家族を愛し心の絆を強く求める傾向があります。美意識が高く、理想像を描きながら、愛と調和のある人生を求めています。',
+      7: '探究心が旺盛で直観的、何かを探究したり研究することが好きな職人気質です。冷静沈着な面とユニークな面が同居していますが、個人主義的な傾向を持っています。独りの時間や空間が大事で、じっくり思索しながら独自の世界を作り出します。この世界の謎や未知の領域への憧れが強く、独特の見解を見出す才能があります。',
+      8: '独立心旺盛で行動力抜群。損得に敏感で何事も諦めず、目標達成させます。自負心が強く負けず嫌いな頑張り屋で、熱意を持って一生懸命に取り組みます。独立心旺盛で野心的、まわりを巻き込みながら、自らの願望を実現します。困難や試練に遭遇する程チャレンジ精神が目覚め、真のパワーを発揮します。力で物事を判断する傾向があります。',
+      9: '浪漫を胸に抱く理想主義者。奔放で強情な面と博識で緻密な面を合わせ持ちます。相手との共感能力が高く寛容な態度を示し、情緒豊かで奉仕する心を持っています。自分の内に複雑な性質を持ち、物事の多面性や多様性を理解する力があります。人類愛を胸に抱き、愛と平和を願う人道主義的なロマンティスト。繊細な一面も。',
+      10: '独立心があり情熱的。何事にも直観的で鋭い感覚と不屈の精神を持っています。自尊心や向上心が強く、人の真似は嫌いで、斬新な発想で物事を展開します。気高きリーダーとしての資質があり、人から指示や命令されるのを嫌います。自主独立の精神が強く甘えることができない。独自の世界を大事にし、本能的で器が大きく、倒れにくい強さがあります。',
+      11: '情緒的で霊感が強く受動的、高潔な精神を持ち、内なる智恵を役立てようとします。繊細な感性と神経質な面があり、崇高な目的や使命で世の中に役立つことを望みます。マスターナンバー11の直感力と霊性を内に秘め、高い理想とインスピレーションで人々を導く使命を持っています。非常にデリケートで、共感能力が高い独特な性質です。',
+      12: '自由な発想と研ぎ澄まされた感性。明朗快活で好奇心旺盛な芸術家肌です。楽天的で社交的。楽しく愉快でユーモアのセンスに溢れた好感度の高い人気者。人との関わりを大事にし献身的で、多芸多才で天性の芸術的センスを持ちます。明るい笑顔と無邪気さが魅力で、バランス感覚に優れ、人に合わせることができます。',
+      13: '倹約家で真面目、几帳面。独創的で破天荒な面と穏和でゆったりした面を合わせ持ちます。安定志向で型にはまりがち。確固とした基盤を欲し、安心して暮らしたいと願います。何事にも誠実で揺るぎない信念と忍耐力を持っています。職人気質で本物志向。仕事熱心で実利的、無駄を嫌い、安定した人生を強く望むマイペース型です。',
+      14: '好奇心や探求心が旺盛。鋭い勘と冒険心に溢れ、変化と自由を享受します。開放的で官能的。時にリーダーシップを発揮し、進歩的な生き方を好みます。頭の回転が早く、すべてに機転が利き、真の自由を求めて彷徨う自由人。自主自立の精神で人並み以上の結果を生み出す、多趣味で多芸多才な人です。己を貫くタイプです。',
+      15: '正義感が強く頼り甲斐があり、心の繋がりや信頼を大切にする優しい人です。責任感が強く、真面目に取組む一方で、逸脱することへの怖れを持っています。自意識が強く、新しい情報や体験を通じて理想の人生を強く求める傾向があります。美意識が高く、理想像を描きながら、愛と調和のある人生を求めています。男性的な力強さも持ち合わせます。',
+      16: '探究心が旺盛で直観的、何かを探究したり研究することが好きな職人気質です。責任感が強く神経質な面を持ち、理想や期待に向けて舵を取る傾向を持っています。独りの時間や空間が大事で、じっくり思索しながら独自の世界を作り出します。この世界の謎や未知の領域への憧れが強く、独特の見解を見出す才能があります。情熱的な一面も。',
+      17: '独立心旺盛で行動力抜群。損得に敏感で何事も諦めず、目標達成させます。自負心が強く負けず嫌いな頑張り屋で、熱意を持って一生懸命に取り組みます。鋭い直観力や洞察力を活かしながら綿密に計画的に、自らの願望を実現します。困難や試練に遭遇する程チャレンジ精神が目覚め、真のパワーを発揮します。',
+      18: '浪漫を胸に抱く理想主義者。奔放で強情な面と博識で博愛な面を合わせ持ちます。相手との共感能力が高く寛容な態度を示しますが、自分のこだわりを大事にします。自分の内に複雑な性質を持ち、物事の多面性や多様性を理解する力があります。人類愛を胸に抱き、愛と平和を願う人道主義的なロマンティスト。時に、ふてぶてしいほどのこだわりを見せます。',
+      19: '独立心があり情熱的。独自のセンスを活かした斬新なアイディアを持っています。自尊心や向上心が強く、人の真似は嫌いで、斬新な発想で物事を展開します。気高きリーダーとしての資質があり、人から指示や命令されるのを嫌います。自主独立の精神が強く甘えることができない。独自の世界を大事にしますが、ユニークである反面、内部分裂を起こしやすく、葛藤を抱えやすいです。',
+      20: '協調性があり受動的、外交的な能力を持ち、親切で相手思いの面を持っています。誰に対しても柔和な態度で感受性豊か、音楽や芸術的な才能を発揮します。豊かな愛情と思いやりがあり、愛する人や仲間のサポートを惜しみません。想像力豊かで直感的。美しいものや目に見えない世界を大切にしています。',
+      21: '自由な発想と研ぎ澄まされた感性。明朗快活で好奇心旺盛な芸術家肌です。楽天的で社交的。楽しく愉快でユーモアのセンスに溢れた好感度の高い人気者。人との関わりを大事にし献身的で、相手の潜在能力を引き出す力を持っています。明るい笑顔と無邪気さが魅力で、バランスが良く、能力が高い人が多いです。',
+      22: 'マスターナンバー22の壮大なビジョンを秘めている。協調性があり受動的、外交的な能力を持ちつつ、壮大なビジョンを現実に変えるマスタービルダーとしての資質を持っています。理想と現実を橋渡しし、大規模なプロジェクトを形にする使命を持つ。豊かな愛情と思いやりがあり、実務的な霊性と組織構築力を兼ね備えます。',
+      23: '好奇心や探求心が旺盛。鋭い勘と冒険心に溢れ、変化と自由を享受します。開放的で官能的。新しい刺激や体験を求め続け、進歩的な生き方を好みます。頭の回転が早く、すべてに機転が利き、真の自由を求めて彷徨う自由人。明朗快活で周りを楽しませ、喜びを分かち合います。多趣味で多芸多才で、子供っぽい明るさがあります。',
+      24: '正義感が強く頼り甲斐があり、心の繋がりや信頼を大切にする優しい人です。責任感が強く、真面目に取り組む一方で逸脱することへの怖れを持っています。感受性が豊かで包容力があり、親切で穏和な面と芯の強い強情な面があります。美意識が高く、理想像を描きながら、愛と調和のある人生を求めています。女性的な優しさと強い執着心を持つことがあります。',
+      25: '探究心が旺盛で直観的、何かを探究したり研究することが好きな職人気質です。クールな面とユニークな面が同居し、豊かな感情や体感することに重きを置きます。独りの時間や空間が大事で、じっくり思索しながら独自の世界を作り出します。この世界の謎や未知の領域への憧れが強く、独特の見解を見出す才能があります。感覚的、感情的です。',
+      26: '独立心旺盛で行動力抜群。損得に敏感で何事も諦めず、目標達成させます。自負心が強く負けず嫌いな頑張り屋で、熱意を持って一生懸命に取り組みます。親切で頼り甲斐があり、まわりを巻き込みながら、自らの願望を実現します。仕事や家庭とのバランスを取りながら、運に任せて真のパワーを発揮します。女性的で優秀、陰の力を持つタイプです。',
+      27: '浪漫を胸に抱く理想主義者。奔放で強情な面と博識で微細な面を合わせ持ちます。相手との共感能力が高く寛容な態度を示し、情緒豊かで奉仕する心を持っています。自分の内に複雑な性質を持ち、物事の多面性や多様性を理解する力があります。人類愛を胸に抱き、愛と平和を願う人道主義的なロマンティスト。女々しいほど繊細で傷つきやすい一面も。',
+      28: '独立心があり情熱的。何事にも直観的で情緒豊か、柔軟な姿勢を持っています。自尊心や向上心が強く、人の真似は嫌いで、斬新な発想で物事を展開します。気高きリーダーとしての資質があり、人から指示や命令されるのを嫌います。自主性はありますが、相手との距離感を踏まえた上で、独自の世界を展開するため、まろやかでストレートすぎず、決して折れない性格です。',
+      29: '情緒的で霊感が強く受動的、高潔な精神を持ち、内なる智恵を役立てようとします。繊細な感性と神経質な面があり、崇高な目的や使命で世の中に役立つことを望みます。豊かな愛情と思いやりがあり、愛する人や仲間のサポートを惜しみません。想像力豊かで情緒的。美しいものや目に見えない世界を大切にしています。非常にデリケートで、共感能力が高いですが、自分を見られたくないという気持ちも強い独特な性質です。',
+      30: '自由な発想と研ぎ澄まされた感性。鋭い閃きと遊び心に溢れた芸術家肌です。楽天的で社交的。楽しく愉快でユーモアのセンスに溢れた好感度の高い人気者。人生を心から愛し自由を愛します。多芸多才で天性の芸術的センスを持ち、明るい笑顔と無邪気さが魅力ですが、少し子供っぽい一面もあります。',
+      31: '大雑把なようで、真面目で几帳面。独創的で破天荒な面と穏和でゆったりした面を合わせ持ちます。安定志向で型にはまりがちですが、確固とした基盤を欲し、安心して暮らしたいと願います。何事にも誠実で揺るぎない信念と忍耐力を持っています。職人気質で本物志向。仕事熱心で実利的、無駄を嫌い、安定した人生を強く望むマイペース型です。',
+    };
+
+    // Detail modal
+    const detailModal = document.createElement('div');
+    detailModal.id = 'detail-modal';
+    detailModal.className = 'hidden fixed inset-0 z-50 modal-overlay flex items-end sm:items-center justify-center';
+    detailModal.innerHTML = '<div class="bg-white rounded-t-2xl sm:rounded-2xl w-full max-w-md max-h-[80vh] overflow-y-auto p-5 fade-in" id="detail-content"></div>';
+    document.body.appendChild(detailModal);
+    detailModal.addEventListener('click', (e) => {
+      if (e.target === detailModal) { detailModal.classList.add('hidden'); document.body.style.overflow = ''; }
+    });
+
+    function showDetail(cellId) {
+      if (!lastResults) return;
+      const pos = positionData[cellId];
+      if (!pos) return;
+      const el = document.getElementById(cellId);
+      const numEl = el?.querySelector('.cb-num');
+      const numVal = numEl ? parseInt(numEl.textContent) : null;
+      if (numVal === null || isNaN(numVal)) return;
+      const nd = numDB[numVal] || numDB[Math.min(numVal, 9)];
+      const content = document.getElementById('detail-content');
+
+      // Full detail (always shown if premium or position is free)
+      const showFull = isPremium || !pos.premium;
+
+      if (showFull) {
+        // 誕生数の場合、誕生日別の詳細説明を追加
+        const birthDaySection = (cellId === 'cell-destiny' && lastResults.birthDay && birthDayDB[lastResults.birthDay])
+          ? `<div class="bg-gradient-to-br from-pink-50 to-purple-50 rounded-xl p-4 mb-3 border border-pink-100">
+              <p class="text-[11px] font-semibold text-pink-600 mb-1">${lastResults.birthDay}日生まれのあなた:</p>
+              <p class="text-xs text-gray-600 leading-relaxed">${birthDayDB[lastResults.birthDay]}</p>
+            </div>` : '';
+
+        content.innerHTML = `
+          <div class="flex items-center justify-between mb-3">
+            <h2 class="text-base font-bold text-gray-800">${pos.name}</h2>
+            <button class="close-detail w-7 h-7 rounded-full bg-gray-100 flex items-center justify-center text-gray-400 hover:text-gray-600 text-lg">&times;</button>
+          </div>
+          <p class="text-xs text-gray-500 mb-4">【この数字が示すテーマ】${pos.theme}</p>
+          ${birthDaySection}
+          <div class="bg-fuchsia-50 rounded-xl p-4 mb-3">
+            <p class="text-[11px] font-semibold text-purple-700 mb-1">核となる意味:</p>
+            <p class="text-xs text-gray-600 leading-relaxed">${nd.core}</p>
+          </div>
+          <div class="bg-purple-50 rounded-xl p-4 mb-3">
+            <p class="text-[11px] font-semibold text-purple-700 mb-1">基本的な特性:</p>
+            <p class="text-xs text-gray-600 leading-relaxed whitespace-pre-line">${nd.traits}</p>
+          </div>
+          <p class="text-[11px] text-gray-400 mb-3">対応カラー：${nd.color}</p>`;
+      } else {
+        content.innerHTML = `
+          <div class="flex items-center justify-between mb-3">
+            <h2 class="text-base font-bold text-gray-800">${pos.name}</h2>
+            <button class="close-detail w-7 h-7 rounded-full bg-gray-100 flex items-center justify-center text-gray-400 hover:text-gray-600 text-lg">&times;</button>
+          </div>
+          <p class="text-xs text-gray-500 mb-4">【この数字が示すテーマ】${pos.theme}</p>
+          <p class="text-xs text-purple-500 mb-3">さらに詳しく</p>
+          <div class="bg-purple-50 rounded-xl p-4 space-y-3">
+            <p class="text-xs font-bold text-purple-700">🔐 より深い洞察をアンロック</p>
+            <p class="text-[11px] text-gray-500 leading-relaxed">プレミアムプランで、あなたの数秘が持つ全ての意味と、具体的なアドバイスにアクセスしましょう。</p>
+            <button class="btn-activate-premium w-full gradient-cta text-white rounded-full py-2.5 text-xs font-semibold">今すぐ全特典を体験する (DEVモード)</button>
+          </div>`;
+      }
+
+      content.querySelector('.close-detail').addEventListener('click', () => {
+        detailModal.classList.add('hidden'); document.body.style.overflow = '';
+      });
+
+      // Premium activate button
+      const premBtn = content.querySelector('.btn-activate-premium');
+      if (premBtn) {
+        premBtn.addEventListener('click', () => {
+          isPremium = true;
+          detailModal.classList.add('hidden');
+          document.body.style.overflow = '';
+          updatePremiumUI();
+          alert('プレミアムプランが有効になりました！全ての数秘詳細がアンロックされました。');
+        });
+      }
+
+      detailModal.classList.remove('hidden');
+      document.body.style.overflow = 'hidden';
+    }
+
+    function updatePremiumUI() {
+      const badge = document.getElementById('premium-badge');
+      if (badge) badge.classList.remove('hidden');
+    }
+
+    document.querySelectorAll('.chart-box').forEach(box => {
+      box.addEventListener('click', () => showDetail(box.id));
+    });
+
+    // =========================================================
+    // =========================================================
+    // Palm Reading (手相占い) — based on NotebookLM database
+    // =========================================================
+    const palmDB = {
+      lifeline: {
+        'long-deep':      { title: '濃く長い生命線', reading: '体力やバイタリティが非常に強く、病気や困難に対する回復力も高い大吉相です。手首までしっかりと伸びている場合は、長寿の可能性が高いでしょう。', score: 5 },
+        'big-curve':      { title: '大きくカーブした生命線', reading: '中指から下ろした直線を越えるほど大きく張り出しています。人一倍のスタミナとエネルギーを持ち、多少の無理がきく活動的な人生を送ります。', score: 4 },
+        'double':         { title: '二重生命線', reading: '常人の2倍の生命力・体力・強靭なメンタリティを持ちます。大病や困難からも復活する回復力と、目に見えない守護の力も示す非常に強い相です。', score: 5 },
+        'broken':         { title: '途切れ・キレギレの生命線', reading: '生命力が低下しやすい時期があることを示します。疲労やストレスの蓄積、免疫力の低下に注意してください。休息と自己ケアが大切です。', score: 2 },
+        'branch-out':     { title: '末端が外側に枝分かれ（旅行線）', reading: '地元を離れたり、旅行や海外へ行くなど、移動や変化によって開運・成功することを意味します。新しい環境に飛び込む勇気が幸運を引き寄せます。', score: 4 },
+        'upward':         { title: '上向きの支線（開運線）', reading: '生命線から上に向かって伸びる線は「開運線」と呼ばれ、努力が実を結び、人生が好転する幸運のサインです。', score: 5 },
+        'thin-short':     { title: '薄い・短い生命線', reading: '体力面でやや弱めですが、生活習慣の改善や運動で変化します。手相は変わるものなので、前向きに取り組みましょう。', score: 2 },
+      },
+      headline: {
+        'long':           { title: '長い頭脳線', reading: '思考力が高く、物事を論理的かつ多角的に深く考える「熟考型」です。軽はずみな行動をせず、年を重ねても判断力が衰えません。', score: 4 },
+        'short':          { title: '短い頭脳線', reading: '考えるよりも先に行動する「即決即断型」です。直感力やひらめきに優れ、頭の切り替えが早いのが特徴です。', score: 3 },
+        'double':         { title: '二重頭脳線', reading: '常人の2倍の知力や多芸多才さを持ち、複数の分野を同時にこなせる天才的な才能を示します。非常に珍しい吉相です。', score: 5 },
+        'separated':      { title: '離れ型（KY線）', reading: '独立心が強く、大胆で楽観的。常識に囚われない自由な発想力と行動力を持ちます。起業家や開拓者に多い相です。', score: 4 },
+        'straight':       { title: 'まっすぐな頭脳線（理系線）', reading: '物事を論理的・合理的に考え、数字や計算に強い傾向があります。エンジニアや研究者に向いています。', score: 3 },
+        'curved-down':    { title: '下向きカーブ（文系線）', reading: '想像力や感受性が豊かで、芸術やクリエイティブな分野で才能を発揮します。アーティスト気質です。', score: 4 },
+        'forked':         { title: '末端が枝分かれ', reading: '複数の才能を持ち、多方面で活躍できます。3本に分かれている場合は、マルチタスクが得意で頭の回転が非常に速いことを示します。', score: 4 },
+      },
+      heartline: {
+        'long-up':        { title: '上向き・長い感情線', reading: '愛情深く、思いやりがあり、人付き合いを大切にする前向きな性格です。誠実で家庭的、バランスの取れた愛情表現ができます。', score: 4 },
+        'fork-2':         { title: '末端が二股の感情線', reading: '対人運や恋愛運が良く、気配りができる人望の厚い人です。周囲から信頼されやすい相です。', score: 4 },
+        'fork-3':         { title: '三股の感情線（幸運の女神線）', reading: '周囲の人、特にパートナーを幸せにする力を持つ「あげまん」の相です。コミュニケーション能力が高く、誰からも愛されます。', score: 5 },
+        'double':         { title: '二重感情線', reading: '常人の2倍の情熱、深い愛情、そして逆境に負けない強靭な精神力と粘り強さを持ちます。非常に強い相です。', score: 5 },
+        'wavy':           { title: '波打ち・キレギレの感情線', reading: '感情のコントロールに課題がある可能性があります。マインドフルネスや自己理解を深めることで改善できます。', score: 2 },
+        'downward-branches': { title: '下向き支線が多い感情線', reading: '他人の痛みに敏感で、慈愛に満ちた優しい心の持ち主です。ヒーラーやカウンセラーの素質があります。', score: 4 },
+        'straight-short': { title: 'まっすぐ・短い感情線', reading: '感情表現が控えめで、理性的に物事を判断するタイプです。信頼できる安定した人間関係を築きます。', score: 3 },
+      },
+      fateline: {
+        'deep-long':      { title: '太く濃く長い運命線', reading: '目標に向かってブレずに進む強い意志があり、仕事運が最強です。社会的に大きな成功を収めます。天下筋と呼ばれる場合も。', score: 5 },
+        'late-bloom':     { title: '途中から濃くなる運命線', reading: '若い頃は苦労しても、中年期や晩年に天職に出会い、運気が急上昇する「大器晩成型」のサインです。', score: 4 },
+        'from-moon':      { title: '月丘から伸びる運命線', reading: '周囲のサポートや大衆からの人気によって成功します。芸能や接客など、人から愛されることで運が開けます。', score: 4 },
+        'from-lifeline':  { title: '生命線から伸びる運命線', reading: '自分自身の努力によって運命を切り開き、成功を掴み取ります。自力でのし上がる強い意志を持っています。', score: 4 },
+        'double':         { title: '二重運命線', reading: '本業と副業など2つの草鞋を履いて多方面で活躍する、2倍の運勢を持つマルチタスクの才能を示します。', score: 5 },
+        'broken':         { title: '途切れた運命線', reading: '人生の転換期や仕事の環境変化を示します。途切れた後にまた始まっていれば、新たなステージへの移行を意味します。', score: 3 },
+        'none':           { title: '運命線なし/薄い', reading: '束縛を嫌い自由に生きるタイプです。型にはまらない柔軟な人生を歩む可能性があります。', score: 2 },
+      },
+      sunline: {
+        'deep-long':      { title: '濃く長い太陽線', reading: '金運や成功運が非常に強く、一生お金に困らない豊かさを表します。カリスマ性に溢れ、自然と人を惹きつける最強クラスの大吉相です。', score: 5 },
+        'thin-short':     { title: '短い・薄い太陽線', reading: '大器晩成型ですが、努力を重ねることで後から濃くなり、晩年に花開く可能性を秘めています。', score: 3 },
+        'multiple':       { title: '複数の太陽線', reading: '多芸多才で、複数の収入源を持ったり、様々な分野で成功を収めるサインです。', score: 4 },
+        'fork-vy':        { title: 'V字・Y字の太陽線', reading: '金運や幸運が多方面に広がり、晩年に向かって豊かさが増していくサインです。', score: 4 },
+        'trident':        { title: '三股の太陽線（トライデント）', reading: '金運・成功・名声が爆発的に拡大し、あらゆる幸福を同時に手にする奇跡の相です。非常に稀な最強吉相。', score: 5 },
+        'from-emotion':   { title: '感情線上から伸びる太陽線', reading: '長年の地道な努力が報われ、50代以降の人生後半に安定した成功や富を得ることを意味します。', score: 4 },
+        'none':           { title: '太陽線なし', reading: '現時点では太陽線が現れていませんが、努力と行動次第で新たに出現する可能性があります。', score: 1 },
+      },
+      moneyline: {
+        'deep-long':      { title: '濃く長い財運線', reading: 'お金を稼ぐ力、貯蓄する能力が非常に高いです。起業や投資などで大成功し、巨万の富を築く力があります。', score: 5 },
+        'multiple':       { title: '複数の財運線', reading: '本業以外にも副業や投資など複数の収入源を持つことを示します。金運が活発な証拠です。', score: 4 },
+        'thin-short':     { title: '薄い・短い財運線', reading: '金運は発展途上ですが、商才を磨くことで線が濃くなっていきます。学びの姿勢が鍵です。', score: 2 },
+        'none':           { title: '財運線なし', reading: '現時点では財運線が見えませんが、お金に対する意識を高め、計画的な行動をすることで出現することがあります。', score: 1 },
+      }
+    };
+
+    // =========================================================
+    // Palm Photo Upload & AI Analysis
+    // =========================================================
+    let palmImageData = null;
+    let cameraStream = null;
+
+    function handlePalmImage(dataUrl) {
+      palmImageData = dataUrl;
+      document.getElementById('palm-preview-img').src = palmImageData;
+      document.getElementById('palm-preview-area').classList.remove('hidden');
+      document.getElementById('palm-upload-prompt').classList.add('hidden');
+      document.getElementById('palm-camera-area').classList.add('hidden');
+      stopCamera();
+      analyzePalmWithAI(dataUrl);
+    }
+
+    function handlePalmFile(file) {
+      if (!file || !file.type.startsWith('image/')) return;
+      const reader = new FileReader();
+      reader.onload = (e) => handlePalmImage(e.target.result);
+      reader.readAsDataURL(file);
+    }
+
+    async function analyzePalmWithAI(dataUrl) {
+      const analysisDiv = document.getElementById('palm-ai-analysis');
+      const analysisContent = analysisDiv.querySelector('.bg-white');
+      const apiKey = localStorage.getItem('gemini_api_key') || document.getElementById('geminiApiKey')?.value;
+
+      if (!apiKey) {
+        // Fallback to simulation if no API key
+        analysisDiv.classList.remove('hidden');
+        analysisContent.innerHTML = `
+          <p class="text-[11px] font-semibold text-amber-600 flex items-center gap-1">
+            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+            APIキー未設定
+          </p>
+          <p class="text-[10px] text-gray-400">Gemini API Keyを入力画面で設定すると、AIが手のひらの写真を分析します。手動で選択してください。</p>`;
+        return;
+      }
+
+      // Show loading state
+      analysisDiv.classList.remove('hidden');
+      analysisContent.innerHTML = `
+        <div class="flex items-center gap-2">
+          <svg class="w-4 h-4 animate-spin text-purple-500" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path></svg>
+          <p class="text-[11px] font-semibold text-purple-700">AI画像分析中...</p>
+        </div>
+        <p class="text-[10px] text-gray-400">Gemini Visionが手のひらの線を解析しています</p>`;
+
+      try {
+        // Extract base64 data (remove data:image/...;base64, prefix)
+        const base64Data = dataUrl.split(',')[1];
+        const mimeType = dataUrl.split(';')[0].split(':')[1];
+
+        const prompt = `あなたは手相占いの専門家です。この手のひらの画像を分析し、以下の情報をJSON形式で返してください。
+
+各線について、選択肢の中から最も適切なものを1つ選んでください：
+
+1. lifeline（生命線）: "long-deep"(濃く長い), "big-curve"(大きくカーブ), "double"(二重), "broken"(途切れ), "branch-out"(末端枝分かれ), "upward"(上向き支線), "thin-short"(薄い短い)
+2. headline（頭脳線）: "long"(長い), "short"(短い), "double"(二重), "separated"(離れ型KY線), "straight"(まっすぐ), "curved-down"(下向きカーブ), "forked"(枝分かれ)
+3. heartline（感情線）: "long-up"(上向き長い), "fork-2"(二股), "fork-3"(三股), "double"(二重), "wavy"(波打ち), "downward-branches"(下向き支線), "straight-short"(まっすぐ短い)
+4. fateline（運命線）: "deep-long"(太く長い), "late-bloom"(途中から濃い), "from-moon"(月丘から), "from-lifeline"(生命線から), "double"(二重), "broken"(途切れ), "none"(なし)
+5. sunline（太陽線）: "deep-long"(濃く長い), "thin-short"(短い薄い), "multiple"(複数), "fork-vy"(VY字), "trident"(三股), "from-emotion"(感情線上から), "none"(なし)
+6. moneyline（財運線）: "deep-long"(濃く長い), "multiple"(複数), "thin-short"(薄い短い), "none"(なし)
+
+特殊相（見つかったもののみ配列で）:
+specials: ["masukake","butsugan","shinpi","haou","solomon","star","fish","lucky-m","senkin","chokkan","charisma","taiyou-cross"]
+
+発達している丘（最大3つ）:
+mounts: ["jupiter","saturn","sun","mercury","venus","moon"]
+
+また、画像から読み取った追加の所見をfindingsフィールドに日本語で書いてください。
+
+JSONのみを返してください。マークダウンのコードブロックは不要です。`;
+
+        const response = await fetch(
+          'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=' + apiKey,
+          {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              contents: [{
+                parts: [
+                  { text: prompt },
+                  { inline_data: { mime_type: mimeType, data: base64Data } }
+                ]
+              }],
+              generationConfig: { temperature: 0.3, maxOutputTokens: 2048 }
+            })
+          }
+        );
+
+        if (!response.ok) throw new Error('API error: ' + response.status);
+
+        const result = await response.json();
+        const text = result.candidates?.[0]?.content?.parts?.[0]?.text || '';
+
+        // Parse JSON from response (handle possible markdown wrapping)
+        const jsonStr = text.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim();
+        const analysis = JSON.parse(jsonStr);
+
+        // Apply results to dropdowns with animation
+        const selectMap = {
+          lifeline: 'palm-lifeline', headline: 'palm-headline', heartline: 'palm-heartline',
+          fateline: 'palm-fateline', sunline: 'palm-sunline', moneyline: 'palm-moneyline'
+        };
+
+        Object.entries(selectMap).forEach(([key, selId], idx) => {
+          const val = analysis[key];
+          if (!val) return;
+          setTimeout(() => {
+            const sel = document.getElementById(selId);
+            sel.value = val;
+            sel.style.transition = 'background-color 0.4s';
+            sel.style.backgroundColor = '#f0fdf4';
+            setTimeout(() => { sel.style.backgroundColor = ''; }, 1000);
+          }, idx * 200);
+        });
+
+        // Apply special marks
+        if (analysis.specials && Array.isArray(analysis.specials)) {
+          document.querySelectorAll('.palm-special').forEach(cb => { cb.checked = false; });
+          analysis.specials.forEach(key => {
+            const cb = document.querySelector(`.palm-special[value="${key}"]`);
+            if (cb) { cb.checked = true; cb.parentElement.style.borderColor = '#a78bfa'; }
+          });
+        }
+
+        // Apply mounts
+        if (analysis.mounts && Array.isArray(analysis.mounts)) {
+          document.querySelectorAll('.palm-mount').forEach(cb => { cb.checked = false; });
+          analysis.mounts.slice(0, 3).forEach(key => {
+            const cb = document.querySelector(`.palm-mount[value="${key}"]`);
+            if (cb) { cb.checked = true; cb.parentElement.style.borderColor = '#a78bfa'; }
+          });
+        }
+
+        // Show success + findings
+        const findingsText = analysis.findings || 'AI分析が完了しました。';
+        analysisContent.innerHTML = `
+          <p class="text-[11px] font-semibold text-green-700 flex items-center gap-1">
+            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+            Gemini Vision AI 分析完了
+          </p>
+          <p class="text-[10px] text-gray-500 leading-relaxed mt-1">${findingsText}</p>
+          <p class="text-[9px] text-gray-300 mt-2">結果を確認し、必要に応じて手動で修正してください</p>`;
+
+      } catch(e) {
+        console.error('Palm AI error:', e);
+        analysisContent.innerHTML = `
+          <p class="text-[11px] font-semibold text-red-600 flex items-center gap-1">
+            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+            AI分析エラー
+          </p>
+          <p class="text-[10px] text-gray-400">${e.message}。手動で選択してください。</p>`;
+      }
+    }
+
+    // Open camera via getUserMedia
+    async function startCamera() {
+      try {
+        const video = document.getElementById('palm-video');
+        cameraStream = await navigator.mediaDevices.getUserMedia({
+          video: { facingMode: 'environment', width: { ideal: 1280 }, height: { ideal: 720 } }
+        });
+        video.srcObject = cameraStream;
+        document.getElementById('palm-upload-prompt').classList.add('hidden');
+        document.getElementById('palm-camera-area').classList.remove('hidden');
+      } catch(e) {
+        alert('カメラへのアクセスが許可されていません。ブラウザの設定を確認してください。');
+      }
+    }
+
+    function stopCamera() {
+      if (cameraStream) {
+        cameraStream.getTracks().forEach(t => t.stop());
+        cameraStream = null;
+      }
+      const video = document.getElementById('palm-video');
+      if (video) video.srcObject = null;
+    }
+
+    // Open camera button
+    document.getElementById('btn-open-camera').addEventListener('click', () => startCamera());
+
+    // Shutter button — capture frame from video
+    document.getElementById('btn-capture').addEventListener('click', () => {
+      const video = document.getElementById('palm-video');
+      const canvas = document.getElementById('palm-canvas');
+      canvas.width = video.videoWidth;
+      canvas.height = video.videoHeight;
+      canvas.getContext('2d').drawImage(video, 0, 0);
+      const dataUrl = canvas.toDataURL('image/jpeg', 0.9);
+      handlePalmImage(dataUrl);
+    });
+
+    // Cancel camera
+    document.getElementById('btn-cancel-camera').addEventListener('click', () => {
+      stopCamera();
+      document.getElementById('palm-camera-area').classList.add('hidden');
+      document.getElementById('palm-upload-prompt').classList.remove('hidden');
+    });
+
+    // File upload
+    document.getElementById('palm-upload').addEventListener('change', (e) => {
+      handlePalmFile(e.target.files[0]);
+    });
+
+    // Remove image
+    document.getElementById('palm-remove-img').addEventListener('click', () => {
+      palmImageData = null;
+      stopCamera();
+      document.getElementById('palm-preview-area').classList.add('hidden');
+      document.getElementById('palm-upload-prompt').classList.remove('hidden');
+      document.getElementById('palm-ai-analysis').classList.add('hidden');
+      document.getElementById('palm-upload').value = '';
+      ['palm-lifeline', 'palm-headline', 'palm-heartline', 'palm-fateline', 'palm-sunline', 'palm-moneyline'].forEach(id => {
+        document.getElementById(id).value = '';
+      });
+    });
+
+    // =========================================================
+    // Palm Reading Result
+    // =========================================================
+    // Special marks database (from NotebookLM 手相占い*Labo)
+    const specialDB = {
+      masukake:      { name: 'ますかけ線', rarity: '5000人に1人（両手）', reading: '感情線と頭脳線が一体化し手のひらを一直線に横切る相。天才的な発想力と強運、カリスマ性を持ち、波乱万丈でも天下を取るほどの成功を収めるとされます。織田信長、徳川家康も持っていたと言われる大吉相です。' },
+      butsugan:      { name: '仏眼相', rarity: '1000人に1人（両手）', reading: '親指の第一関節のシワが目の形になる相。霊感や直感力が非常に強く、ご先祖様や神仏の強い加護によって危険を回避し、幸運を引き寄せるスピリチュアルな守護の証です。' },
+      shinpi:        { name: '神秘十字線', rarity: '800〜1000人に1人（両手）', reading: '感情線と頭脳線の間、中指下に現れる十字。ご先祖様や神仏から強力に守られ、危機的状況でも救われる強運を持ちます。スピリチュアルな才能の証でもあります。' },
+      haou:          { name: '覇王線（三奇紋）', rarity: '1000人に1人', reading: '運命線・太陽線・財運線が一点で交わる最強の金運相。自らの努力で桁外れの富と名声を掴む「億万長者の相」です。事業家、経営者に多く見られます。' },
+      solomon:       { name: 'ソロモンの環', rarity: '数千〜数万人に1人', reading: '人差し指の付け根を囲む半円の線。並外れた知恵、直感力、カリスマ性を持ち、人々を導くリーダーとして大成功を収める賢者の証です。' },
+      star:          { name: 'スター線（星紋）', rarity: '一生に一度レベル', reading: '3本以上の短い線が1点で交差し星の形になる相。現れた場所の意味を爆発的に強め、突発的な大幸運・大成功を呼び込む奇跡のサインです。すぐ消えることも多い瞬間的な吉相。' },
+      fish:          { name: 'フィッシュ（魚紋）', rarity: '非常に希少', reading: '2本の線が交差して魚のような形になる紋。どこに現れても幸運の訪れや劇的な運気上昇、人生の大逆転を告げる大吉相です。' },
+      'lucky-m':     { name: 'ラッキーM線', rarity: '1000人に1人', reading: '感情線・頭脳線・生命線・運命線の4本が繋がり手のひらに「M」を描く相。健康・知性・感情・運勢の全てがバランスよく調和し、強い引き寄せの力で願いを現実化させます。' },
+      senkin:        { name: '千金紋（成り上がり線）', rarity: '100人に1人以下', reading: '生命線の起点から中指方向へ湾曲して昇る線。人生前半の苦労やどん底から一気に這い上がり、大成功や巨万の富を手にする「一発逆転」の象徴です。' },
+      chokkan:       { name: '直感線', rarity: '数千〜数万人に1人', reading: '月丘から水星丘へ弧を描く半円状の線。第六感やインスピレーションが非常に鋭く、物事の本質を瞬時に見抜く力を持ちます。ギャンブル運も強い超レア相。' },
+      charisma:      { name: 'カリスマ線', rarity: '珍しい', reading: '金星丘の下部から手首側に伸びる2〜3本の短い縦線。人を惹きつける強烈な魅力と存在感を持ち、強い責任感とリーダーシップで周囲から頼られる存在になります。' },
+      'taiyou-cross': { name: '太陽十字線', rarity: '激レア', reading: '感情線と頭脳線の間、薬指下に現れる十字。芸術的な才能や感性が非常に優れ、強いインスピレーションや直感力でクリエイティブな分野で成功するサインです。' },
+    };
+
+    // Mounts database (from NotebookLM 手相占い*Labo)
+    const mountDB = {
+      jupiter: { name: '木星丘', area: '人差し指下', reading: '野心、向上心、リーダーシップ、管理能力を司ります。発達している場合、人を教え導く能力に長け、経営者や教育者、管理職として活躍します。ソロモンの環や聖職紋が現れやすい丘です。' },
+      saturn:  { name: '土星丘', area: '中指下', reading: '忍耐力、継続力、努力、思慮深さを司ります。発達している場合、一つの物事に対する探求心が非常に強く、深く追求する力があります。コツコツと積み上げて大きな成果を出すタイプです。' },
+      sun:     { name: '太陽丘', area: '薬指下', reading: '成功、人気、幸福度、名声、金運、芸術性を司ります。発達している場合、存在そのものが明るく人を惹きつけ、芸術的な才能や美的センスに優れます。太陽線やスター線が現れると最強の吉相になります。' },
+      mercury: { name: '水星丘', area: '小指下', reading: '商才、財運、コミュニケーション能力、発想力を司ります。発達している場合、社交的で話上手、営業や商売で成功しやすく、年齢を重ねてもお金や人脈に困りにくいとされます。' },
+      venus:   { name: '金星丘', area: '親指付け根', reading: '生命力、愛情、情熱、体力を司ります。発達している場合、バイタリティに溢れ、愛情豊かで人間的な魅力が強い。カリスマ線が現れやすい丘で、人を惹きつける力の源泉です。' },
+      moon:    { name: '月丘', area: '小指下の手首側', reading: '想像力、感受性、直感、芸術的才能を司ります。発達している場合、創造力やイマジネーションが豊かで、芸術家やクリエイターに多い。直感線が現れやすい丘です。' },
+    };
+
+    // Limit mount selection to 3
+    document.querySelectorAll('.palm-mount').forEach(cb => {
+      cb.addEventListener('change', () => {
+        const checked = document.querySelectorAll('.palm-mount:checked');
+        if (checked.length > 3) { cb.checked = false; }
+      });
+    });
+
+    document.getElementById('btn-palm-read').addEventListener('click', () => {
+      const selects = {
+        lifeline: document.getElementById('palm-lifeline').value,
+        headline: document.getElementById('palm-headline').value,
+        heartline: document.getElementById('palm-heartline').value,
+        fateline: document.getElementById('palm-fateline').value,
+        sunline: document.getElementById('palm-sunline').value,
+        moneyline: document.getElementById('palm-moneyline').value,
+      };
+
+      // Check at least 3 selected
+      const filled = Object.values(selects).filter(v => v).length;
+      if (filled < 3) {
+        alert('少なくとも3つの線を選択してください。');
+        return;
+      }
+
+      const resultDiv = document.getElementById('palm-result');
+      let html = '';
+      let totalScore = 0;
+      let count = 0;
+
+      const lineNames = {
+        lifeline: '生命線', headline: '頭脳線', heartline: '感情線',
+        fateline: '運命線', sunline: '太陽線', moneyline: '財運線'
+      };
+      const lineColors = {
+        lifeline: 'pink', headline: 'indigo', heartline: 'rose',
+        fateline: 'purple', sunline: 'amber', moneyline: 'emerald'
+      };
+
+      for (const [key, val] of Object.entries(selects)) {
+        if (!val) continue;
+        const data = palmDB[key][val];
+        if (!data) continue;
+        totalScore += data.score;
+        count++;
+        const color = lineColors[key];
+        const stars = '★'.repeat(data.score) + '☆'.repeat(5 - data.score);
+        html += `
+          <div class="bg-${color}-50 rounded-xl p-3.5">
+            <div class="flex items-center justify-between mb-1">
+              <span class="text-xs font-bold text-${color}-700">${lineNames[key]}</span>
+              <span class="text-[10px] text-${color}-400">${stars}</span>
+            </div>
+            <p class="text-[11px] font-medium text-gray-700 mb-1">${data.title}</p>
+            <p class="text-xs text-gray-500 leading-relaxed">${data.reading}</p>
+          </div>`;
+      }
+
+      // Overall score
+      const avg = (totalScore / count).toFixed(1);
+      const overallStars = '★'.repeat(Math.round(totalScore / count)) + '☆'.repeat(5 - Math.round(totalScore / count));
+      const overallMsg = avg >= 4.5 ? '驚異的な強運の持ち主です！' :
+                         avg >= 3.5 ? '非常にバランスの良い良相です。' :
+                         avg >= 2.5 ? '伸びしろのある手相です。努力で開運できます。' :
+                                      '課題はありますが、手相は変わります。前向きに取り組みましょう。';
+
+      html = `
+        <div class="bg-gradient-to-r from-purple-600 via-pink-600 to-rose-500 rounded-xl p-4 text-white text-center">
+          <p class="text-xs opacity-80 mb-1">総合鑑定スコア</p>
+          <p class="text-2xl font-bold font-lora">${avg} / 5.0</p>
+          <p class="text-sm mt-1">${overallStars}</p>
+          <p class="text-xs opacity-90 mt-2">${overallMsg}</p>
+        </div>
+      ` + html;
+
+      // Numerology + Palm cross-reading (if available)
+      if (lastResults) {
+        const lp = lastResults.lifePath;
+        const crossReadings = {
+          1: '運命数1のリーダーシップと手相が示す行動力が相乗効果を生みます。独立・起業に向いた総合運勢です。',
+          2: '運命数2の協調性と手相の感受性が調和し、パートナーシップを通じた成功が期待できます。',
+          3: '運命数3の創造力と手相が示す表現力が融合。芸術・エンタメ分野での開花が見込めます。',
+          4: '運命数4の堅実さと手相の基盤力が組み合わさり、着実に資産を築ける総合運勢です。',
+          5: '運命数5の冒険心と手相の変化への適応力が噛み合い、多彩な経験から成功を掴みます。',
+          6: '運命数6の愛情と手相の対人力が呼応し、家庭・コミュニティでの深い絆を築けます。',
+          7: '運命数7の探究心と手相の直感力が相乗し、専門分野での深い洞察と成功が期待できます。',
+          8: '運命数8の達成力と手相の金運が結合。ビジネスでの大きな成功と物質的豊かさを実現します。',
+          9: '運命数9の博愛精神と手相の慈愛が融合。人々を導き、社会に大きな貢献ができる総合運勢です。',
+        };
+        const cross = crossReadings[lp] || crossReadings[Math.min(lp, 9)];
+        html += `
+          <div class="bg-purple-50 border border-purple-200 rounded-xl p-4 mt-1">
+            <p class="text-[11px] font-semibold text-purple-700 mb-1">数秘 × 手相 クロスリーディング</p>
+            <p class="text-xs text-gray-600 leading-relaxed">${cross}</p>
+          </div>`;
+      }
+
+      // Special marks results
+      const checkedSpecials = [...document.querySelectorAll('.palm-special:checked')].map(c => c.value);
+      if (checkedSpecials.length > 0) {
+        html += `<div class="bg-amber-50 border border-amber-200 rounded-xl p-4">
+          <p class="text-xs font-bold text-amber-700 mb-2">特殊相の鑑定（${checkedSpecials.length}個検出）</p>`;
+        checkedSpecials.forEach(key => {
+          const sp = specialDB[key];
+          if (!sp) return;
+          html += `<div class="mb-3 last:mb-0">
+            <div class="flex items-center justify-between mb-0.5">
+              <span class="text-[11px] font-semibold text-gray-800">${sp.name}</span>
+              <span class="text-[9px] text-amber-500 bg-amber-100 rounded-full px-2 py-0.5">${sp.rarity}</span>
+            </div>
+            <p class="text-xs text-gray-500 leading-relaxed">${sp.reading}</p>
+          </div>`;
+        });
+        html += `</div>`;
+      }
+
+      // Mount results
+      const checkedMounts = [...document.querySelectorAll('.palm-mount:checked')].map(c => c.value);
+      if (checkedMounts.length > 0) {
+        html += `<div class="bg-indigo-50 border border-indigo-200 rounded-xl p-4">
+          <p class="text-xs font-bold text-indigo-700 mb-2">発達している丘の鑑定</p>`;
+        checkedMounts.forEach(key => {
+          const mt = mountDB[key];
+          if (!mt) return;
+          html += `<div class="mb-3 last:mb-0">
+            <span class="text-[11px] font-semibold text-gray-800">${mt.name}（${mt.area}）</span>
+            <p class="text-xs text-gray-500 leading-relaxed mt-0.5">${mt.reading}</p>
+          </div>`;
+        });
+        html += `</div>`;
+      }
+
+      resultDiv.innerHTML = html;
+      resultDiv.classList.remove('hidden');
+      resultDiv.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    });
+
+    // =========================================================
+    // PDF Report Generation (jsPDF + html2canvas)
+    // =========================================================
+    document.getElementById('btn-download-pdf').addEventListener('click', async () => {
+      if (!lastResults) return;
+      const btn = document.getElementById('btn-download-pdf');
+      const origText = btn.innerHTML;
+      btn.innerHTML = '<svg class="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path></svg> PDF生成中...';
+      btn.disabled = true;
+
+      try {
+        const r = lastResults;
+        const name = document.getElementById('result-name').textContent;
+        const bdate = document.getElementById('chart-birthdate').textContent;
+        const pa = r.periods;
+
+        // Build a hidden render container for the full PDF content
+        const pdfRoot = document.createElement('div');
+        pdfRoot.id = 'pdf-render';
+        pdfRoot.style.cssText = 'position:fixed;left:-9999px;top:0;width:800px;background:#fff;font-family:Inter,system-ui,sans-serif;font-size:14px;color:#1f2937;';
+
+        // Helper: number detail block
+        const numBlock = (label, val, pos, extraHtml) => {
+          const nd = numDB[val] || numDB[Math.min(val, 9)];
+          const theme = pos ? pos.theme : '';
+          return `
+            <div style="background:#faf5ff;border-radius:8px;padding:14px 16px;margin-bottom:12px;">
+              <div style="display:flex;align-items:center;gap:12px;margin-bottom:6px;">
+                <span style="font-family:Lora,serif;font-size:28px;font-weight:700;color:#7c3aed;">${val}</span>
+                <div>
+                  <div style="font-size:14px;font-weight:700;color:#6b21a8;">${label}</div>
+                  ${theme ? '<div style="font-size:11px;color:#9ca3af;margin-top:2px;">'+theme+'</div>' : ''}
+                </div>
+              </div>
+              ${extraHtml || ''}
+              <div style="font-size:12px;color:#4b5563;line-height:1.7;margin-top:8px;">
+                <div style="font-weight:600;color:#7c3aed;margin-bottom:2px;">核となる意味:</div>
+                ${nd.core}
+              </div>
+              <div style="font-size:11px;color:#6b7280;line-height:1.6;margin-top:8px;white-space:pre-line;">
+                <span style="font-weight:600;color:#7c3aed;">基本的な特性:</span> ${nd.traits}
+              </div>
+              <div style="font-size:10px;color:#9ca3af;margin-top:6px;">対応カラー：${nd.color}</div>
+            </div>`;
+        };
+
+        // 誕生日別の説明HTML
+        const birthDayHtml = (r.birthDay && birthDayDB[r.birthDay])
+          ? `<div style="background:linear-gradient(135deg,#fdf2f8,#faf5ff);border:1px solid #f9a8d4;border-radius:8px;padding:12px 14px;margin-top:8px;margin-bottom:4px;">
+              <div style="font-size:11px;font-weight:600;color:#db2777;margin-bottom:4px;">${r.birthDay}日生まれのあなた:</div>
+              <div style="font-size:12px;color:#4b5563;line-height:1.7;">${birthDayDB[r.birthDay]}</div>
+            </div>` : '';
+
+        pdfRoot.innerHTML = `
+          <!-- Cover -->
+          <div style="height:1100px;display:flex;flex-direction:column;align-items:center;justify-content:center;background:linear-gradient(135deg,#f3e8ff,#fce7f3,#e0e7ff);text-align:center;padding:40px;">
+            <div style="font-size:36px;font-weight:700;color:#6b21a8;margin-bottom:12px;">数秘AIライフコンパス</div>
+            <div style="font-size:18px;color:#9333ea;margin-bottom:40px;">パーソナル数秘レポート</div>
+            <div style="font-size:28px;font-weight:700;color:#1f2937;margin-bottom:8px;">${name} さん</div>
+            <div style="font-size:14px;color:#9ca3af;margin-bottom:4px;">${bdate}</div>
+            <div style="font-size:14px;color:#9ca3af;">作成日: ${new Date().toLocaleDateString('ja-JP')}</div>
+            <div style="font-size:12px;color:#d1d5db;margin-top:60px;max-width:500px;">このレポートはあなたの生年月日から導き出された数秘術の分析結果です。</div>
+          </div>
+
+          <!-- Chart -->
+          <div style="page-break-before:always;padding:40px;text-align:center;">
+            <div style="font-size:22px;font-weight:700;color:#6b21a8;margin-bottom:20px;">${name}さんの数秘チャート</div>
+            <div id="pdf-chart-slot"></div>
+          </div>
+
+          <!-- Number Details -->
+          <div style="page-break-before:always;padding:40px;">
+            <div style="font-size:22px;font-weight:700;color:#6b21a8;margin-bottom:20px;text-align:center;">数秘ナンバー詳細</div>
+            ${numBlock('成熟数', r.maturity, positionData['cell-maturity'])}
+            ${numBlock('成長数', r.spirit, positionData['cell-spirit'])}
+            ${numBlock('人格数', r.persona, positionData['cell-persona'])}
+            ${numBlock('誕生数', r.destiny, positionData['cell-destiny'], birthDayHtml)}
+            ${numBlock('社会数', r.ground, positionData['cell-ground'])}
+            ${numBlock('運命数', r.lifePath, positionData['cell-lifepath'])}
+            ${numBlock('克服数', r.ch1, positionData['cell-ch1'])}
+          </div>
+
+          <!-- Challenges & Goals -->
+          <div style="page-break-before:always;padding:40px;">
+            <div style="font-size:22px;font-weight:700;color:#6b21a8;margin-bottom:20px;text-align:center;">挑戦数 & 目標数</div>
+            ${numBlock('第2目標数', r.target2, positionData['cell-target2'])}
+            ${numBlock('第3目標数', r.target3, positionData['cell-target3'])}
+            ${numBlock('第2挑戦数', r.ch2, positionData['cell-ch2'])}
+            ${numBlock('第3挑戦数', r.ch3, positionData['cell-ch3'])}
+            ${numBlock('第4挑戦数', r.ch4, positionData['cell-ch4'])}
+          </div>
+
+          <!-- Life Cycles -->
+          <div style="padding:40px;">
+            <div style="font-size:22px;font-weight:700;color:#6b21a8;margin-bottom:20px;text-align:center;">ライフサイクル期間</div>
+            <div style="background:#faf5ff;border-radius:8px;padding:20px;font-size:14px;color:#4b5563;line-height:2;">
+              <div>第1期: 0〜${pa.first}歳</div>
+              <div>第2期: ${pa.first+1}〜${pa.second}歳</div>
+              <div>第3期: ${pa.second+1}〜${pa.third}歳</div>
+              <div>第4期: ${pa.third}歳〜</div>
+              <div style="margin-top:12px;font-weight:600;color:#1f2937;">現在の年齢: ${r.age}歳</div>
+            </div>
+          </div>
+
+          <!-- ===== パーソナルライフガイダンス ===== -->
+          <div style="page-break-before:always;padding:40px;">
+            <div style="font-size:24px;font-weight:700;color:#6b21a8;margin-bottom:8px;text-align:center;">パーソナルライフガイダンス</div>
+            <div style="font-size:12px;color:#9ca3af;text-align:center;margin-bottom:30px;">${name}さんの数秘プロファイルに基づく人生の指針</div>
+
+            <!-- 1. あなたの本質 -->
+            <div style="margin-bottom:24px;">
+              <div style="font-size:16px;font-weight:700;color:#7c3aed;margin-bottom:8px;border-left:3px solid #7c3aed;padding-left:10px;">あなたの本質と使命</div>
+              <div style="font-size:12px;color:#4b5563;line-height:1.8;">
+                <p style="margin-bottom:8px;">${name}さんの運命数は<strong style="color:#6b21a8;">${r.lifePath}</strong>です。${(numDB[r.lifePath]||numDB[Math.min(r.lifePath,9)]).core}</p>
+                <p style="margin-bottom:8px;">誕生数<strong style="color:#6b21a8;">${r.destiny}</strong>が示すあなたの内面は、${(numDB[r.destiny]||numDB[Math.min(r.destiny,9)]).core.substring(0,80)}…という特性を持っています。この内なる衝動こそが、あなたの行動の根源的な動機となります。</p>
+                <p>成熟数<strong style="color:#6b21a8;">${r.maturity}</strong>は、人生の後半に向かって統合されるテーマです。${(numDB[r.maturity]||numDB[Math.min(r.maturity,9)]).core.substring(0,80)}…という方向へ、あなたは自然と進化していくでしょう。</p>
+              </div>
+            </div>
+
+            <!-- 2. 外面と内面 -->
+            <div style="margin-bottom:24px;">
+              <div style="font-size:16px;font-weight:700;color:#7c3aed;margin-bottom:8px;border-left:3px solid #7c3aed;padding-left:10px;">外面的な自分と内面的な自分</div>
+              <div style="font-size:12px;color:#4b5563;line-height:1.8;">
+                <p style="margin-bottom:8px;">人格数<strong style="color:#6b21a8;">${r.persona}</strong>は、周囲があなたに抱く第一印象を表します。${(numDB[r.persona]||numDB[Math.min(r.persona,9)]).core.substring(0,80)}…というエネルギーを外に放っています。</p>
+                <p style="margin-bottom:8px;">一方、成長数<strong style="color:#6b21a8;">${r.spirit}</strong>は幼少期に形成された内面の性質です。${(numDB[r.spirit]||numDB[Math.min(r.spirit,9)]).core.substring(0,80)}…という資質が、あなたの基盤を形作っています。</p>
+                <p>社会数<strong style="color:#6b21a8;">${r.ground}</strong>は、あなたが生まれた時代のエネルギーです。${(numDB[r.ground]||numDB[Math.min(r.ground,9)]).core.substring(0,80)}…という時代の波に乗ることで、社会的な成功が加速します。</p>
+              </div>
+            </div>
+
+            <!-- 3. 人生の課題と克服 -->
+            <div style="margin-bottom:24px;">
+              <div style="font-size:16px;font-weight:700;color:#7c3aed;margin-bottom:8px;border-left:3px solid #7c3aed;padding-left:10px;">人生の課題と克服のテーマ</div>
+              <div style="font-size:12px;color:#4b5563;line-height:1.8;">
+                <p style="margin-bottom:8px;">克服数<strong style="color:#6b21a8;">${r.ch1}</strong>は、あなたが人生で最初に直面する課題です。${(numDB[r.ch1]||numDB[Math.min(r.ch1,9)]).core.substring(0,60)}…のエネルギーを正しく使いこなすことが、この課題の克服の鍵となります。</p>
+                <p style="margin-bottom:8px;">第2挑戦数<strong style="color:#6b21a8;">${r.ch2}</strong>は中期的な課題、第3挑戦数<strong style="color:#6b21a8;">${r.ch3}</strong>はより深い内面の課題です。これらの課題はあなたを成長させるために存在し、乗り越えるたびに魂のレベルが上がります。</p>
+                <p>第4挑戦数<strong style="color:#6b21a8;">${r.ch4}</strong>は生涯を通じたテーマです。この数のエネルギーとの付き合い方を学ぶことが、あなたの人生の大きな意味の一つです。</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- ===== 人生のステージ ===== -->
+          <div style="page-break-before:always;padding:40px;">
+            <div style="font-size:16px;font-weight:700;color:#7c3aed;margin-bottom:8px;border-left:3px solid #7c3aed;padding-left:10px;">人生の4つのステージ</div>
+            <div style="font-size:12px;color:#4b5563;line-height:1.8;">
+              <div style="background:#fce7f3;border-radius:8px;padding:14px;margin-bottom:10px;">
+                <div style="font-weight:700;color:#be185d;margin-bottom:4px;">第1期: 成長期（0〜${pa.first}歳）</div>
+                <p>この時期の目標は成長数<strong>${r.spirit}</strong>のエネルギーに導かれています。${(numDB[r.spirit]||numDB[Math.min(r.spirit,9)]).core.substring(0,60)}…というテーマが幼少期から青年期を形作ります。克服数<strong>${r.ch1}</strong>の課題と向き合いながら、自己の基盤を築く時期です。</p>
+              </div>
+              <div style="background:#f3e8ff;border-radius:8px;padding:14px;margin-bottom:10px;">
+                <div style="font-weight:700;color:#7c3aed;margin-bottom:4px;">第2期: 発展期（${pa.first+1}〜${pa.second}歳）</div>
+                <p>第2目標数<strong>${r.target2}</strong>が示すように、${(numDB[r.target2]||numDB[Math.min(r.target2,9)]).core.substring(0,60)}…というエネルギーが強まります。社会的に活動の幅を広げ、才能を発揮する時期です。第2挑戦数<strong>${r.ch2}</strong>の課題を通じてさらなる成長が促されます。</p>
+              </div>
+              <div style="background:#e0e7ff;border-radius:8px;padding:14px;margin-bottom:10px;">
+                <div style="font-weight:700;color:#4f46e5;margin-bottom:4px;">第3期: 成熟期（${pa.second+1}〜${pa.third}歳）</div>
+                <p>第3目標数<strong>${r.target3}</strong>のもとで、人生の知恵が結実する時期。${(numDB[r.target3]||numDB[Math.min(r.target3,9)]).core.substring(0,60)}…というテーマが前面に出てきます。成熟数<strong>${r.maturity}</strong>への統合が始まり、人生の意味がより明確になります。</p>
+              </div>
+              <div style="background:#ccfbf1;border-radius:8px;padding:14px;margin-bottom:10px;">
+                <div style="font-weight:700;color:#0d9488;margin-bottom:4px;">第4期: 完成期（${pa.third}歳〜）</div>
+                <p>成熟数<strong>${r.maturity}</strong>のエネルギーが完全に花開く時期。${(numDB[r.maturity]||numDB[Math.min(r.maturity,9)]).core.substring(0,60)}…というテーマが人生の集大成として現れます。蓄積した経験と叡智を次世代に伝える使命が生まれます。</p>
+              </div>
+            </div>
+
+            <!-- 今年のテーマ -->
+            <div style="margin-top:24px;margin-bottom:24px;">
+              <div style="font-size:16px;font-weight:700;color:#7c3aed;margin-bottom:8px;border-left:3px solid #7c3aed;padding-left:10px;">今年のパーソナルサイクル</div>
+              <div style="font-size:12px;color:#4b5563;line-height:1.8;">
+                <div style="display:flex;gap:16px;margin-bottom:12px;">
+                  <div style="background:#f0fdfa;border-radius:8px;padding:12px;text-align:center;flex:1;">
+                    <div style="font-size:10px;color:#0d9488;">個人年</div>
+                    <div style="font-family:Lora,serif;font-size:24px;font-weight:700;color:#0f766e;">${r.pYear}</div>
+                  </div>
+                  <div style="background:#f0fdfa;border-radius:8px;padding:12px;text-align:center;flex:1;">
+                    <div style="font-size:10px;color:#0d9488;">個人月</div>
+                    <div style="font-family:Lora,serif;font-size:24px;font-weight:700;color:#0f766e;">${r.pMonth}</div>
+                  </div>
+                  <div style="background:#f0fdfa;border-radius:8px;padding:12px;text-align:center;flex:1;">
+                    <div style="font-size:10px;color:#0d9488;">個人日</div>
+                    <div style="font-family:Lora,serif;font-size:24px;font-weight:700;color:#0f766e;">${r.pDay}</div>
+                  </div>
+                </div>
+                <p>今年の個人年は<strong style="color:#0f766e;">${r.pYear}</strong>。${cycleDescriptions[r.pYear] || cycleDescriptions[Math.min(r.pYear,9)]}</p>
+              </div>
+            </div>
+
+            <!-- 総合メッセージ -->
+            <div style="background:linear-gradient(135deg,#f3e8ff,#fce7f3);border-radius:12px;padding:24px;text-align:center;">
+              <div style="font-size:16px;font-weight:700;color:#6b21a8;margin-bottom:12px;">${name}さんへのメッセージ</div>
+              <div style="font-size:12px;color:#4b5563;line-height:1.9;">
+                あなたは運命数${r.lifePath}の持つ「${(numDB[r.lifePath]||numDB[Math.min(r.lifePath,9)]).traits.split('\\n')[0]}」のエネルギーを軸に、誕生数${r.destiny}の内なる衝動と、人格数${r.persona}の外への表現力を組み合わせて、唯一無二の人生を歩んでいます。
+                <br><br>
+                今は${r.age}歳、ライフサイクルの${r.age <= pa.first ? '第1期（成長期）' : r.age <= pa.second ? '第2期（発展期）' : r.age <= pa.third ? '第3期（成熟期）' : '第4期（完成期）'}にいます。この時期のエネルギーを最大限に活かし、あなたらしい輝きを世界に届けてください。
+                <br><br>
+                数秘術は、あなたの可能性を照らす光です。数字が示すテーマを意識しながら、日々の選択を重ねていくことで、あなたの人生はさらに豊かで充実したものになるでしょう。
+              </div>
+            </div>
+
+            <div style="text-align:center;font-size:10px;color:#d1d5db;margin-top:40px;">&copy; 2026 数秘AIライフコンパス — Powered by Gemini</div>
+          </div>
+
+          <!-- ===== 手相鑑定レポート ===== -->
+          ${(() => {
+            // Collect palm reading data from the form
+            const pSelects = {
+              lifeline: document.getElementById('palm-lifeline').value,
+              headline: document.getElementById('palm-headline').value,
+              heartline: document.getElementById('palm-heartline').value,
+              fateline: document.getElementById('palm-fateline').value,
+              sunline: document.getElementById('palm-sunline').value,
+              moneyline: document.getElementById('palm-moneyline').value,
+            };
+            const pLineNames = { lifeline:'生命線', headline:'頭脳線', heartline:'感情線', fateline:'運命線', sunline:'太陽線', moneyline:'財運線' };
+            const pFilled = Object.entries(pSelects).filter(([,v]) => v);
+            const pSpecials = [...document.querySelectorAll('.palm-special:checked')].map(c => c.value);
+            const pMounts = [...document.querySelectorAll('.palm-mount:checked')].map(c => c.value);
+
+            if (pFilled.length === 0 && pSpecials.length === 0 && pMounts.length === 0) return '';
+
+            let palmHtml = '<div style="page-break-before:always;padding:40px;">';
+            palmHtml += '<div style="font-size:24px;font-weight:700;color:#6b21a8;margin-bottom:8px;text-align:center;">手相鑑定レポート</div>';
+            palmHtml += '<div style="font-size:12px;color:#9ca3af;text-align:center;margin-bottom:30px;">あなたの手のひらの線と相から読み解く運勢</div>';
+
+            // Basic lines
+            if (pFilled.length > 0) {
+              palmHtml += '<div style="font-size:16px;font-weight:700;color:#7c3aed;margin-bottom:12px;border-left:3px solid #7c3aed;padding-left:10px;">基本6線の鑑定</div>';
+              let pTotal = 0, pCount = 0;
+              pFilled.forEach(([key, val]) => {
+                const data = palmDB[key]?.[val];
+                if (!data) return;
+                pTotal += data.score; pCount++;
+                const stars = '★'.repeat(data.score) + '☆'.repeat(5 - data.score);
+                palmHtml += '<div style="background:#faf5ff;border-radius:8px;padding:12px 14px;margin-bottom:8px;">' +
+                  '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;">' +
+                  '<span style="font-size:13px;font-weight:700;color:#6b21a8;">' + pLineNames[key] + '</span>' +
+                  '<span style="font-size:10px;color:#a78bfa;">' + stars + '</span></div>' +
+                  '<div style="font-size:11px;font-weight:600;color:#4b5563;margin-bottom:2px;">' + data.title + '</div>' +
+                  '<div style="font-size:11px;color:#6b7280;line-height:1.7;">' + data.reading + '</div></div>';
+              });
+              if (pCount > 0) {
+                const pAvg = (pTotal / pCount).toFixed(1);
+                palmHtml += '<div style="background:linear-gradient(135deg,#7c3aed,#ec4899);border-radius:10px;padding:16px;text-align:center;color:#fff;margin-bottom:20px;">' +
+                  '<div style="font-size:10px;opacity:0.8;">基本線 総合スコア</div>' +
+                  '<div style="font-family:Lora,serif;font-size:28px;font-weight:700;">' + pAvg + ' / 5.0</div></div>';
+              }
+            }
+
+            // Special marks
+            if (pSpecials.length > 0) {
+              palmHtml += '<div style="font-size:16px;font-weight:700;color:#7c3aed;margin-bottom:12px;margin-top:24px;border-left:3px solid #7c3aed;padding-left:10px;">特殊相の鑑定（' + pSpecials.length + '個検出）</div>';
+              pSpecials.forEach(key => {
+                const sp = specialDB[key];
+                if (!sp) return;
+                palmHtml += '<div style="background:#fffbeb;border:1px solid #fde68a;border-radius:8px;padding:12px 14px;margin-bottom:8px;">' +
+                  '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;">' +
+                  '<span style="font-size:13px;font-weight:700;color:#92400e;">' + sp.name + '</span>' +
+                  '<span style="font-size:9px;color:#d97706;background:#fef3c7;border-radius:10px;padding:2px 8px;">' + sp.rarity + '</span></div>' +
+                  '<div style="font-size:11px;color:#6b7280;line-height:1.7;">' + sp.reading + '</div></div>';
+              });
+            }
+
+            // Mounts
+            if (pMounts.length > 0) {
+              palmHtml += '<div style="font-size:16px;font-weight:700;color:#7c3aed;margin-bottom:12px;margin-top:24px;border-left:3px solid #7c3aed;padding-left:10px;">発達している丘の鑑定</div>';
+              pMounts.forEach(key => {
+                const mt = mountDB[key];
+                if (!mt) return;
+                palmHtml += '<div style="background:#eef2ff;border:1px solid #c7d2fe;border-radius:8px;padding:12px 14px;margin-bottom:8px;">' +
+                  '<div style="font-size:13px;font-weight:700;color:#3730a3;margin-bottom:4px;">' + mt.name + '（' + mt.area + '）</div>' +
+                  '<div style="font-size:11px;color:#6b7280;line-height:1.7;">' + mt.reading + '</div></div>';
+              });
+            }
+
+            // Cross reading with numerology
+            if (lastResults && pFilled.length > 0) {
+              const lp = lastResults.lifePath;
+              const crossReadings = {
+                1: '運命数1のリーダーシップと手相が示す行動力が相乗効果を生みます。独立・起業に向いた総合運勢です。',
+                2: '運命数2の協調性と手相の感受性が調和し、パートナーシップを通じた成功が期待できます。',
+                3: '運命数3の創造力と手相が示す表現力が融合。芸術・エンタメ分野での開花が見込めます。',
+                4: '運命数4の堅実さと手相の基盤力が組み合わさり、着実に資産を築ける総合運勢です。',
+                5: '運命数5の冒険心と手相の変化への適応力が噛み合い、多彩な経験から成功を掴みます。',
+                6: '運命数6の愛情と手相の対人力が呼応し、家庭・コミュニティでの深い絆を築けます。',
+                7: '運命数7の探究心と手相の直感力が相乗し、専門分野での深い洞察と成功が期待できます。',
+                8: '運命数8の達成力と手相の金運が結合。ビジネスでの大きな成功と物質的豊かさを実現します。',
+                9: '運命数9の博愛精神と手相の慈愛が融合。人々を導き、社会に大きな貢献ができる総合運勢です。',
+              };
+              const cross = crossReadings[lp] || crossReadings[Math.min(lp, 9)];
+              palmHtml += '<div style="background:#f3e8ff;border:1px solid #d8b4fe;border-radius:10px;padding:16px;margin-top:24px;">' +
+                '<div style="font-size:14px;font-weight:700;color:#6b21a8;margin-bottom:8px;">数秘 × 手相 クロスリーディング</div>' +
+                '<div style="font-size:12px;color:#4b5563;line-height:1.8;">' + cross + '</div>';
+
+              // Special marks + numerology synthesis
+              if (pSpecials.length > 0) {
+                let synth = '手相に';
+                synth += pSpecials.map(k => specialDB[k]?.name).filter(Boolean).join('・');
+                synth += 'が確認されました。';
+                if (pSpecials.includes('haou') || pSpecials.includes('solomon')) {
+                  synth += '運命数' + lp + 'の使命と覇王線/ソロモンの環の大吉相が組み合わさり、社会的に大きな影響力を発揮する可能性を秘めています。';
+                } else if (pSpecials.includes('shinpi') || pSpecials.includes('butsugan')) {
+                  synth += '運命数' + lp + 'のテーマとスピリチュアルな守護の相が重なり、直感を信じた行動が大きな成果をもたらすでしょう。';
+                } else {
+                  synth += '運命数' + lp + 'のエネルギーとこれらの特殊相が共鳴し、人生の重要な転機で強い後押しを受けるでしょう。';
+                }
+                palmHtml += '<div style="font-size:11px;color:#6b7280;line-height:1.7;margin-top:8px;">' + synth + '</div>';
+              }
+              palmHtml += '</div>';
+            }
+
+            palmHtml += '</div>';
+            return palmHtml;
+          })()}
+        `;
+
+        document.body.appendChild(pdfRoot);
+
+        // Clone chart into PDF render container
+        const chartEl = document.querySelector('.chart-area');
+        if (chartEl) {
+          const chartClone = chartEl.cloneNode(true);
+          chartClone.style.margin = '0 auto';
+          chartClone.style.maxWidth = '500px';
+          // Fix center row: override justify-between to keep boxes closer in PDF
+          const centerRows = chartClone.querySelectorAll('.chart-row');
+          centerRows.forEach(row => {
+            if (row.classList.contains('justify-between')) {
+              row.style.justifyContent = 'center';
+              row.style.gap = '24px';
+            }
+          });
+          document.getElementById('pdf-chart-slot').appendChild(chartClone);
+        }
+
+        // Wait for fonts/rendering
+        await new Promise(r => setTimeout(r, 500));
+
+        // Render to canvas then PDF
+        const canvas = await html2canvas(pdfRoot, {
+          scale: 2,
+          useCORS: true,
+          backgroundColor: '#ffffff',
+          windowWidth: 800
+        });
+
+        document.body.removeChild(pdfRoot);
+
+        const { jsPDF } = window.jspdf;
+        const pdf = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
+        const pw = 210, ph = 297, margin = 8;
+        const contentW = pw - margin * 2;
+
+        const imgData = canvas.toDataURL('image/png');
+        const imgW = contentW;
+        const imgH = (canvas.height / canvas.width) * imgW;
+
+        // Split into pages
+        const pageContentH = ph - margin * 2;
+        let srcY = 0;
+        let pageNum = 0;
+        const totalPages = Math.ceil(imgH / pageContentH);
+
+        while (srcY < imgH) {
+          if (pageNum > 0) pdf.addPage();
+          const sliceH = Math.min(pageContentH, imgH - srcY);
+
+          // Create a slice of the canvas for this page
+          const sliceCanvas = document.createElement('canvas');
+          sliceCanvas.width = canvas.width;
+          sliceCanvas.height = (sliceH / imgW) * canvas.width;
+          const ctx = sliceCanvas.getContext('2d');
+          const srcPixelY = (srcY / imgH) * canvas.height;
+          const srcPixelH = (sliceH / imgH) * canvas.height;
+          ctx.drawImage(canvas, 0, srcPixelY, canvas.width, srcPixelH, 0, 0, sliceCanvas.width, sliceCanvas.height);
+
+          const sliceData = sliceCanvas.toDataURL('image/png');
+          pdf.addImage(sliceData, 'PNG', margin, margin, contentW, sliceH);
+
+          srcY += pageContentH;
+          pageNum++;
+        }
+
+        pdf.save(name + '_数秘レポート.pdf');
+
+      } catch(e) {
+        console.error('PDF generation error:', e);
+        alert('PDF生成中にエラーが発生しました。');
+      } finally {
+        btn.innerHTML = origText;
+        btn.disabled = false;
+      }
+    });
+  </script>
+</body>
+</html>
