@@ -1281,8 +1281,8 @@
       document.getElementById('palm-preview-img-' + hand).src = dataUrl;
       document.getElementById('palm-preview-area-' + hand).classList.remove('hidden');
       document.getElementById('palm-upload-prompt-' + hand).classList.add('hidden');
-      // Trigger AI analysis when at least one hand is available
-      analyzePalmWithAI();
+      // Trigger AI analysis when at least one hand is available (debounced)
+      debouncedAnalyze();
     }
 
     function handlePalmFile(file, hand) {
@@ -1294,6 +1294,14 @@
 
     const GEMINI_PROXY_URL = 'https://gemini-proxy.kodawarimaxjp.workers.dev';
     let palmAnalysisPending = false; // prevent concurrent API calls
+    let palmDebounceTimer = null;
+    let cachedCrossReading = null; // cache cross-reading to avoid repeated API calls
+    let cachedCrossReadingKey = ''; // invalidation key
+
+    function debouncedAnalyze() {
+      clearTimeout(palmDebounceTimer);
+      palmDebounceTimer = setTimeout(() => analyzePalmWithAI(), 500);
+    }
 
     // Compress image to reduce API payload (max 800px, JPEG 0.7)
     function compressImage(dataUrl, maxSize = 800) {
@@ -1317,24 +1325,42 @@
       });
     }
 
-    // Retry with exponential backoff for transient errors
-    async function fetchWithRetry(url, options, maxRetries = 2) {
+    // Retry with exponential backoff + AbortController timeout
+    async function fetchWithRetry(url, options, maxRetries = 2, timeoutMs = 30000) {
       for (let attempt = 0; attempt <= maxRetries; attempt++) {
-        const response = await fetch(url, options);
-        if (response.ok) return response;
-        // Retry on 429 (rate limit) or 500+ (server error)
-        if ((response.status === 429 || response.status >= 500) && attempt < maxRetries) {
-          const delay = Math.pow(2, attempt) * 1000 + Math.random() * 500;
-          await new Promise(r => setTimeout(r, delay));
-          continue;
-        }
-        // Non-retryable errors
-        if (response.status === 403) {
-          throw new Error('APIキーが無効です。設定を確認してください');
-        } else if (response.status === 429) {
-          throw new Error('APIの利用制限に達しました。しばらく待ってから再度お試しください');
-        } else {
-          throw new Error('API error: ' + response.status);
+        const controller = new AbortController();
+        const timer = setTimeout(() => controller.abort(), timeoutMs);
+        try {
+          const response = await fetch(url, { ...options, signal: controller.signal });
+          clearTimeout(timer);
+          if (response.ok) return response;
+          // Retry on 429 or 500+
+          if ((response.status === 429 || response.status >= 500) && attempt < maxRetries) {
+            const delay = Math.pow(2, attempt) * 1000 + Math.random() * 500;
+            await new Promise(r => setTimeout(r, delay));
+            continue;
+          }
+          // Parse structured error from Worker proxy
+          let errMsg = '';
+          try { const errBody = await response.json(); errMsg = errBody.error || ''; } catch {}
+          // Non-retryable errors with specific messages
+          if (response.status === 400) {
+            throw new Error(errMsg || 'リクエストが不正です。画像を変更してお試しください');
+          } else if (response.status === 403) {
+            throw new Error(errMsg || 'APIキーが無効です。設定を確認してください');
+          } else if (response.status === 429) {
+            throw new Error(errMsg || 'APIの利用制限に達しました。しばらく待ってから再度お試しください');
+          } else if (response.status >= 500) {
+            throw new Error(errMsg || 'AIサーバーが一時的に利用できません。1分後に再度お試しください');
+          } else {
+            throw new Error(errMsg || 'API error: ' + response.status);
+          }
+        } catch (e) {
+          clearTimeout(timer);
+          if (e.name === 'AbortError') {
+            throw new Error('AI分析がタイムアウトしました。通信環境を確認して再度お試しください');
+          }
+          throw e;
         }
       }
     }
@@ -1479,13 +1505,13 @@ JSONのみ返してください（\`\`\`不要）:
 
         // Use user's own key directly, or proxy (default)
         const fetchUrl = userApiKey
-          ? 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=' + userApiKey
+          ? 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-lite:generateContent?key=' + userApiKey
           : GEMINI_PROXY_URL;
         const response = await fetchWithRetry(fetchUrl, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: requestBody,
-        });
+        }, 2, 45000); // 45s timeout for image analysis
 
         const result = await response.json();
         const text = result.candidates?.[0]?.content?.parts?.[0]?.text || '';
@@ -1592,7 +1618,7 @@ JSONのみ返してください（\`\`\`不要）:
           document.getElementById(id).value = '';
         });
       } else {
-        analyzePalmWithAI();
+        debouncedAnalyze();
       }
     });
 
@@ -1609,7 +1635,7 @@ JSONのみ返してください（\`\`\`不要）:
           document.getElementById(id).value = '';
         });
       } else {
-        analyzePalmWithAI();
+        debouncedAnalyze();
       }
     });
 
@@ -1861,7 +1887,7 @@ ${numContext}
       try {
         const chatApiKey = (document.getElementById('geminiApiKey')?.value || '').trim();
         const fetchUrl = chatApiKey
-          ? 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=' + chatApiKey
+          ? 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-lite:generateContent?key=' + chatApiKey
           : GEMINI_PROXY_URL;
 
         const response = await fetchWithRetry(fetchUrl, {
@@ -1871,7 +1897,7 @@ ${numContext}
             contents,
             generationConfig: { temperature: 0.7, maxOutputTokens: 512 }
           }),
-        });
+        }, 2, 20000); // 20s timeout for chat
 
         const result = await response.json();
         const answer = result.candidates?.[0]?.content?.parts?.[0]?.text || '回答できませんでした。';
@@ -1898,7 +1924,9 @@ ${numContext}
       if (!lastResults) return;
       const btn = document.getElementById('btn-download-pdf');
       const origText = btn.innerHTML;
-      btn.innerHTML = '<svg class="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path></svg> PDF生成中...';
+      const spinnerSvg = '<svg class="w-4 h-4 animate-spin inline-block" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path></svg>';
+      const updateProgress = (step, label) => { btn.innerHTML = `${spinnerSvg} PDF生成中... (${step}/4) ${label}`; };
+      updateProgress(1, 'データ準備');
       btn.disabled = true;
 
       try {
@@ -2216,6 +2244,7 @@ ${numContext}
         }
 
         // Generate AI cross reading if palm + numerology data exists
+        updateProgress(2, 'AI統合リーディング');
         const crossEl = document.getElementById('pdf-cross-reading-content');
         if (crossEl && lastResults) {
           try {
@@ -2235,6 +2264,11 @@ ${numContext}
             const spList = [...document.querySelectorAll('.palm-special:checked')].map(c => specialDB[c.value]?.name).filter(Boolean).join('、');
             const mtList = [...document.querySelectorAll('.palm-mount:checked')].map(c => mountDB[c.value]?.name).filter(Boolean).join('、');
 
+            // Cache key based on data — reuse cached result if unchanged
+            const crossCacheKey = JSON.stringify([lastResults.lifePath, lastResults.personality, lastResults.social, palmSummary, spList, mtList]);
+            if (cachedCrossReading && cachedCrossReadingKey === crossCacheKey) {
+              crossEl.innerHTML = cachedCrossReading;
+            } else {
             const crossPrompt = `あなたは数秘術と手相占いの両方に精通したプロの占い師です。以下のデータに基づき、この人だけの「数秘×手相 統合リーディング」を書いてください。
 
 【数秘術データ】
@@ -2266,7 +2300,7 @@ ${palmAnalysisResult?.findings ? '- AI画像分析所見: ' + palmAnalysisResult
 
             const crossApiKey = (document.getElementById('geminiApiKey')?.value || '').trim();
             const crossUrl = crossApiKey
-              ? 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=' + crossApiKey
+              ? 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-lite:generateContent?key=' + crossApiKey
               : GEMINI_PROXY_URL;
             const crossResp = await fetchWithRetry(crossUrl, {
               method: 'POST',
@@ -2275,31 +2309,39 @@ ${palmAnalysisResult?.findings ? '- AI画像分析所見: ' + palmAnalysisResult
                 contents: [{ parts: [{ text: crossPrompt }] }],
                 generationConfig: { temperature: 0.7, maxOutputTokens: 4096 }
               })
-            });
+            }, 1, 15000); // 15s timeout, 1 retry for PDF cross-reading
             if (crossResp.ok) {
               const crossResult = await crossResp.json();
               let crossText = crossResult.candidates?.[0]?.content?.parts?.[0]?.text || '';
-              // Format section headers
               crossText = crossText.replace(/【(.+?)】/g, '<div style="font-size:13px;font-weight:700;color:#7c3aed;margin-top:14px;margin-bottom:4px;">$1</div>');
               crossText = crossText.replace(/\n/g, '<br>');
               crossEl.innerHTML = crossText;
+              cachedCrossReading = crossText;
+              cachedCrossReadingKey = crossCacheKey;
             }
+            } // end else (no cache hit)
           } catch(e) {
             console.error('Cross reading generation error:', e);
-            crossEl.innerHTML = '<span style="color:#9ca3af;">統合リーディングの生成に失敗しました。</span>';
+            crossEl.innerHTML = '<span style="color:#9ca3af;">統合リーディングはオンライン版でご確認ください。</span>';
           }
         }
 
         // Wait for fonts/rendering
         await new Promise(r => setTimeout(r, 500));
 
-        // Render to canvas then PDF
-        const canvas = await html2canvas(pdfRoot, {
-          scale: 1.5,
+        updateProgress(3, '画像レンダリング');
+        // Render to canvas then PDF (mobile: lower scale to prevent OOM)
+        const isMobile = window.innerWidth < 768;
+        const canvasPromise = html2canvas(pdfRoot, {
+          scale: isMobile ? 1.0 : 1.5,
           useCORS: true,
           backgroundColor: '#ffffff',
           windowWidth: 800
         });
+        const canvasTimeout = new Promise((_, reject) =>
+          setTimeout(() => reject(new Error('PDF_RENDER_TIMEOUT')), 30000)
+        );
+        const canvas = await Promise.race([canvasPromise, canvasTimeout]);
 
         document.body.removeChild(pdfRoot);
 
@@ -2331,7 +2373,7 @@ ${palmAnalysisResult?.findings ? '- AI画像分析所見: ' + palmAnalysisResult
           // Left: logo text
           doc.setFontSize(8);
           doc.setTextColor(109, 40, 217); // purple-700
-          doc.text('数秘AIライフコンパス', marginX, marginTop + headerHeight - 3);
+          doc.text('Numerology AI Life Compass', marginX, marginTop + headerHeight - 3);
           // Right: page number
           doc.setFontSize(8);
           doc.setTextColor(156, 163, 175); // gray-400
@@ -2346,9 +2388,10 @@ ${palmAnalysisResult?.findings ? '- AI画像分析所見: ' + palmAnalysisResult
           doc.line(marginX, footerY - 1, pw - marginX, footerY - 1);
           doc.setFontSize(7);
           doc.setTextColor(156, 163, 175); // gray-400
-          doc.text('\u00A9 2026 数秘AIライフコンパス \u2014 Powered by Gemini', pw / 2, footerY + 2, { align: 'center' });
+          doc.text('(c) 2026 Numerology AI Life Compass - Powered by Gemini', pw / 2, footerY + 2, { align: 'center' });
         };
 
+        updateProgress(4, 'PDF書き出し');
         while (srcY < imgH) {
           if (pageNum > 0) pdf.addPage();
           pageNum++;
@@ -2364,22 +2407,38 @@ ${palmAnalysisResult?.findings ? '- AI画像分析所見: ' + palmAnalysisResult
           ctx.drawImage(canvas, 0, srcPixelY, canvas.width, srcPixelH, 0, 0, sliceCanvas.width, sliceCanvas.height);
 
           const sliceData = sliceCanvas.toDataURL('image/jpeg', 0.85);
-          // Content area starts below header
           const contentY = marginTop + headerHeight;
           pdf.addImage(sliceData, 'JPEG', marginX, contentY, contentW, sliceH);
 
           drawHeader(pdf, pageNum, totalPages);
           drawFooter(pdf);
 
+          // Explicit cleanup to prevent mobile OOM
+          sliceCanvas.width = 0;
+          sliceCanvas.height = 0;
+
           srcY += pageContentH;
         }
+
+        // Cleanup main canvas
+        canvas.width = 0;
+        canvas.height = 0;
 
         pdf.save(name + '_数秘レポート.pdf');
 
       } catch(e) {
         console.error('PDF generation error:', e);
-        alert('PDF生成中にエラーが発生しました。');
+        let msg = 'PDF生成中にエラーが発生しました。';
+        if (e.message === 'PDF_RENDER_TIMEOUT') {
+          msg = 'PDF生成がタイムアウトしました。ページを再読み込みしてもう一度お試しください。';
+        } else if (e.name === 'RangeError' || e.message?.includes('memory')) {
+          msg = 'メモリ不足のためPDF生成に失敗しました。他のタブを閉じてから再度お試しください。';
+        }
+        alert(msg);
       } finally {
+        // Ensure pdfRoot is removed even on error
+        const leftover = document.getElementById('pdf-render');
+        if (leftover) leftover.remove();
         btn.innerHTML = origText;
         btn.disabled = false;
       }
