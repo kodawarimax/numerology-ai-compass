@@ -1314,10 +1314,21 @@
     }
 
     // Compress image to reduce API payload (max 800px, JPEG)
+    // Includes timeout for Safari where Image loading can hang
     function compressImage(dataUrl, maxSize = 800) {
       return new Promise((resolve) => {
+        let resolved = false;
+        const done = (val) => { if (!resolved) { resolved = true; resolve(val); } };
+
+        // 10s timeout — Safari can hang on certain image formats
+        const timer = setTimeout(() => {
+          console.warn('compressImage timeout — using original');
+          done(dataUrl);
+        }, 10000);
+
         const img = new Image();
         img.onload = () => {
+          clearTimeout(timer);
           try {
             const canvas = document.createElement('canvas');
             let w = img.width, h = img.height;
@@ -1329,22 +1340,25 @@
             canvas.width = w;
             canvas.height = h;
             const ctx = canvas.getContext('2d');
-            if (!ctx) { console.warn('Canvas context unavailable'); resolve(null); return; }
+            if (!ctx) { console.warn('Canvas context unavailable'); done(dataUrl); return; }
             ctx.drawImage(img, 0, 0, w, h);
             let result = canvas.toDataURL('image/jpeg', 0.7);
-            // If still too large (>4MB base64 ≈ 3MB binary), re-compress at lower quality
+            // If still too large (>4MB), re-compress at lower quality
             if (result.length > 4 * 1024 * 1024) {
               result = canvas.toDataURL('image/jpeg', 0.4);
             }
-            // Cleanup
             canvas.width = 0; canvas.height = 0;
-            resolve(result);
+            done(result);
           } catch (e) {
             console.warn('Image compression failed:', e);
-            resolve(null);
+            done(dataUrl); // fallback to original instead of null
           }
         };
-        img.onerror = () => resolve(null); // null signals failure to caller
+        img.onerror = () => {
+          clearTimeout(timer);
+          console.warn('Image load failed in compressImage');
+          done(null);
+        };
         img.src = dataUrl;
       });
     }
@@ -1356,7 +1370,14 @@
         const controller = new AbortController();
         const timer = setTimeout(() => controller.abort(), timeoutMs);
         try {
-          const response = await fetch(url, { ...options, signal: controller.signal });
+          // Explicit options construction (avoid spread issues on older Safari)
+          const fetchOpts = {
+            method: options.method || 'GET',
+            headers: options.headers || {},
+            signal: controller.signal,
+          };
+          if (options.body) fetchOpts.body = options.body;
+          const response = await fetch(url, fetchOpts);
           clearTimeout(timer);
           if (response.ok) return response;
           // Parse structured error from Worker proxy
@@ -1383,7 +1404,9 @@
           }
         } catch (e) {
           clearTimeout(timer);
-          if (e.name === 'AbortError') {
+          // Safari throws DOMException with name 'AbortError'; Chrome throws AbortError directly
+          const isAbort = (e && (e.name === 'AbortError' || (e instanceof DOMException && e.code === 20)));
+          if (isAbort) {
             if (attempt < maxRetries) { lastError = new Error('タイムアウト'); continue; }
             throw new Error('AI分析がタイムアウトしました。通信環境を確認して再度お試しください');
           }
@@ -1441,7 +1464,7 @@
 
       const analysisDiv = document.getElementById('palm-ai-analysis');
       const analysisContent = analysisDiv.querySelector('.bg-white, div');
-      const userApiKey = (document.getElementById('geminiApiKey')?.value || '').trim();
+      const userApiKey = ((document.getElementById('geminiApiKey') || {}).value || '').trim();
 
       // Show loading state
       analysisDiv.classList.remove('hidden');
@@ -1569,13 +1592,14 @@ JSONのみ返してください（\`\`\`不要）:
 
         const result = await response.json();
 
-        // Check for safety filter blocks
-        const finishReason = result.candidates?.[0]?.finishReason;
+        // Check for safety filter blocks (Safari-safe access)
+        const cand0 = result.candidates && result.candidates[0];
+        const finishReason = cand0 && cand0.finishReason;
         if (!result.candidates || result.candidates.length === 0 || finishReason === 'SAFETY') {
           throw new Error('この画像は分析できません。手のひら全体が明るく写った写真を使用してください。');
         }
 
-        const text = result.candidates?.[0]?.content?.parts?.[0]?.text || '';
+        const text = (cand0 && cand0.content && cand0.content.parts && cand0.content.parts[0] && cand0.content.parts[0].text) || '';
         if (!text.trim()) {
           throw new Error('AIから応答がありませんでした。別の写真でお試しください。');
         }
@@ -1985,7 +2009,7 @@ ${numContext}
       }
 
       try {
-        const chatApiKey = (document.getElementById('geminiApiKey')?.value || '').trim();
+        const chatApiKey = ((document.getElementById('geminiApiKey') || {}).value || '').trim();
         const fetchUrl = chatApiKey
           ? 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-lite:generateContent?key=' + chatApiKey
           : GEMINI_PROXY_URL;
@@ -2000,7 +2024,8 @@ ${numContext}
         }, 2, 20000); // 20s timeout for chat
 
         const result = await response.json();
-        const answer = result.candidates?.[0]?.content?.parts?.[0]?.text || '回答できませんでした。';
+        const c0 = result.candidates && result.candidates[0];
+        const answer = (c0 && c0.content && c0.content.parts && c0.content.parts[0] && c0.content.parts[0].text) || '回答できませんでした。';
 
         appendChatBubble('model', answer);
         palmChatHistory.push({ question, answer });
@@ -2399,7 +2424,7 @@ ${palmAnalysisResult?.findings ? '- AI画像分析所見: ' + palmAnalysisResult
 具体的で前向きな言葉を使い、この人にしか当てはまらない独自の内容にしてください。
 マークダウンは使わず、プレーンテキストで返してください。`;
 
-            const crossApiKey = (document.getElementById('geminiApiKey')?.value || '').trim();
+            const crossApiKey = ((document.getElementById('geminiApiKey') || {}).value || '').trim();
             const crossUrl = crossApiKey
               ? 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-lite:generateContent?key=' + crossApiKey
               : GEMINI_PROXY_URL;
@@ -2413,7 +2438,8 @@ ${palmAnalysisResult?.findings ? '- AI画像分析所見: ' + palmAnalysisResult
             }, 1, 15000); // 15s timeout, 1 retry for PDF cross-reading
             if (crossResp.ok) {
               const crossResult = await crossResp.json();
-              let crossText = crossResult.candidates?.[0]?.content?.parts?.[0]?.text || '';
+              const cc0 = crossResult.candidates && crossResult.candidates[0];
+              let crossText = (cc0 && cc0.content && cc0.content.parts && cc0.content.parts[0] && cc0.content.parts[0].text) || '';
               crossText = crossText.replace(/【(.+?)】/g, '<div style="font-size:13px;font-weight:700;color:#7c3aed;margin-top:14px;margin-bottom:4px;">$1</div>');
               crossText = crossText.replace(/\n/g, '<br>');
               crossEl.innerHTML = crossText;
@@ -2548,7 +2574,7 @@ ${palmAnalysisResult?.findings ? '- AI画像分析所見: ' + palmAnalysisResult
         let msg = 'PDF生成中にエラーが発生しました。';
         if (e.message === 'PDF_RENDER_TIMEOUT') {
           msg = 'PDF生成がタイムアウトしました。ページを再読み込みしてもう一度お試しください。';
-        } else if (e.name === 'RangeError' || e.message?.includes('memory')) {
+        } else if (e.name === 'RangeError' || (e.message && e.message.indexOf('memory') !== -1)) {
           msg = 'メモリ不足のためPDF生成に失敗しました。他のタブを閉じてから再度お試しください。';
         }
         alert(msg);
