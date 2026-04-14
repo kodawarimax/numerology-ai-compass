@@ -235,6 +235,14 @@
       </div>
     </div>
 
+    <!-- Font size adjustment bar -->
+    <div class="flex items-center gap-2 justify-end px-4 py-1 bg-white border-b border-gray-50">
+      <span class="text-[10px] text-gray-400">文字サイズ</span>
+      <button id="btn-font-decrease" class="w-6 h-6 rounded-full bg-gray-100 text-gray-500 text-xs font-bold flex items-center justify-center hover:bg-gray-200">A-</button>
+      <button id="btn-font-reset" class="w-6 h-6 rounded-full bg-gray-100 text-gray-500 text-xs font-bold flex items-center justify-center hover:bg-gray-200">A</button>
+      <button id="btn-font-increase" class="w-6 h-6 rounded-full bg-purple-100 text-purple-600 text-xs font-bold flex items-center justify-center hover:bg-purple-200">A+</button>
+    </div>
+
     <!-- Section Navigation Tabs -->
     <div class="sticky top-0 z-30 bg-white/90 backdrop-blur-sm border-b border-gray-100 shadow-sm">
       <div class="max-w-md mx-auto flex">
@@ -848,6 +856,28 @@
     let isPremium = false;
 
     // =========================================================
+    // Font size adjustment
+    // =========================================================
+    const FONT_DEFAULT = 14;
+    const FONT_MIN = 10;
+    const FONT_MAX = 22;
+    const FONT_STEP = 2;
+    let currentFontSize = parseInt(localStorage.getItem('result_font_size') || FONT_DEFAULT, 10);
+
+    function applyFontSize(size) {
+      currentFontSize = Math.min(FONT_MAX, Math.max(FONT_MIN, size));
+      viewResult.style.fontSize = currentFontSize + 'px';
+      localStorage.setItem('result_font_size', currentFontSize);
+    }
+
+    // Apply saved font size on load
+    applyFontSize(currentFontSize);
+
+    document.getElementById('btn-font-increase').addEventListener('click', () => applyFontSize(currentFontSize + FONT_STEP));
+    document.getElementById('btn-font-decrease').addEventListener('click', () => applyFontSize(currentFontSize - FONT_STEP));
+    document.getElementById('btn-font-reset').addEventListener('click', () => applyFontSize(FONT_DEFAULT));
+
+    // =========================================================
     // Form submit → calculate & show result view
     // =========================================================
     document.getElementById('birth-form').addEventListener('submit', (e) => {
@@ -1355,8 +1385,13 @@
 5. sunline（太陽線）: "deep-long"(濃く長い), "thin-short"(短い薄い), "multiple"(複数), "fork-vy"(VY字), "trident"(三股), "from-emotion"(感情線上から), "none"(なし)
 6. moneyline（財運線）: "deep-long"(濃く長い), "multiple"(複数), "thin-short"(薄い短い), "none"(なし)
 
-特殊相（見つかったもの）: specials配列: ["masukake","butsugan","shinpi","haou","solomon","star","fish","lucky-m","senkin","chokkan","charisma","taiyou-cross"]
+特殊相（わずかな兆候でも積極的に検出）: specials配列: ["masukake","butsugan","shinpi","haou","solomon","star","fish","lucky-m","senkin","chokkan","charisma","taiyou-cross"]
+- わずかな兆候でも積極的に検出してください。特殊相は希少ですが、部分的に見えるもの、発達途中のものも含めてください。
+- 特殊相が全く見つからない場合でも、最も可能性が高いものを1つは選んでください（specials配列を空にしないでください）。
+
 発達している丘（最大3つ）: mounts配列: ["jupiter","saturn","sun","mercury","venus","moon"]
+- 丘の発達は、写真から膨らみが確認できなくても、線の配置や全体のバランスから推測してください。少なくとも2つは選択してください。
+
 確信度: confidence ("high"/"medium"/"low")
 
 findingsフィールド: 右手の特徴、左手の特徴、右手と左手の対比分析、総合所見を日本語で詳しく記述してください。
@@ -1378,8 +1413,13 @@ JSONのみ返してください（\`\`\`不要）:
 5. sunline（太陽線）: "deep-long"(濃く長い), "thin-short"(短い薄い), "multiple"(複数), "fork-vy"(VY字), "trident"(三股), "from-emotion"(感情線上から), "none"(なし)
 6. moneyline（財運線）: "deep-long"(濃く長い), "multiple"(複数), "thin-short"(薄い短い), "none"(なし)
 
-特殊相（見つかったもの）: specials配列: ["masukake","butsugan","shinpi","haou","solomon","star","fish","lucky-m","senkin","chokkan","charisma","taiyou-cross"]
+特殊相（わずかな兆候でも積極的に検出）: specials配列: ["masukake","butsugan","shinpi","haou","solomon","star","fish","lucky-m","senkin","chokkan","charisma","taiyou-cross"]
+- わずかな兆候でも積極的に検出してください。特殊相は希少ですが、部分的に見えるもの、発達途中のものも含めてください。
+- 特殊相が全く見つからない場合でも、最も可能性が高いものを1つは選んでください（specials配列を空にしないでください）。
+
 発達している丘（最大3つ）: mounts配列: ["jupiter","saturn","sun","mercury","venus","moon"]
+- 丘の発達は、写真から膨らみが確認できなくても、線の配置や全体のバランスから推測してください。少なくとも2つは選択してください。
+
 確信度: confidence ("high"/"medium"/"low")
 
 findingsフィールド: 観察した各線の長さ・太さ・特徴の具体的な描写と総合所見を日本語で詳しく記述してください。
@@ -2257,7 +2297,7 @@ ${palmAnalysisResult?.findings ? '- AI画像分析所見: ' + palmAnalysisResult
 
         // Render to canvas then PDF
         const canvas = await html2canvas(pdfRoot, {
-          scale: 2,
+          scale: 1.5,
           useCORS: true,
           backgroundColor: '#ffffff',
           windowWidth: 800
@@ -2267,37 +2307,73 @@ ${palmAnalysisResult?.findings ? '- AI画像分析所見: ' + palmAnalysisResult
 
         const { jsPDF } = window.jspdf;
         const pdf = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
-        const pw = 210, ph = 297, margin = 8;
-        const contentW = pw - margin * 2;
+        const pw = 210, ph = 297;
+        const marginX = 8;
+        const marginTop = 15;  // top margin for header
+        const marginBottom = 12; // bottom margin for footer
+        const headerHeight = 10; // header area height in mm
+        const footerHeight = 8;  // footer area height in mm
+        const contentW = pw - marginX * 2;
 
-        const imgData = canvas.toDataURL('image/png');
         const imgW = contentW;
         const imgH = (canvas.height / canvas.width) * imgW;
 
-        // Split into pages
-        const pageContentH = ph - margin * 2;
+        // Usable content height per page (excluding header and footer)
+        const pageContentH = ph - marginTop - marginBottom - headerHeight - footerHeight;
         let srcY = 0;
         let pageNum = 0;
         const totalPages = Math.ceil(imgH / pageContentH);
 
+        // Helper: draw header on current page
+        const drawHeader = (doc, pNum, pTotal) => {
+          // Background line
+          doc.setDrawColor(147, 51, 234); // purple-600
+          doc.setLineWidth(0.3);
+          doc.line(marginX, marginTop + headerHeight - 1, pw - marginX, marginTop + headerHeight - 1);
+          // Left: logo text
+          doc.setFontSize(8);
+          doc.setTextColor(109, 40, 217); // purple-700
+          doc.text('数秘AIライフコンパス', marginX, marginTop + headerHeight - 3);
+          // Right: page number
+          doc.setFontSize(8);
+          doc.setTextColor(156, 163, 175); // gray-400
+          doc.text(`${pNum} / ${pTotal}`, pw - marginX, marginTop + headerHeight - 3, { align: 'right' });
+        };
+
+        // Helper: draw footer on current page
+        const drawFooter = (doc) => {
+          const footerY = ph - marginBottom - footerHeight + 4;
+          doc.setDrawColor(209, 213, 219); // gray-300
+          doc.setLineWidth(0.2);
+          doc.line(marginX, footerY - 1, pw - marginX, footerY - 1);
+          doc.setFontSize(7);
+          doc.setTextColor(156, 163, 175); // gray-400
+          doc.text('\u00A9 2026 数秘AIライフコンパス \u2014 Powered by Gemini', pw / 2, footerY + 2, { align: 'center' });
+        };
+
         while (srcY < imgH) {
           if (pageNum > 0) pdf.addPage();
+          pageNum++;
           const sliceH = Math.min(pageContentH, imgH - srcY);
 
           // Create a slice of the canvas for this page
           const sliceCanvas = document.createElement('canvas');
           sliceCanvas.width = canvas.width;
-          sliceCanvas.height = (sliceH / imgW) * canvas.width;
+          sliceCanvas.height = Math.round((sliceH / imgH) * canvas.height);
           const ctx = sliceCanvas.getContext('2d');
-          const srcPixelY = (srcY / imgH) * canvas.height;
-          const srcPixelH = (sliceH / imgH) * canvas.height;
+          const srcPixelY = Math.round((srcY / imgH) * canvas.height);
+          const srcPixelH = sliceCanvas.height;
           ctx.drawImage(canvas, 0, srcPixelY, canvas.width, srcPixelH, 0, 0, sliceCanvas.width, sliceCanvas.height);
 
-          const sliceData = sliceCanvas.toDataURL('image/png');
-          pdf.addImage(sliceData, 'PNG', margin, margin, contentW, sliceH);
+          const sliceData = sliceCanvas.toDataURL('image/jpeg', 0.85);
+          // Content area starts below header
+          const contentY = marginTop + headerHeight;
+          pdf.addImage(sliceData, 'JPEG', marginX, contentY, contentW, sliceH);
+
+          drawHeader(pdf, pageNum, totalPages);
+          drawFooter(pdf);
 
           srcY += pageContentH;
-          pageNum++;
         }
 
         pdf.save(name + '_数秘レポート.pdf');
