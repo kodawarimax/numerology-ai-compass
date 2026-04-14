@@ -192,12 +192,17 @@
             <option>その他</option>
           </select>
         </div>
-        <!-- Gemini API Key (optional - proxy used by default) -->
+        <!-- Gemini API Key (hidden by default, toggle to show) -->
         <div>
-          <label class="block text-xs text-gray-500 mb-1">Gemini API Key <span class="text-gray-400">(任意・自分のキーを使う場合)</span></label>
-          <input type="password" id="geminiApiKey" placeholder="未入力でもAI分析は利用できます"
-            class="w-full border border-gray-200 rounded-lg px-3 py-2.5 text-sm focus:ring-2 focus:ring-purple-300 outline-none font-mono">
-          <p class="text-[9px] text-gray-300 mt-0.5">※ 未入力の場合はデフォルトのAI分析を使用します。自分のキーを入力するとそちらが優先されます。</p>
+          <button type="button" id="toggle-api-key" class="text-[9px] text-gray-300 hover:text-gray-500 transition-colors">
+            ▶ 上級設定（API Key）
+          </button>
+          <div id="api-key-section" class="hidden mt-1">
+            <label class="block text-xs text-gray-500 mb-1">Gemini API Key <span class="text-gray-400">(任意)</span></label>
+            <input type="password" id="geminiApiKey" placeholder="未入力でもAI分析は利用できます"
+              class="w-full border border-gray-200 rounded-lg px-3 py-2.5 text-sm focus:ring-2 focus:ring-purple-300 outline-none font-mono">
+            <p class="text-[9px] text-gray-300 mt-0.5">※ 未入力の場合はデフォルトのAI分析を使用します。</p>
+          </div>
         </div>
         <!-- Submit -->
         <button type="submit"
@@ -685,7 +690,7 @@
           <!-- Chat UI -->
           <div id="palm-chat" class="hidden space-y-3 mt-4">
             <div class="bg-purple-50 rounded-xl p-4">
-              <h4 class="text-xs font-semibold text-purple-700 mb-2">手相について質問する</h4>
+              <h4 class="text-xs font-semibold text-purple-700 mb-2">占いの結果について質問する</h4>
               <div id="palm-chat-messages" class="space-y-2 max-h-60 overflow-y-auto mb-3"></div>
               <div class="flex gap-2">
                 <input type="text" id="palm-chat-input" placeholder="例: 恋愛運を詳しく教えて" class="flex-1 border border-purple-200 rounded-full px-4 py-2 text-xs focus:ring-2 focus:ring-purple-300 outline-none bg-white">
@@ -1011,8 +1016,19 @@
         document.getElementById('birthDay').value = saved.day || '';
       }
       const savedKey = localStorage.getItem('gemini_api_key');
-      if (savedKey) document.getElementById('geminiApiKey').value = savedKey;
+      if (savedKey) {
+        document.getElementById('geminiApiKey').value = savedKey;
+        document.getElementById('api-key-section').classList.remove('hidden');
+      }
     } catch(e) {}
+
+    // Toggle API key section
+    document.getElementById('toggle-api-key').addEventListener('click', () => {
+      const section = document.getElementById('api-key-section');
+      const btn = document.getElementById('toggle-api-key');
+      section.classList.toggle('hidden');
+      btn.textContent = section.classList.contains('hidden') ? '▶ 上級設定（API Key）' : '▼ 上級設定（API Key）';
+    });
 
     // Back button
     document.getElementById('btn-back-form').addEventListener('click', () => {
