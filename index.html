@@ -1271,10 +1271,34 @@
       debouncedAnalyze();
     }
 
+    function showPalmError(msg) {
+      const div = document.getElementById('palm-ai-analysis');
+      div.classList.remove('hidden');
+      div.querySelector('div').innerHTML = `
+        <p class="text-[11px] font-semibold text-red-600 flex items-center gap-1">
+          <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+          エラー
+        </p>
+        <p class="text-[10px] text-gray-400">${msg}</p>`;
+    }
+
     function handlePalmFile(file, hand) {
-      if (!file || !file.type.startsWith('image/')) return;
+      if (!file) return;
+      if (!file.type.startsWith('image/')) {
+        showPalmError('画像ファイルを選択してください（JPEG, PNG等）');
+        return;
+      }
+      if (file.size === 0) {
+        showPalmError('空のファイルです。別の写真を選択してください。');
+        return;
+      }
+      if (file.size > 20 * 1024 * 1024) {
+        showPalmError('ファイルサイズが大きすぎます（20MB以下にしてください）');
+        return;
+      }
       const reader = new FileReader();
       reader.onload = (e) => handlePalmImage(e.target.result, hand);
+      reader.onerror = () => showPalmError('ファイルの読み込みに失敗しました。別の写真をお試しください。');
       reader.readAsDataURL(file);
     }
 
@@ -1289,24 +1313,38 @@
       palmDebounceTimer = setTimeout(() => analyzePalmWithAI(), 500);
     }
 
-    // Compress image to reduce API payload (max 800px, JPEG 0.7)
+    // Compress image to reduce API payload (max 800px, JPEG)
     function compressImage(dataUrl, maxSize = 800) {
       return new Promise((resolve) => {
         const img = new Image();
         img.onload = () => {
-          const canvas = document.createElement('canvas');
-          let w = img.width, h = img.height;
-          if (w > maxSize || h > maxSize) {
-            const ratio = Math.min(maxSize / w, maxSize / h);
-            w = Math.round(w * ratio);
-            h = Math.round(h * ratio);
+          try {
+            const canvas = document.createElement('canvas');
+            let w = img.width, h = img.height;
+            if (w > maxSize || h > maxSize) {
+              const ratio = Math.min(maxSize / w, maxSize / h);
+              w = Math.round(w * ratio);
+              h = Math.round(h * ratio);
+            }
+            canvas.width = w;
+            canvas.height = h;
+            const ctx = canvas.getContext('2d');
+            if (!ctx) { console.warn('Canvas context unavailable'); resolve(null); return; }
+            ctx.drawImage(img, 0, 0, w, h);
+            let result = canvas.toDataURL('image/jpeg', 0.7);
+            // If still too large (>4MB base64 ≈ 3MB binary), re-compress at lower quality
+            if (result.length > 4 * 1024 * 1024) {
+              result = canvas.toDataURL('image/jpeg', 0.4);
+            }
+            // Cleanup
+            canvas.width = 0; canvas.height = 0;
+            resolve(result);
+          } catch (e) {
+            console.warn('Image compression failed:', e);
+            resolve(null);
           }
-          canvas.width = w;
-          canvas.height = h;
-          canvas.getContext('2d').drawImage(img, 0, 0, w, h);
-          resolve(canvas.toDataURL('image/jpeg', 0.7));
         };
-        img.onerror = () => resolve(dataUrl); // fallback to original
+        img.onerror = () => resolve(null); // null signals failure to caller
         img.src = dataUrl;
       });
     }
@@ -1422,11 +1460,16 @@
         const compressedRight = hasRight ? await compressImage(palmImages.right) : null;
         const compressedLeft = hasLeft ? await compressImage(palmImages.left) : null;
 
+        // Check compression results
+        if (hasRight && !compressedRight) throw new Error('右手の画像を処理できませんでした。JPEG/PNG形式の写真をお試しください。');
+        if (hasLeft && !compressedLeft) throw new Error('左手の画像を処理できませんでした。JPEG/PNG形式の写真をお試しください。');
+
         const bothHands = hasRight && hasLeft;
         const prompt = bothHands
           ? `あなたは手相占いの専門家です。右手（後天的な運勢）と左手（先天的な才能）の2枚の画像を分析します。
 
 【重要な指示】
+- 画像が手のひらでない場合は、JSONではなく {"error":"not_a_hand"} のみを返してください
 - 画像が不鮮明・低解像度であっても、見える線や特徴から必ず推測して全フィールドを埋めてください
 - 判断に迷う場合でも、最も可能性が高い選択肢を必ず選んでください（空欄禁止）
 - 右手（後天的）と左手（先天的）それぞれについて分析し、総合判定を行ってください
@@ -1460,6 +1503,7 @@ JSONのみ返してください（\`\`\`不要）:
           : `あなたは手相占いの専門家です。この手のひらの画像を分析します。この画像は${hasRight ? '右手' : '左手'}として送られています。
 
 【重要な指示】
+- 画像が手のひらでない場合は、JSONではなく {"error":"not_a_hand"} のみを返してください
 - 画像が不鮮明・低解像度であっても、見える線や特徴から必ず推測して全フィールドを埋めてください
 - 判断に迷う場合でも、最も可能性が高い選択肢を必ず選んでください（空欄禁止）
 - 各線の長さ・太さ・特徴を具体的に観察して選択してください
@@ -1493,16 +1537,25 @@ JSONのみ返してください（\`\`\`不要）:
         parts.push({ text: prompt });
 
         if (compressedRight) {
-          parts.push({ inline_data: { mime_type: 'image/jpeg', data: compressedRight.split(',')[1] } });
+          const b64 = compressedRight.split(',')[1];
+          if (!b64) throw new Error('右手の画像データが不正です。再度撮影してください。');
+          parts.push({ inline_data: { mime_type: 'image/jpeg', data: b64 } });
         }
         if (compressedLeft) {
-          parts.push({ inline_data: { mime_type: 'image/jpeg', data: compressedLeft.split(',')[1] } });
+          const b64 = compressedLeft.split(',')[1];
+          if (!b64) throw new Error('左手の画像データが不正です。再度撮影してください。');
+          parts.push({ inline_data: { mime_type: 'image/jpeg', data: b64 } });
         }
 
         const requestBody = JSON.stringify({
           contents: [{ parts }],
           generationConfig: { temperature: 0.3, maxOutputTokens: 2048 }
         });
+
+        // Payload size check
+        if (requestBody.length > 10 * 1024 * 1024) {
+          throw new Error('画像データが大きすぎます。より低解像度の写真をお試しください。');
+        }
 
         // Use user's own key directly, or proxy (default)
         const fetchUrl = userApiKey
@@ -1515,11 +1568,34 @@ JSONのみ返してください（\`\`\`不要）:
         }, 2, 45000); // 45s timeout for image analysis
 
         const result = await response.json();
+
+        // Check for safety filter blocks
+        const finishReason = result.candidates?.[0]?.finishReason;
+        if (!result.candidates || result.candidates.length === 0 || finishReason === 'SAFETY') {
+          throw new Error('この画像は分析できません。手のひら全体が明るく写った写真を使用してください。');
+        }
+
         const text = result.candidates?.[0]?.content?.parts?.[0]?.text || '';
+        if (!text.trim()) {
+          throw new Error('AIから応答がありませんでした。別の写真でお試しください。');
+        }
 
         // Parse JSON from response robustly
         const rawAnalysis = parseJsonRobust(text);
+
+        // Check for not_a_hand response
+        if (rawAnalysis.error === 'not_a_hand') {
+          throw new Error('手のひらの画像が検出できませんでした。手のひら全体が写った写真をアップロードしてください。');
+        }
+
         const analysis = normalizeAnalysisKeys(rawAnalysis);
+
+        // Warn if required fields are missing
+        const requiredKeys = ['lifeline', 'headline', 'heartline'];
+        const missingKeys = requiredKeys.filter(k => !analysis[k]);
+        if (missingKeys.length > 0) {
+          console.warn('Missing analysis keys:', missingKeys);
+        }
 
         // Store for chat
         palmAnalysisResult = analysis;
@@ -1576,11 +1652,20 @@ JSONのみ返してください（\`\`\`不要）:
             </div>`;
         }
 
+        // Low confidence tip
+        let confidenceTipHtml = '';
+        if (analysis.confidence === 'low') {
+          confidenceTipHtml = `
+            <div class="bg-blue-50 border border-blue-200 rounded-lg p-2 mt-1 mb-1">
+              <p class="text-[10px] text-blue-600">💡 写真が不鮮明な可能性があります。明るい場所で手のひら全体を撮り直すと、より正確な結果が得られます。</p>
+            </div>`;
+        }
+
         // Show success + findings
         const findingsText = analysis.findings || 'AI分析が完了しました。';
         const confidenceLabel = { high: '高', medium: '中', low: '低' }[analysis.confidence] || '';
         const handLabel = bothHands ? '両手' : (hasRight ? '右手' : '左手');
-        innerDiv.innerHTML = `${handWarningHtml}
+        innerDiv.innerHTML = `${handWarningHtml}${confidenceTipHtml}
           <p class="text-[11px] font-semibold text-green-700 flex items-center gap-1">
             <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
             Gemini Vision AI 分析完了（${handLabel}${confidenceLabel ? '・確信度：' + confidenceLabel : ''}）
