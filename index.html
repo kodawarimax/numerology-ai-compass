@@ -2191,7 +2191,7 @@ ${numContext}
         // Build a hidden render container for the full PDF content
         const pdfRoot = document.createElement('div');
         pdfRoot.id = 'pdf-render';
-        pdfRoot.style.cssText = 'position:fixed;left:-9999px;top:0;width:800px;background:#fff;font-family:Inter,system-ui,sans-serif;font-size:14px;color:#1f2937;';
+        pdfRoot.style.cssText = 'position:absolute;left:-9999px;top:0;width:800px;background:#fff;font-family:Inter,system-ui,sans-serif;font-size:14px;color:#1f2937;';
 
         // Helper: number detail block
         const numBlock = (label, val, pos, extraHtml) => {
@@ -2587,11 +2587,14 @@ ${palmAnalysisResult?.findings ? '- AI画像分析所見: ' + palmAnalysisResult
         // Render to canvas then PDF (mobile: lower scale to prevent OOM)
         const isMobile = window.innerWidth < 768;
 
-        // Collect Y positions of ALL break candidates BEFORE rendering
+        // Collect Y positions of ALL break candidates using getBoundingClientRect
+        // This is more reliable than offsetTop for position:absolute containers
+        const pdfRootRect = pdfRoot.getBoundingClientRect();
         const candidateEls = pdfRoot.querySelectorAll('[data-pdf-break-candidate]');
-        const candidateYs = [];
+        const candidateYsPx = [];
         candidateEls.forEach(el => {
-          candidateYs.push(el.offsetTop);
+          const y = el.getBoundingClientRect().top - pdfRootRect.top;
+          candidateYsPx.push(Math.round(y));
         });
 
         const canvasPromise = html2canvas(pdfRoot, {
@@ -2606,75 +2609,86 @@ ${palmAnalysisResult?.findings ? '- AI画像分析所見: ' + palmAnalysisResult
         const canvas = await Promise.race([canvasPromise, canvasTimeout]);
 
         // Capture DOM height before removing from document
-        const pdfRootH = pdfRoot.scrollHeight || 1;
+        const pdfRootH = pdfRootRect.height || pdfRoot.scrollHeight || 1;
         document.body.removeChild(pdfRoot);
 
         const { jsPDF } = window.jspdf;
         const pdf = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
         const pw = 210, ph = 297;
         const marginX = 8;
-        const marginTop = 15;  // top margin for header
-        const marginBottom = 12; // bottom margin for footer
-        const headerHeight = 10; // header area height in mm
-        const footerHeight = 8;  // footer area height in mm
+        const marginTop = 15;
+        const marginBottom = 12;
+        const headerHeight = 10;
+        const footerHeight = 8;
         const contentW = pw - marginX * 2;
 
-        const imgW = contentW;
-        const imgH = (canvas.height / canvas.width) * imgW;
+        // Work entirely in canvas pixel space to avoid mm conversion errors
+        const canvasH = canvas.height;
+        const canvasW = canvas.width;
 
-        // Usable content height per page (excluding header and footer)
-        const pageContentH = ph - marginTop - marginBottom - headerHeight - footerHeight;
+        // Convert DOM px candidate positions to canvas px (scale factor)
+        const scaleFactor = canvasH / pdfRootH;
+        const candidatesPx = [...new Set(candidateYsPx)].sort((a, b) => a - b)
+          .map(py => Math.round(py * scaleFactor))
+          .filter(p => p > 10);
 
-        // Convert DOM pixel candidate positions to mm in the final image
-        const candidateMms = [...new Set(candidateYs)].sort((a, b) => a - b)
-          .map(py => (py / pdfRootH) * imgH)
-          .filter(b => b > 5);
+        // Page content area in canvas pixels
+        const imgW = contentW; // mm
+        const imgH = (canvasH / canvasW) * imgW; // total image height in mm
+        const pageContentH = ph - marginTop - marginBottom - headerHeight - footerHeight; // mm
+        const pageContentPx = Math.round((pageContentH / imgH) * canvasH); // canvas px per page
+        const minSlicePx = Math.round(pageContentPx * 0.25);
 
-        // Build page slices using fine-grained candidate splitting
-        const slices = [];
-        let cursor = 0;
-        const minSliceH = pageContentH * 0.25; // minimum 25% page to avoid tiny fragments
+        // Build page slices in canvas pixel coordinates
+        const slicesPx = [];
+        let cursorPx = 0;
 
-        while (cursor < imgH - 1) {
-          const remaining = imgH - cursor;
-          if (remaining <= pageContentH + 2) {
-            slices.push({ startMm: cursor, heightMm: remaining });
+        while (cursorPx < canvasH - 5) {
+          const remainingPx = canvasH - cursorPx;
+          if (remainingPx <= pageContentPx + 5) {
+            slicesPx.push({ startPx: cursorPx, heightPx: remainingPx });
             break;
           }
 
-          const pageEnd = cursor + pageContentH;
+          const pageEndPx = cursorPx + pageContentPx;
 
           // Find the LAST candidate that fits within this page (greedy fill)
-          let bestBreak = -1;
-          for (const bp of candidateMms) {
-            if (bp <= cursor + 2) continue;
-            if (bp > pageEnd + 2) break;
-            // Enforce minimum slice height to avoid tiny fragments
-            if (bp - cursor >= minSliceH) {
-              bestBreak = bp;
+          let bestBreakPx = -1;
+          for (const cp of candidatesPx) {
+            if (cp <= cursorPx + 5) continue;
+            if (cp > pageEndPx + 5) break;
+            if (cp - cursorPx >= minSlicePx) {
+              bestBreakPx = cp;
             }
           }
 
-          if (bestBreak > 0) {
-            slices.push({ startMm: cursor, heightMm: bestBreak - cursor });
-            cursor = bestBreak;
+          if (bestBreakPx > 0) {
+            slicesPx.push({ startPx: cursorPx, heightPx: bestBreakPx - cursorPx });
+            cursorPx = bestBreakPx;
           } else {
             // No candidate in range — find the NEXT candidate beyond this page
-            let nextCandidate = -1;
-            for (const bp of candidateMms) {
-              if (bp > cursor + 2) { nextCandidate = bp; break; }
+            let nextCandidatePx = -1;
+            for (const cp of candidatesPx) {
+              if (cp > cursorPx + 5) { nextCandidatePx = cp; break; }
             }
-            if (nextCandidate > 0 && nextCandidate < cursor + pageContentH * 2) {
-              // Allow oversized page up to 2x to avoid mid-text cut
-              slices.push({ startMm: cursor, heightMm: nextCandidate - cursor });
-              cursor = nextCandidate;
+            if (nextCandidatePx > 0 && nextCandidatePx < cursorPx + pageContentPx * 2) {
+              slicesPx.push({ startPx: cursorPx, heightPx: nextCandidatePx - cursorPx });
+              cursorPx = nextCandidatePx;
             } else {
-              // Absolute last resort: mechanical cut (should never happen with 30+ candidates)
-              slices.push({ startMm: cursor, heightMm: pageContentH });
-              cursor += pageContentH;
+              // Absolute last resort: mechanical cut
+              slicesPx.push({ startPx: cursorPx, heightPx: pageContentPx });
+              cursorPx += pageContentPx;
             }
           }
         }
+
+        // Convert slices to mm for PDF placement
+        const pxToMm = (px) => (px / canvasH) * imgH;
+        const slices = slicesPx.map(s => ({
+          startPx: s.startPx,
+          heightPx: s.heightPx,
+          heightMm: pxToMm(s.heightPx)
+        }));
 
         const totalPages = slices.length;
 
@@ -2709,14 +2723,12 @@ ${palmAnalysisResult?.findings ? '- AI画像分析所見: ' + palmAnalysisResult
         slices.forEach((slice, idx) => {
           if (idx > 0) pdf.addPage();
 
-          // Create a slice of the canvas for this page
+          // Create a slice of the canvas using direct pixel coordinates
           const sliceCanvas = document.createElement('canvas');
-          sliceCanvas.width = canvas.width;
-          sliceCanvas.height = Math.round((slice.heightMm / imgH) * canvas.height);
+          sliceCanvas.width = canvasW;
+          sliceCanvas.height = slice.heightPx;
           const ctx = sliceCanvas.getContext('2d');
-          const srcPixelY = Math.round((slice.startMm / imgH) * canvas.height);
-          const srcPixelH = sliceCanvas.height;
-          ctx.drawImage(canvas, 0, srcPixelY, canvas.width, srcPixelH, 0, 0, sliceCanvas.width, sliceCanvas.height);
+          ctx.drawImage(canvas, 0, slice.startPx, canvasW, slice.heightPx, 0, 0, canvasW, slice.heightPx);
 
           const sliceData = sliceCanvas.toDataURL('image/jpeg', 0.85);
           const contentY = marginTop + headerHeight;
