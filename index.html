@@ -2198,7 +2198,7 @@ ${numContext}
           const nd = numDB[val] || numDB[Math.min(val, 9)];
           const theme = pos ? pos.theme : '';
           return `
-            <div style="background:#faf5ff;border-radius:8px;padding:14px 16px;margin-bottom:12px;">
+            <div data-pdf-break-candidate style="background:#faf5ff;border-radius:8px;padding:14px 16px;margin-bottom:12px;">
               <div style="display:flex;align-items:center;gap:12px;margin-bottom:6px;">
                 <span style="font-family:Lora,serif;font-size:28px;font-weight:700;color:#7c3aed;">${val}</span>
                 <div>
@@ -2227,7 +2227,7 @@ ${numContext}
 
         pdfRoot.innerHTML = `
           <!-- Cover -->
-          <div style="height:1100px;display:flex;flex-direction:column;align-items:center;justify-content:center;background:linear-gradient(135deg,#f3e8ff,#fce7f3,#e0e7ff);text-align:center;padding:40px;">
+          <div style="height:1030px;display:flex;flex-direction:column;align-items:center;justify-content:center;background:linear-gradient(135deg,#f3e8ff,#fce7f3,#e0e7ff);text-align:center;padding:40px;">
             <div style="font-size:36px;font-weight:700;color:#6b21a8;margin-bottom:12px;">数秘AIライフコンパス</div>
             <div style="font-size:18px;color:#9333ea;margin-bottom:40px;">パーソナル数秘レポート</div>
             <div style="font-size:28px;font-weight:700;color:#1f2937;margin-bottom:8px;">${name} さん</div>
@@ -2237,13 +2237,13 @@ ${numContext}
           </div>
 
           <!-- Chart -->
-          <div style="padding:40px;text-align:center;" data-pdf-page-break="1">
+          <div style="padding:40px;text-align:center;" data-pdf-break-candidate>
             <div style="font-size:22px;font-weight:700;color:#6b21a8;margin-bottom:20px;">${name}さんの数秘チャート</div>
             <div id="pdf-chart-slot"></div>
           </div>
 
           <!-- Number Details -->
-          <div style="padding:40px;" data-pdf-page-break="1">
+          <div style="padding:40px;" data-pdf-break-candidate>
             <div style="font-size:22px;font-weight:700;color:#6b21a8;margin-bottom:20px;text-align:center;">数秘ナンバー詳細</div>
             ${numBlock('成熟数', r.maturity, positionData['cell-maturity'])}
             ${numBlock('成長数', r.spirit, positionData['cell-spirit'])}
@@ -2255,7 +2255,7 @@ ${numContext}
           </div>
 
           <!-- Challenges & Goals -->
-          <div style="padding:40px;" data-pdf-page-break="1">
+          <div style="padding:40px;" data-pdf-break-candidate>
             <div style="font-size:22px;font-weight:700;color:#6b21a8;margin-bottom:20px;text-align:center;">挑戦数 & 目標数</div>
             ${numBlock('第2目標数', r.target2, positionData['cell-target2'])}
             ${numBlock('第3目標数', r.target3, positionData['cell-target3'])}
@@ -2265,7 +2265,7 @@ ${numContext}
           </div>
 
           <!-- Life Cycles -->
-          <div style="padding:40px;">
+          <div data-pdf-break-candidate style="padding:40px;">
             <div style="font-size:22px;font-weight:700;color:#6b21a8;margin-bottom:20px;text-align:center;">ライフサイクル期間</div>
             <div style="background:#faf5ff;border-radius:8px;padding:20px;font-size:14px;color:#4b5563;line-height:2;">
               <div>第1期: 0〜${pa.first}歳</div>
@@ -2277,12 +2277,12 @@ ${numContext}
           </div>
 
           <!-- ===== パーソナルライフガイダンス ===== -->
-          <div style="padding:40px;" data-pdf-page-break="1">
+          <div style="padding:40px;" data-pdf-break-candidate>
             <div style="font-size:24px;font-weight:700;color:#6b21a8;margin-bottom:8px;text-align:center;">パーソナルライフガイダンス</div>
             <div style="font-size:12px;color:#9ca3af;text-align:center;margin-bottom:30px;">${name}さんの数秘プロファイルに基づく人生の指針</div>
 
             <!-- 1. あなたの本質 -->
-            <div style="margin-bottom:24px;">
+            <div data-pdf-break-candidate style="margin-bottom:24px;">
               <div style="font-size:16px;font-weight:700;color:#7c3aed;margin-bottom:8px;border-left:3px solid #7c3aed;padding-left:10px;">あなたの本質と使命</div>
               <div style="font-size:12px;color:#4b5563;line-height:1.8;">
                 <p style="margin-bottom:8px;">${name}さんの運命数は<strong style="color:#6b21a8;">${r.lifePath}</strong>です。${(numDB[r.lifePath]||numDB[Math.min(r.lifePath,9)]).core}</p>
@@ -2292,7 +2292,7 @@ ${numContext}
             </div>
 
             <!-- 2. 外面と内面 -->
-            <div style="margin-bottom:24px;">
+            <div data-pdf-break-candidate style="margin-bottom:24px;">
               <div style="font-size:16px;font-weight:700;color:#7c3aed;margin-bottom:8px;border-left:3px solid #7c3aed;padding-left:10px;">外面的な自分と内面的な自分</div>
               <div style="font-size:12px;color:#4b5563;line-height:1.8;">
                 <p style="margin-bottom:8px;">人格数<strong style="color:#6b21a8;">${r.persona}</strong>は、周囲があなたに抱く第一印象を表します。${(numDB[r.persona]||numDB[Math.min(r.persona,9)]).core.substring(0,80)}…というエネルギーを外に放っています。</p>
@@ -2302,7 +2302,7 @@ ${numContext}
             </div>
 
             <!-- 3. 人生の課題と克服 -->
-            <div style="margin-bottom:24px;">
+            <div data-pdf-break-candidate style="margin-bottom:24px;">
               <div style="font-size:16px;font-weight:700;color:#7c3aed;margin-bottom:8px;border-left:3px solid #7c3aed;padding-left:10px;">人生の課題と克服のテーマ</div>
               <div style="font-size:12px;color:#4b5563;line-height:1.8;">
                 <p style="margin-bottom:8px;">克服数<strong style="color:#6b21a8;">${r.ch1}</strong>は、あなたが人生で最初に直面する課題です。${(numDB[r.ch1]||numDB[Math.min(r.ch1,9)]).core.substring(0,60)}…のエネルギーを正しく使いこなすことが、この課題の克服の鍵となります。</p>
@@ -2313,29 +2313,29 @@ ${numContext}
           </div>
 
           <!-- ===== 人生のステージ ===== -->
-          <div style="padding:40px;" data-pdf-page-break="1">
+          <div style="padding:40px;" data-pdf-break-candidate>
             <div style="font-size:16px;font-weight:700;color:#7c3aed;margin-bottom:8px;border-left:3px solid #7c3aed;padding-left:10px;">人生の4つのステージ</div>
             <div style="font-size:12px;color:#4b5563;line-height:1.8;">
-              <div style="background:#fce7f3;border-radius:8px;padding:14px;margin-bottom:10px;">
+              <div data-pdf-break-candidate style="background:#fce7f3;border-radius:8px;padding:14px;margin-bottom:10px;">
                 <div style="font-weight:700;color:#be185d;margin-bottom:4px;">第1期: 成長期（0〜${pa.first}歳）</div>
                 <p>この時期の目標は成長数<strong>${r.spirit}</strong>のエネルギーに導かれています。${(numDB[r.spirit]||numDB[Math.min(r.spirit,9)]).core.substring(0,60)}…というテーマが幼少期から青年期を形作ります。克服数<strong>${r.ch1}</strong>の課題と向き合いながら、自己の基盤を築く時期です。</p>
               </div>
-              <div style="background:#f3e8ff;border-radius:8px;padding:14px;margin-bottom:10px;">
+              <div data-pdf-break-candidate style="background:#f3e8ff;border-radius:8px;padding:14px;margin-bottom:10px;">
                 <div style="font-weight:700;color:#7c3aed;margin-bottom:4px;">第2期: 発展期（${pa.first+1}〜${pa.second}歳）</div>
                 <p>第2目標数<strong>${r.target2}</strong>が示すように、${(numDB[r.target2]||numDB[Math.min(r.target2,9)]).core.substring(0,60)}…というエネルギーが強まります。社会的に活動の幅を広げ、才能を発揮する時期です。第2挑戦数<strong>${r.ch2}</strong>の課題を通じてさらなる成長が促されます。</p>
               </div>
-              <div style="background:#e0e7ff;border-radius:8px;padding:14px;margin-bottom:10px;">
+              <div data-pdf-break-candidate style="background:#e0e7ff;border-radius:8px;padding:14px;margin-bottom:10px;">
                 <div style="font-weight:700;color:#4f46e5;margin-bottom:4px;">第3期: 成熟期（${pa.second+1}〜${pa.third}歳）</div>
                 <p>第3目標数<strong>${r.target3}</strong>のもとで、人生の知恵が結実する時期。${(numDB[r.target3]||numDB[Math.min(r.target3,9)]).core.substring(0,60)}…というテーマが前面に出てきます。成熟数<strong>${r.maturity}</strong>への統合が始まり、人生の意味がより明確になります。</p>
               </div>
-              <div style="background:#ccfbf1;border-radius:8px;padding:14px;margin-bottom:10px;">
+              <div data-pdf-break-candidate style="background:#ccfbf1;border-radius:8px;padding:14px;margin-bottom:10px;">
                 <div style="font-weight:700;color:#0d9488;margin-bottom:4px;">第4期: 完成期（${pa.third}歳〜）</div>
                 <p>成熟数<strong>${r.maturity}</strong>のエネルギーが完全に花開く時期。${(numDB[r.maturity]||numDB[Math.min(r.maturity,9)]).core.substring(0,60)}…というテーマが人生の集大成として現れます。蓄積した経験と叡智を次世代に伝える使命が生まれます。</p>
               </div>
             </div>
 
             <!-- 今年のテーマ -->
-            <div style="margin-top:24px;margin-bottom:24px;">
+            <div data-pdf-break-candidate style="margin-top:24px;margin-bottom:24px;">
               <div style="font-size:16px;font-weight:700;color:#7c3aed;margin-bottom:8px;border-left:3px solid #7c3aed;padding-left:10px;">今年のパーソナルサイクル</div>
               <div style="font-size:12px;color:#4b5563;line-height:1.8;">
                 <div style="display:flex;gap:16px;margin-bottom:12px;">
@@ -2357,7 +2357,7 @@ ${numContext}
             </div>
 
             <!-- 総合メッセージ -->
-            <div style="background:linear-gradient(135deg,#f3e8ff,#fce7f3);border-radius:12px;padding:24px;text-align:center;">
+            <div data-pdf-break-candidate style="background:linear-gradient(135deg,#f3e8ff,#fce7f3);border-radius:12px;padding:24px;text-align:center;">
               <div style="font-size:16px;font-weight:700;color:#6b21a8;margin-bottom:12px;">${name}さんへのメッセージ</div>
               <div style="font-size:12px;color:#4b5563;line-height:1.9;">
                 あなたは運命数${r.lifePath}の持つ「${(numDB[r.lifePath]||numDB[Math.min(r.lifePath,9)]).traits.split('\\n')[0]}」のエネルギーを軸に、誕生数${r.destiny}の内なる衝動と、人格数${r.persona}の外への表現力を組み合わせて、唯一無二の人生を歩んでいます。
@@ -2393,7 +2393,7 @@ ${numContext}
 
             if (pFilled.length === 0 && pSpecials.length === 0 && pMounts.length === 0) return '';
 
-            let palmHtml = '<div style="padding:40px;" data-pdf-page-break="1">';
+            let palmHtml = '<div style="padding:40px;" data-pdf-break-candidate>';
             palmHtml += '<div style="font-size:24px;font-weight:700;color:#6b21a8;margin-bottom:8px;text-align:center;">手相鑑定レポート</div>';
             palmHtml += '<div style="font-size:12px;color:#9ca3af;text-align:center;margin-bottom:30px;">あなたの手のひらの線と相から読み解く運勢</div>';
 
@@ -2420,7 +2420,7 @@ ${numContext}
                 const data = palmDB[key]?.[val];
                 if (!data) return;
                 const stars = '★'.repeat(data.score) + '☆'.repeat(5 - data.score);
-                palmHtml += '<div style="background:#faf5ff;border-radius:8px;padding:12px 14px;margin-bottom:8px;">' +
+                palmHtml += '<div data-pdf-break-candidate style="background:#faf5ff;border-radius:8px;padding:12px 14px;margin-bottom:8px;">' +
                   '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;">' +
                   '<span style="font-size:13px;font-weight:700;color:#6b21a8;">' + pLineNames[key] + '</span>' +
                   '<span style="font-size:10px;color:#a78bfa;">' + stars + '</span></div>' +
@@ -2435,7 +2435,7 @@ ${numContext}
               pSpecials.forEach(key => {
                 const sp = specialDB[key];
                 if (!sp) return;
-                palmHtml += '<div style="background:#fffbeb;border:1px solid #fde68a;border-radius:8px;padding:12px 14px;margin-bottom:8px;">' +
+                palmHtml += '<div data-pdf-break-candidate style="background:#fffbeb;border:1px solid #fde68a;border-radius:8px;padding:12px 14px;margin-bottom:8px;">' +
                   '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;">' +
                   '<span style="font-size:13px;font-weight:700;color:#92400e;">' + sp.name + '</span>' +
                   '<span style="font-size:9px;color:#d97706;background:#fef3c7;border-radius:10px;padding:2px 8px;">' + sp.rarity + '</span></div>' +
@@ -2449,7 +2449,7 @@ ${numContext}
               pMounts.forEach(key => {
                 const mt = mountDB[key];
                 if (!mt) return;
-                palmHtml += '<div style="background:#eef2ff;border:1px solid #c7d2fe;border-radius:8px;padding:12px 14px;margin-bottom:8px;">' +
+                palmHtml += '<div data-pdf-break-candidate style="background:#eef2ff;border:1px solid #c7d2fe;border-radius:8px;padding:12px 14px;margin-bottom:8px;">' +
                   '<div style="font-size:13px;font-weight:700;color:#3730a3;margin-bottom:4px;">' + mt.name + '（' + mt.area + '）</div>' +
                   '<div style="font-size:11px;color:#6b7280;line-height:1.7;">' + mt.reading + '</div></div>';
               });
@@ -2457,7 +2457,7 @@ ${numContext}
 
             // AI分析の所見
             if (palmAnalysisResult?.findings) {
-              palmHtml += '<div style="background:#f0fdf4;border:1px solid #bbf7d0;border-radius:10px;padding:16px;margin-top:24px;">' +
+              palmHtml += '<div data-pdf-break-candidate style="background:#f0fdf4;border:1px solid #bbf7d0;border-radius:10px;padding:16px;margin-top:24px;">' +
                 '<div style="font-size:14px;font-weight:700;color:#166534;margin-bottom:8px;display:flex;align-items:center;gap:6px;">' +
                 '<span>AI分析の所見</span></div>' +
                 '<div style="font-size:11px;color:#374151;line-height:1.9;">' + palmAnalysisResult.findings + '</div></div>';
@@ -2465,7 +2465,7 @@ ${numContext}
 
             // Cross reading placeholder — will be filled by AI
             if (lastResults && pFilled.length > 0) {
-              palmHtml += '<div id="pdf-cross-reading" style="background:linear-gradient(135deg,#f3e8ff,#fce7f3,#e0e7ff);border:1px solid #d8b4fe;border-radius:12px;padding:20px;margin-top:24px;">' +
+              palmHtml += '<div data-pdf-break-candidate id="pdf-cross-reading" style="background:linear-gradient(135deg,#f3e8ff,#fce7f3,#e0e7ff);border:1px solid #d8b4fe;border-radius:12px;padding:20px;margin-top:24px;">' +
                 '<div style="font-size:18px;font-weight:700;color:#6b21a8;margin-bottom:4px;">数秘 × 手相 統合リーディング</div>' +
                 '<div style="font-size:10px;color:#9ca3af;margin-bottom:16px;">あなただけのパーソナルリーディング — Powered by Gemini AI</div>' +
                 '<div id="pdf-cross-reading-content" style="font-size:12px;color:#374151;line-height:2.0;">' +
@@ -2587,11 +2587,11 @@ ${palmAnalysisResult?.findings ? '- AI画像分析所見: ' + palmAnalysisResult
         // Render to canvas then PDF (mobile: lower scale to prevent OOM)
         const isMobile = window.innerWidth < 768;
 
-        // Collect Y positions of page-break markers BEFORE rendering
-        const breakEls = pdfRoot.querySelectorAll('[data-pdf-page-break]');
-        const breakYs = [];
-        breakEls.forEach(el => {
-          breakYs.push(el.offsetTop);
+        // Collect Y positions of ALL break candidates BEFORE rendering
+        const candidateEls = pdfRoot.querySelectorAll('[data-pdf-break-candidate]');
+        const candidateYs = [];
+        candidateEls.forEach(el => {
+          candidateYs.push(el.offsetTop);
         });
 
         const canvasPromise = html2canvas(pdfRoot, {
@@ -2625,44 +2625,54 @@ ${palmAnalysisResult?.findings ? '- AI画像分析所見: ' + palmAnalysisResult
         // Usable content height per page (excluding header and footer)
         const pageContentH = ph - marginTop - marginBottom - headerHeight - footerHeight;
 
-        // Convert DOM pixel break positions to mm positions in the final image
-        const breakMms = breakYs.map(py => (py / pdfRootH) * imgH);
+        // Convert DOM pixel candidate positions to mm in the final image
+        const candidateMms = [...new Set(candidateYs)].sort((a, b) => a - b)
+          .map(py => (py / pdfRootH) * imgH)
+          .filter(b => b > 5);
 
-        // Build page slices using section-aware splitting
-        // Each slice is { startMm, endMm } in the imgH coordinate space
+        // Build page slices using fine-grained candidate splitting
         const slices = [];
-        let cursor = 0; // current position in mm
-        // Sort break positions and remove duplicates / near-zero values
-        const sortedBreaks = breakMms.filter(b => b > 5).sort((a, b) => a - b);
+        let cursor = 0;
+        const minSliceH = pageContentH * 0.25; // minimum 25% page to avoid tiny fragments
 
-        // Walk through the image, splitting at page-break positions when possible
         while (cursor < imgH - 1) {
           const remaining = imgH - cursor;
           if (remaining <= pageContentH + 2) {
-            // Last page — take everything remaining
             slices.push({ startMm: cursor, heightMm: remaining });
             break;
           }
-          // Find the best break point within this page's range
+
           const pageEnd = cursor + pageContentH;
-          // Look for section breaks between 60% and 100% of page height from cursor
-          const minBreak = cursor + pageContentH * 0.5;
+
+          // Find the LAST candidate that fits within this page (greedy fill)
           let bestBreak = -1;
-          for (const bp of sortedBreaks) {
-            if (bp <= cursor + 2) continue; // skip breaks at/before current position
-            if (bp > pageEnd + 2) break;    // past this page
-            if (bp >= minBreak) {
+          for (const bp of candidateMms) {
+            if (bp <= cursor + 2) continue;
+            if (bp > pageEnd + 2) break;
+            // Enforce minimum slice height to avoid tiny fragments
+            if (bp - cursor >= minSliceH) {
               bestBreak = bp;
-              break; // take the first valid break in range
             }
           }
+
           if (bestBreak > 0) {
             slices.push({ startMm: cursor, heightMm: bestBreak - cursor });
             cursor = bestBreak;
           } else {
-            // No section break found — fall back to full page height
-            slices.push({ startMm: cursor, heightMm: pageContentH });
-            cursor += pageContentH;
+            // No candidate in range — find the NEXT candidate beyond this page
+            let nextCandidate = -1;
+            for (const bp of candidateMms) {
+              if (bp > cursor + 2) { nextCandidate = bp; break; }
+            }
+            if (nextCandidate > 0 && nextCandidate < cursor + pageContentH * 2) {
+              // Allow oversized page up to 2x to avoid mid-text cut
+              slices.push({ startMm: cursor, heightMm: nextCandidate - cursor });
+              cursor = nextCandidate;
+            } else {
+              // Absolute last resort: mechanical cut (should never happen with 30+ candidates)
+              slices.push({ startMm: cursor, heightMm: pageContentH });
+              cursor += pageContentH;
+            }
           }
         }
 
