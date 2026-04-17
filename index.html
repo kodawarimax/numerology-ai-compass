@@ -2237,13 +2237,13 @@ ${numContext}
           </div>
 
           <!-- Chart -->
-          <div style="page-break-before:always;padding:40px;text-align:center;">
+          <div style="padding:40px;text-align:center;" data-pdf-page-break="1">
             <div style="font-size:22px;font-weight:700;color:#6b21a8;margin-bottom:20px;">${name}さんの数秘チャート</div>
             <div id="pdf-chart-slot"></div>
           </div>
 
           <!-- Number Details -->
-          <div style="page-break-before:always;padding:40px;">
+          <div style="padding:40px;" data-pdf-page-break="1">
             <div style="font-size:22px;font-weight:700;color:#6b21a8;margin-bottom:20px;text-align:center;">数秘ナンバー詳細</div>
             ${numBlock('成熟数', r.maturity, positionData['cell-maturity'])}
             ${numBlock('成長数', r.spirit, positionData['cell-spirit'])}
@@ -2255,7 +2255,7 @@ ${numContext}
           </div>
 
           <!-- Challenges & Goals -->
-          <div style="page-break-before:always;padding:40px;">
+          <div style="padding:40px;" data-pdf-page-break="1">
             <div style="font-size:22px;font-weight:700;color:#6b21a8;margin-bottom:20px;text-align:center;">挑戦数 & 目標数</div>
             ${numBlock('第2目標数', r.target2, positionData['cell-target2'])}
             ${numBlock('第3目標数', r.target3, positionData['cell-target3'])}
@@ -2277,7 +2277,7 @@ ${numContext}
           </div>
 
           <!-- ===== パーソナルライフガイダンス ===== -->
-          <div style="page-break-before:always;padding:40px;">
+          <div style="padding:40px;" data-pdf-page-break="1">
             <div style="font-size:24px;font-weight:700;color:#6b21a8;margin-bottom:8px;text-align:center;">パーソナルライフガイダンス</div>
             <div style="font-size:12px;color:#9ca3af;text-align:center;margin-bottom:30px;">${name}さんの数秘プロファイルに基づく人生の指針</div>
 
@@ -2313,7 +2313,7 @@ ${numContext}
           </div>
 
           <!-- ===== 人生のステージ ===== -->
-          <div style="page-break-before:always;padding:40px;">
+          <div style="padding:40px;" data-pdf-page-break="1">
             <div style="font-size:16px;font-weight:700;color:#7c3aed;margin-bottom:8px;border-left:3px solid #7c3aed;padding-left:10px;">人生の4つのステージ</div>
             <div style="font-size:12px;color:#4b5563;line-height:1.8;">
               <div style="background:#fce7f3;border-radius:8px;padding:14px;margin-bottom:10px;">
@@ -2393,7 +2393,7 @@ ${numContext}
 
             if (pFilled.length === 0 && pSpecials.length === 0 && pMounts.length === 0) return '';
 
-            let palmHtml = '<div style="page-break-before:always;padding:40px;">';
+            let palmHtml = '<div style="padding:40px;" data-pdf-page-break="1">';
             palmHtml += '<div style="font-size:24px;font-weight:700;color:#6b21a8;margin-bottom:8px;text-align:center;">手相鑑定レポート</div>';
             palmHtml += '<div style="font-size:12px;color:#9ca3af;text-align:center;margin-bottom:30px;">あなたの手のひらの線と相から読み解く運勢</div>';
 
@@ -2586,6 +2586,14 @@ ${palmAnalysisResult?.findings ? '- AI画像分析所見: ' + palmAnalysisResult
         updateProgress(3, '画像レンダリング');
         // Render to canvas then PDF (mobile: lower scale to prevent OOM)
         const isMobile = window.innerWidth < 768;
+
+        // Collect Y positions of page-break markers BEFORE rendering
+        const breakEls = pdfRoot.querySelectorAll('[data-pdf-page-break]');
+        const breakYs = [];
+        breakEls.forEach(el => {
+          breakYs.push(el.offsetTop);
+        });
+
         const canvasPromise = html2canvas(pdfRoot, {
           scale: isMobile ? 1.0 : 1.5,
           useCORS: true,
@@ -2597,6 +2605,8 @@ ${palmAnalysisResult?.findings ? '- AI画像分析所見: ' + palmAnalysisResult
         );
         const canvas = await Promise.race([canvasPromise, canvasTimeout]);
 
+        // Capture DOM height before removing from document
+        const pdfRootH = pdfRoot.scrollHeight || 1;
         document.body.removeChild(pdfRoot);
 
         const { jsPDF } = window.jspdf;
@@ -2614,9 +2624,49 @@ ${palmAnalysisResult?.findings ? '- AI画像分析所見: ' + palmAnalysisResult
 
         // Usable content height per page (excluding header and footer)
         const pageContentH = ph - marginTop - marginBottom - headerHeight - footerHeight;
-        let srcY = 0;
-        let pageNum = 0;
-        const totalPages = Math.ceil(imgH / pageContentH);
+
+        // Convert DOM pixel break positions to mm positions in the final image
+        const breakMms = breakYs.map(py => (py / pdfRootH) * imgH);
+
+        // Build page slices using section-aware splitting
+        // Each slice is { startMm, endMm } in the imgH coordinate space
+        const slices = [];
+        let cursor = 0; // current position in mm
+        // Sort break positions and remove duplicates / near-zero values
+        const sortedBreaks = breakMms.filter(b => b > 5).sort((a, b) => a - b);
+
+        // Walk through the image, splitting at page-break positions when possible
+        while (cursor < imgH - 1) {
+          const remaining = imgH - cursor;
+          if (remaining <= pageContentH + 2) {
+            // Last page — take everything remaining
+            slices.push({ startMm: cursor, heightMm: remaining });
+            break;
+          }
+          // Find the best break point within this page's range
+          const pageEnd = cursor + pageContentH;
+          // Look for section breaks between 60% and 100% of page height from cursor
+          const minBreak = cursor + pageContentH * 0.5;
+          let bestBreak = -1;
+          for (const bp of sortedBreaks) {
+            if (bp <= cursor + 2) continue; // skip breaks at/before current position
+            if (bp > pageEnd + 2) break;    // past this page
+            if (bp >= minBreak) {
+              bestBreak = bp;
+              break; // take the first valid break in range
+            }
+          }
+          if (bestBreak > 0) {
+            slices.push({ startMm: cursor, heightMm: bestBreak - cursor });
+            cursor = bestBreak;
+          } else {
+            // No section break found — fall back to full page height
+            slices.push({ startMm: cursor, heightMm: pageContentH });
+            cursor += pageContentH;
+          }
+        }
+
+        const totalPages = slices.length;
 
         // Helper: draw header on current page
         const drawHeader = (doc, pNum, pTotal) => {
@@ -2646,33 +2696,29 @@ ${palmAnalysisResult?.findings ? '- AI画像分析所見: ' + palmAnalysisResult
         };
 
         updateProgress(4, 'PDF書き出し');
-        while (srcY < imgH) {
-          if (pageNum > 0) pdf.addPage();
-          pageNum++;
-          const sliceH = Math.min(pageContentH, imgH - srcY);
+        slices.forEach((slice, idx) => {
+          if (idx > 0) pdf.addPage();
 
           // Create a slice of the canvas for this page
           const sliceCanvas = document.createElement('canvas');
           sliceCanvas.width = canvas.width;
-          sliceCanvas.height = Math.round((sliceH / imgH) * canvas.height);
+          sliceCanvas.height = Math.round((slice.heightMm / imgH) * canvas.height);
           const ctx = sliceCanvas.getContext('2d');
-          const srcPixelY = Math.round((srcY / imgH) * canvas.height);
+          const srcPixelY = Math.round((slice.startMm / imgH) * canvas.height);
           const srcPixelH = sliceCanvas.height;
           ctx.drawImage(canvas, 0, srcPixelY, canvas.width, srcPixelH, 0, 0, sliceCanvas.width, sliceCanvas.height);
 
           const sliceData = sliceCanvas.toDataURL('image/jpeg', 0.85);
           const contentY = marginTop + headerHeight;
-          pdf.addImage(sliceData, 'JPEG', marginX, contentY, contentW, sliceH);
+          pdf.addImage(sliceData, 'JPEG', marginX, contentY, contentW, slice.heightMm);
 
-          drawHeader(pdf, pageNum, totalPages);
+          drawHeader(pdf, idx + 1, totalPages);
           drawFooter(pdf);
 
           // Explicit cleanup to prevent mobile OOM
           sliceCanvas.width = 0;
           sliceCanvas.height = 0;
-
-          srcY += pageContentH;
-        }
+        });
 
         // Cleanup main canvas
         canvas.width = 0;
