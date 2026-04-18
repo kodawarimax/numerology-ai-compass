@@ -33,7 +33,7 @@ function checkIpLimit(ip) {
 // Note: Cloudflare Workers have per-isolate memory. Multiple edge locations
 // each track their own counters. For a ~100 user/day app this is acceptable.
 const globalTimestamps = [];
-const GLOBAL_RPM_MAX = 12; // Gemini 2.5 Flash-Lite = 15 RPM, keep 3 buffer
+const GLOBAL_RPM_MAX = 12; // Gemini 2.5 Flash = 15 RPM, keep 3 buffer
 
 function checkGlobalRpm() {
   const now = Date.now();
@@ -150,7 +150,7 @@ export default {
       recordGlobalRequest();
       recordDailyRequest();
 
-      const geminiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-lite:generateContent?key=${env.GEMINI_API_KEY}`;
+      const geminiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${env.GEMINI_API_KEY}`;
 
       // Fetch with 25s timeout (within CF Workers limits)
       const controller = new AbortController();

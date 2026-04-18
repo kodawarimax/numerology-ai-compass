@@ -529,6 +529,7 @@
               <option value="branch-out">末端が外側に枝分かれ</option>
               <option value="upward">上向きの支線がある</option>
               <option value="thin-short">薄い・短い</option>
+              <option value="unclear">⚠ AI判定不確実</option>
             </select>
           </div>
 
@@ -544,6 +545,7 @@
               <option value="straight">まっすぐ（理系線）</option>
               <option value="curved-down">下向きにカーブ（文系線）</option>
               <option value="forked">末端が枝分かれ</option>
+              <option value="unclear">⚠ AI判定不確実</option>
             </select>
           </div>
 
@@ -559,6 +561,7 @@
               <option value="wavy">波打っている・キレギレ</option>
               <option value="downward-branches">下向きの支線が多い</option>
               <option value="straight-short">まっすぐ・短い</option>
+              <option value="unclear">⚠ AI判定不確実</option>
             </select>
           </div>
 
@@ -574,6 +577,7 @@
               <option value="double">二重運命線</option>
               <option value="broken">途切れている</option>
               <option value="none">運命線がない/薄い</option>
+              <option value="unclear">⚠ AI判定不確実</option>
             </select>
           </div>
 
@@ -589,6 +593,7 @@
               <option value="trident">三股（トライデント）</option>
               <option value="from-emotion">感情線上から伸びる</option>
               <option value="none">太陽線がない</option>
+              <option value="unclear">⚠ AI判定不確実</option>
             </select>
           </div>
 
@@ -601,6 +606,7 @@
               <option value="multiple">複数ある</option>
               <option value="thin-short">薄い・短い</option>
               <option value="none">財運線がない</option>
+              <option value="unclear">⚠ AI判定不確実</option>
             </select>
           </div>
 
@@ -1241,6 +1247,7 @@
         'branch-out':     { title: '末端が外側に枝分かれ（旅行線）', reading: '地元を離れたり、旅行や海外へ行くなど、移動や変化によって開運・成功することを意味します。新しい環境に飛び込む勇気が幸運を引き寄せます。', score: 4 },
         'upward':         { title: '上向きの支線（開運線）', reading: '生命線から上に向かって伸びる線は「開運線」と呼ばれ、努力が実を結び、人生が好転する幸運のサインです。', score: 5 },
         'thin-short':     { title: '薄い・短い生命線', reading: '体力面でやや弱めですが、生活習慣の改善や運動で変化します。手相は変わるものなので、前向きに取り組みましょう。', score: 2 },
+        'unclear':        { title: '判定不確実', reading: '画像から生命線を明確に判別できませんでした。より鮮明な写真で再度お試しいただくか、手動で選択してください。', score: 0 },
       },
       headline: {
         'long':           { title: '長い頭脳線', reading: '思考力が高く、物事を論理的かつ多角的に深く考える「熟考型」です。軽はずみな行動をせず、年を重ねても判断力が衰えません。', score: 4 },
@@ -1250,6 +1257,7 @@
         'straight':       { title: 'まっすぐな頭脳線（理系線）', reading: '物事を論理的・合理的に考え、数字や計算に強い傾向があります。エンジニアや研究者に向いています。', score: 3 },
         'curved-down':    { title: '下向きカーブ（文系線）', reading: '想像力や感受性が豊かで、芸術やクリエイティブな分野で才能を発揮します。アーティスト気質です。', score: 4 },
         'forked':         { title: '末端が枝分かれ', reading: '複数の才能を持ち、多方面で活躍できます。3本に分かれている場合は、マルチタスクが得意で頭の回転が非常に速いことを示します。', score: 4 },
+        'unclear':        { title: '判定不確実', reading: '画像から頭脳線を明確に判別できませんでした。より鮮明な写真で再度お試しいただくか、手動で選択してください。', score: 0 },
       },
       heartline: {
         'long-up':        { title: '上向き・長い感情線', reading: '愛情深く、思いやりがあり、人付き合いを大切にする前向きな性格です。誠実で家庭的、バランスの取れた愛情表現ができます。', score: 4 },
@@ -1259,6 +1267,7 @@
         'wavy':           { title: '波打ち・キレギレの感情線', reading: '感情のコントロールに課題がある可能性があります。マインドフルネスや自己理解を深めることで改善できます。', score: 2 },
         'downward-branches': { title: '下向き支線が多い感情線', reading: '他人の痛みに敏感で、慈愛に満ちた優しい心の持ち主です。ヒーラーやカウンセラーの素質があります。', score: 4 },
         'straight-short': { title: 'まっすぐ・短い感情線', reading: '感情表現が控えめで、理性的に物事を判断するタイプです。信頼できる安定した人間関係を築きます。', score: 3 },
+        'unclear':        { title: '判定不確実', reading: '画像から感情線を明確に判別できませんでした。より鮮明な写真で再度お試しいただくか、手動で選択してください。', score: 0 },
       },
       fateline: {
         'deep-long':      { title: '太く濃く長い運命線', reading: '目標に向かってブレずに進む強い意志があり、仕事運が最強です。社会的に大きな成功を収めます。天下筋と呼ばれる場合も。', score: 5 },
@@ -1268,6 +1277,7 @@
         'double':         { title: '二重運命線', reading: '本業と副業など2つの草鞋を履いて多方面で活躍する、2倍の運勢を持つマルチタスクの才能を示します。', score: 5 },
         'broken':         { title: '途切れた運命線', reading: '人生の転換期や仕事の環境変化を示します。途切れた後にまた始まっていれば、新たなステージへの移行を意味します。', score: 3 },
         'none':           { title: '運命線なし/薄い', reading: '束縛を嫌い自由に生きるタイプです。型にはまらない柔軟な人生を歩む可能性があります。', score: 2 },
+        'unclear':        { title: '判定不確実', reading: '画像から運命線を明確に判別できませんでした。より鮮明な写真で再度お試しいただくか、手動で選択してください。', score: 0 },
       },
       sunline: {
         'deep-long':      { title: '濃く長い太陽線', reading: '金運や成功運が非常に強く、一生お金に困らない豊かさを表します。カリスマ性に溢れ、自然と人を惹きつける最強クラスの大吉相です。', score: 5 },
@@ -1277,12 +1287,14 @@
         'trident':        { title: '三股の太陽線（トライデント）', reading: '金運・成功・名声が爆発的に拡大し、あらゆる幸福を同時に手にする奇跡の相です。非常に稀な最強吉相。', score: 5 },
         'from-emotion':   { title: '感情線上から伸びる太陽線', reading: '長年の地道な努力が報われ、50代以降の人生後半に安定した成功や富を得ることを意味します。', score: 4 },
         'none':           { title: '太陽線なし', reading: '現時点では太陽線が現れていませんが、努力と行動次第で新たに出現する可能性があります。', score: 1 },
+        'unclear':        { title: '判定不確実', reading: '画像から太陽線を明確に判別できませんでした。より鮮明な写真で再度お試しいただくか、手動で選択してください。', score: 0 },
       },
       moneyline: {
         'deep-long':      { title: '濃く長い財運線', reading: 'お金を稼ぐ力、貯蓄する能力が非常に高いです。起業や投資などで大成功し、巨万の富を築く力があります。', score: 5 },
         'multiple':       { title: '複数の財運線', reading: '本業以外にも副業や投資など複数の収入源を持つことを示します。金運が活発な証拠です。', score: 4 },
         'thin-short':     { title: '薄い・短い財運線', reading: '金運は発展途上ですが、商才を磨くことで線が濃くなっていきます。学びの姿勢が鍵です。', score: 2 },
         'none':           { title: '財運線なし', reading: '現時点では財運線が見えませんが、お金に対する意識を高め、計画的な行動をすることで出現することがあります。', score: 1 },
+        'unclear':        { title: '判定不確実', reading: '画像から財運線を明確に判別できませんでした。より鮮明な写真で再度お試しいただくか、手動で選択してください。', score: 0 },
       }
     };
 
@@ -1346,7 +1358,7 @@
 
     // Compress image to reduce API payload (max 800px, JPEG)
     // Includes timeout for Safari where Image loading can hang
-    function compressImage(dataUrl, maxSize = 800) {
+    function compressImage(dataUrl, maxSize = 1200) {
       return new Promise((resolve) => {
         let resolved = false;
         const done = (val) => { if (!resolved) { resolved = true; resolve(val); } };
@@ -1373,7 +1385,7 @@
             const ctx = canvas.getContext('2d');
             if (!ctx) { console.warn('Canvas context unavailable'); done(dataUrl); return; }
             ctx.drawImage(img, 0, 0, w, h);
-            let result = canvas.toDataURL('image/jpeg', 0.7);
+            let result = canvas.toDataURL('image/jpeg', 0.85);
             // If still too large (>4MB), re-compress at lower quality
             if (result.length > 4 * 1024 * 1024) {
               result = canvas.toDataURL('image/jpeg', 0.4);
@@ -1524,8 +1536,8 @@
 
 【重要な指示】
 - 画像が手のひらでない場合は、JSONではなく {"error":"not_a_hand"} のみを返してください
-- 画像が不鮮明・低解像度であっても、見える線や特徴から必ず推測して全フィールドを埋めてください
-- 判断に迷う場合でも、最も可能性が高い選択肢を必ず選んでください（空欄禁止）
+- 画像が不鮮明・低解像度の場合、見える線は推測で判定し、見えない線は "unclear" としてください
+- 判断に迷う場合は最も可能性が高い選択肢を選ぶか、確信がなければ "unclear" を返してください
 - 右手（後天的）と左手（先天的）それぞれについて分析し、総合判定を行ってください
 
 各線について選択肢から1つ必ず選択：
@@ -1538,10 +1550,10 @@
 
 特殊相（わずかな兆候でも積極的に検出）: specials配列: ["masukake","butsugan","shinpi","haou","solomon","star","fish","lucky-m","senkin","chokkan","charisma","taiyou-cross"]
 - わずかな兆候でも積極的に検出してください。特殊相は希少ですが、部分的に見えるもの、発達途中のものも含めてください。
-- 特殊相が全く見つからない場合でも、最も可能性が高いものを1つは選んでください（specials配列を空にしないでください）。
+- 特殊相が確認できない場合は空配列 [] を返してください。無理に選ばないでください。
 
 発達している丘（最大3つ）: mounts配列: ["jupiter","saturn","sun","mercury","venus","moon"]
-- 丘の発達は、写真から膨らみが確認できなくても、線の配置や全体のバランスから推測してください。少なくとも2つは選択してください。
+- 丘の発達は、写真から膨らみが確認できる場合や、線の配置から推測できる場合に選択してください。確信がなければ少なめでも構いません。
 
 確信度: confidence ("high"/"medium"/"low")
 
@@ -1558,8 +1570,8 @@ JSONのみ返してください（\`\`\`不要）:
 
 【重要な指示】
 - 画像が手のひらでない場合は、JSONではなく {"error":"not_a_hand"} のみを返してください
-- 画像が不鮮明・低解像度であっても、見える線や特徴から必ず推測して全フィールドを埋めてください
-- 判断に迷う場合でも、最も可能性が高い選択肢を必ず選んでください（空欄禁止）
+- 画像が不鮮明・低解像度の場合、見える線は推測で判定し、見えない線は "unclear" としてください
+- 判断に迷う場合は最も可能性が高い選択肢を選ぶか、確信がなければ "unclear" を返してください
 - 各線の長さ・太さ・特徴を具体的に観察して選択してください
 
 各線について選択肢から1つ必ず選択：
@@ -1572,10 +1584,10 @@ JSONのみ返してください（\`\`\`不要）:
 
 特殊相（わずかな兆候でも積極的に検出）: specials配列: ["masukake","butsugan","shinpi","haou","solomon","star","fish","lucky-m","senkin","chokkan","charisma","taiyou-cross"]
 - わずかな兆候でも積極的に検出してください。特殊相は希少ですが、部分的に見えるもの、発達途中のものも含めてください。
-- 特殊相が全く見つからない場合でも、最も可能性が高いものを1つは選んでください（specials配列を空にしないでください）。
+- 特殊相が確認できない場合は空配列 [] を返してください。無理に選ばないでください。
 
 発達している丘（最大3つ）: mounts配列: ["jupiter","saturn","sun","mercury","venus","moon"]
-- 丘の発達は、写真から膨らみが確認できなくても、線の配置や全体のバランスから推測してください。少なくとも2つは選択してください。
+- 丘の発達は、写真から膨らみが確認できる場合や、線の配置から推測できる場合に選択してください。確信がなければ少なめでも構いません。
 
 確信度: confidence ("high"/"medium"/"low")
 
@@ -1613,7 +1625,7 @@ JSONのみ返してください（\`\`\`不要）:
 
         // Use user's own key directly, or proxy (default)
         const fetchUrl = userApiKey
-          ? 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-lite:generateContent?key=' + userApiKey
+          ? 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=' + userApiKey
           : GEMINI_PROXY_URL;
         const response = await fetchWithRetry(fetchUrl, {
           method: 'POST',
@@ -2042,7 +2054,7 @@ ${numContext}
       try {
         const chatApiKey = ((document.getElementById('geminiApiKey') || {}).value || '').trim();
         const fetchUrl = chatApiKey
-          ? 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-lite:generateContent?key=' + chatApiKey
+          ? 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=' + chatApiKey
           : GEMINI_PROXY_URL;
 
         const response = await fetchWithRetry(fetchUrl, {
@@ -2138,7 +2150,7 @@ ${numContext}
       try {
         const chatApiKey = ((document.getElementById('geminiApiKey') || {}).value || '').trim();
         const fetchUrl = chatApiKey
-          ? 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-lite:generateContent?key=' + chatApiKey
+          ? 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=' + chatApiKey
           : GEMINI_PROXY_URL;
 
         const response = await fetchWithRetry(fetchUrl, {
@@ -2553,7 +2565,7 @@ ${palmAnalysisResult?.findings ? '- AI画像分析所見: ' + palmAnalysisResult
 
             const crossApiKey = ((document.getElementById('geminiApiKey') || {}).value || '').trim();
             const crossUrl = crossApiKey
-              ? 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-lite:generateContent?key=' + crossApiKey
+              ? 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=' + crossApiKey
               : GEMINI_PROXY_URL;
             const crossResp = await fetchWithRetry(crossUrl, {
               method: 'POST',
