@@ -254,7 +254,6 @@
         <button class="nav-tab flex-1 py-2.5 text-[10px] font-medium text-purple-600 border-b-2 border-purple-500" data-target="section-chart">数秘チャート</button>
         <button class="nav-tab flex-1 py-2.5 text-[10px] font-medium text-gray-400 border-b-2 border-transparent" data-target="section-palm">手相占い</button>
         <button class="nav-tab flex-1 py-2.5 text-[10px] font-medium text-gray-400 border-b-2 border-transparent" data-target="section-cycles">サイクル</button>
-        <button class="nav-tab flex-1 py-2.5 text-[10px] font-medium text-gray-400 border-b-2 border-transparent" data-target="section-dataset">詳細鑑定</button>
       </div>
     </div>
 
@@ -773,83 +772,6 @@
 
       </div><!-- /section-cycles -->
 
-      <!-- ===== SECTION: 詳細鑑定 (dataset-driven) ===== -->
-      <div id="section-dataset" class="space-y-5">
-
-        <!-- 色彩 & 宝石 -->
-        <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
-          <div class="gradient-header p-4 text-center">
-            <h3 class="text-base font-bold text-gray-800">数と色彩・宝石</h3>
-            <p class="text-[10px] text-gray-500 mt-1">あなたの数字に対応するカラーとクリスタル</p>
-          </div>
-          <div class="p-5 space-y-3" id="ds-color-gems"></div>
-        </div>
-
-        <!-- 相性 -->
-        <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
-          <div class="gradient-header p-4 text-center">
-            <h3 class="text-base font-bold text-gray-800">相性</h3>
-            <p class="text-[10px] text-gray-500 mt-1">あなたの運命数が示す対人傾向</p>
-          </div>
-          <div class="p-5 space-y-2" id="ds-compatibility"></div>
-        </div>
-
-        <!-- 9つの関係性 -->
-        <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
-          <div class="gradient-header p-4 text-center">
-            <h3 class="text-base font-bold text-gray-800">9つの関係性パターン</h3>
-            <p class="text-[10px] text-gray-500 mt-1">数秘が示す人間関係の9種類</p>
-          </div>
-          <div class="p-5 space-y-3" id="ds-relations"></div>
-        </div>
-
-        <!-- 挑戦数 -->
-        <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
-          <div class="gradient-header p-4 text-center">
-            <h3 class="text-base font-bold text-gray-800">挑戦数の詳細</h3>
-            <p class="text-[10px] text-gray-500 mt-1">あなたの課題と乗り越え方</p>
-          </div>
-          <div class="p-5 space-y-4" id="ds-challenges"></div>
-        </div>
-
-        <!-- 時のサイクル -->
-        <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
-          <div class="gradient-header p-4 text-center">
-            <h3 class="text-base font-bold text-gray-800">時のサイクル（個人年詳細）</h3>
-            <p class="text-[10px] text-gray-500 mt-1">今の個人年が示す行動指針</p>
-          </div>
-          <div class="p-5 space-y-3" id="ds-time-cycle"></div>
-        </div>
-
-        <!-- 周期循環 -->
-        <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
-          <div class="gradient-header p-4 text-center">
-            <h3 class="text-base font-bold text-gray-800">周期循環 9年サイクル</h3>
-            <p class="text-[10px] text-gray-500 mt-1">人生を動かす9年間のリズム</p>
-          </div>
-          <div class="p-5 space-y-2" id="ds-period-cycle"></div>
-        </div>
-
-        <!-- 羅針盤キーワード -->
-        <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
-          <div class="gradient-header p-4 text-center">
-            <h3 class="text-base font-bold text-gray-800">羅針盤キーワード</h3>
-            <p class="text-[10px] text-gray-500 mt-1">あなたの数字のコアキーワード</p>
-          </div>
-          <div class="p-5 space-y-3" id="ds-compass"></div>
-        </div>
-
-        <!-- セフィロト -->
-        <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
-          <div class="gradient-header p-4 text-center">
-            <h3 class="text-base font-bold text-gray-800">セフィロト / THE MASTER KEY</h3>
-            <p class="text-[10px] text-gray-500 mt-1">カバラ生命の樹との対応</p>
-          </div>
-          <div class="p-5 space-y-3" id="ds-sephirot"></div>
-        </div>
-
-      </div><!-- /section-dataset -->
-
       <footer class="text-center py-4">
         <p class="text-[10px] text-gray-300">&copy; 2026 数秘AIライフコンパス. あなたの輝く人生を心から応援しています。</p>
         <p class="text-[9px] text-gray-300 mt-0.5">Powered by Gemini.</p>
@@ -924,101 +846,6 @@
         }
       };
     })();
-
-    // =========================================================
-    // DATASET loader — fetched from data/numerology-dataset.json
-    // =========================================================
-    let DATASET = null; // populated by initDataset()
-
-    // XSS-safe text helper: escapes HTML special chars before inserting into innerHTML
-    function esc(str) {
-      if (str == null) return '';
-      return String(str)
-        .replace(/&/g, '&amp;')
-        .replace(/</g, '&lt;')
-        .replace(/>/g, '&gt;')
-        .replace(/"/g, '&quot;')
-        .replace(/'/g, '&#39;');
-    }
-
-    async function initDataset() {
-      try {
-        const res = await fetch('data/numerology-dataset.json');
-        if (!res.ok) throw new Error('HTTP ' + res.status);
-        DATASET = await res.json();
-        deriveDBsFromDataset();
-      } catch (e) {
-        console.warn('Dataset load failed, using built-in fallback:', e.message);
-        // App continues with hardcoded fallbacks defined below
-      }
-    }
-
-    // Map dataset position keys to app calc result keys
-    // Dataset position.key: soul→destiny, persona→persona, ground→ground,
-    //   spirit→spirit, chaos1→ch1, chaos2→target2(not exact—see note), maturity→maturity, lifepath→lifePath
-    // Note: dataset "完成数"(chaos2/target2) and "克服数"(chaos1/ch1) map to app ch1/target2
-    const DS_POS_TO_RESULT_KEY = {
-      '誕生数':  'destiny',
-      '人格数':  'persona',
-      '社会数':  'ground',
-      '成長数':  'spirit',
-      '克服数':  'ch1',
-      '完成数':  'target2',
-      '成熟数':  'maturity',
-      '運命数':  'lifePath',
-    };
-
-    // Get a safe dataset interpretation cell; returns null if missing/na
-    function getDsCell(numVal, positionName) {
-      if (!DATASET) return null;
-      const numStr = String(numVal);
-      const cell = DATASET.interpretations?.[numStr]?.[positionName];
-      if (!cell) return null;
-      if (cell._na_by_design) return null;
-      return cell;
-    }
-
-    // Derive cycleDescriptions from dataset tables.時サイクル
-    function deriveDBsFromDataset() {
-      if (!DATASET) return;
-      const t = DATASET.tables || {};
-
-      // Derive cycleDescriptions from 時サイクル
-      const rawCycle = t['時サイクル'] || {};
-      const newCycleDescs = {};
-      Object.entries(rawCycle).forEach(([key, val]) => {
-        // key like "1（開始）" — extract leading digit
-        const m = key.match(/^(\d+)/);
-        if (!m) return;
-        const n = parseInt(m[1], 10);
-        if (n >= 1 && n <= 9) {
-          const rec = val.推奨行動 || '';
-          const avoid = val.避けるべき行動 || '';
-          newCycleDescs[n] = rec + (avoid ? '　避けるべき行動: ' + avoid : '');
-        }
-      });
-      // Merge: dataset overrides built-in where available
-      if (Object.keys(newCycleDescs).length > 0) {
-        Object.assign(cycleDescriptions, newCycleDescs);
-      }
-
-      // Derive numDB color field from tables.色彩
-      const rawColor = t['色彩'] || {};
-      Object.entries(rawColor).forEach(([numStr, val]) => {
-        const n = parseInt(numStr, 10);
-        if (numDB[n]) {
-          numDB[n].color = val['主要な色'] || numDB[n].color;
-          numDB[n]._dsColor = val; // store full record for new sections
-        }
-      });
-
-      // Store gems
-      const rawGems = t['宝石'] || {};
-      Object.entries(rawGems).forEach(([numStr, val]) => {
-        const n = parseInt(numStr, 10);
-        if (numDB[n]) numDB[n]._dsGem = val;
-      });
-    }
 
     // =========================================================
     // DOM references & state
@@ -1135,9 +962,6 @@
       // Store results for detail modal
       r.birthDay = day;
       lastResults = r;
-
-      // Populate dataset-driven sections
-      renderDatasetSections(r);
 
       // Update personal cycles display
       document.getElementById('display-pyear').textContent = r.pYear;
@@ -1328,18 +1152,6 @@
       if (e.target === detailModal) { detailModal.classList.add('hidden'); document.body.style.overflow = ''; }
     });
 
-    // Map cellId to dataset position name
-    const CELL_TO_DS_POS = {
-      'cell-maturity': '成熟数',
-      'cell-spirit':   '成長数',
-      'cell-persona':  '人格数',
-      'cell-destiny':  '誕生数',
-      'cell-ground':   '社会数',
-      'cell-lifepath': '運命数',
-      'cell-ch1':      '克服数',
-      'cell-target2':  '完成数',
-    };
-
     function showDetail(cellId) {
       if (!lastResults) return;
       const pos = positionData[cellId];
@@ -1358,84 +1170,36 @@
         // 誕生数の場合、誕生日別の詳細説明を追加
         const birthDaySection = (cellId === 'cell-destiny' && lastResults.birthDay && birthDayDB[lastResults.birthDay])
           ? `<div class="bg-gradient-to-br from-pink-50 to-purple-50 rounded-xl p-4 mb-3 border border-pink-100">
-              <p class="text-[11px] font-semibold text-pink-600 mb-1">${esc(String(lastResults.birthDay))}日生まれのあなた:</p>
-              <p class="text-xs text-gray-600 leading-relaxed">${esc(birthDayDB[lastResults.birthDay])}</p>
+              <p class="text-[11px] font-semibold text-pink-600 mb-1">${lastResults.birthDay}日生まれのあなた:</p>
+              <p class="text-xs text-gray-600 leading-relaxed">${birthDayDB[lastResults.birthDay]}</p>
             </div>` : '';
-
-        // Dataset interpretation block
-        const dsPos = CELL_TO_DS_POS[cellId];
-        const dsCell = dsPos ? getDsCell(numVal, dsPos) : null;
-        let dsBlock = '';
-        if (dsCell) {
-          // NOTE: aiBadge is a fixed developer-controlled literal. It must NOT include
-          // any dataset string without esc() — it is concatenated raw into innerHTML below.
-          const aiBadge = dsCell._ai_generated
-            ? '<span class="inline-block bg-amber-100 text-amber-700 text-[9px] font-semibold rounded-full px-2 py-0.5 ml-2">AI補完</span>'
-            : '';
-          const titleLine = dsCell.title
-            ? `<p class="text-sm font-bold text-purple-800 mb-2">${esc(dsCell.title)}${aiBadge}</p>`
-            : aiBadge ? `<p class="mb-2">${aiBadge}</p>` : '';
-
-          const fields = dsCell.fields || {};
-          const fieldRows = Object.entries(fields).map(([k, v]) => {
-            if (typeof v === 'object' && v !== null) {
-              // e.g. 傾き: {陽: ..., 陰: ...}
-              const inner = Object.entries(v).map(([ik, iv]) =>
-                `<span class="block"><span class="font-semibold text-purple-600">${esc(ik)}:</span> ${esc(iv)}</span>`
-              ).join('');
-              return `<div class="text-xs mb-1"><span class="font-semibold text-gray-600">${esc(k)}:</span> ${inner}</div>`;
-            }
-            return `<div class="text-xs mb-1"><span class="font-semibold text-gray-600">${esc(k)}:</span> ${esc(String(v))}</div>`;
-          }).join('');
-
-          const bodyText = dsCell.body
-            ? `<p class="text-xs text-gray-600 leading-relaxed whitespace-pre-line mt-2">${esc(dsCell.body)}</p>`
-            : '';
-
-          const hwBlock = dsCell.handwriting
-            ? `<div class="mt-3 bg-amber-50 border border-amber-200 rounded-lg p-3">
-                <p class="text-[10px] font-semibold text-amber-700 mb-1">手書きメモ（坂本さん）</p>
-                <p class="text-[11px] text-gray-600 italic leading-relaxed">${esc(dsCell.handwriting)}</p>
-              </div>`
-            : '';
-
-          dsBlock = `
-            <div class="bg-indigo-50 rounded-xl p-4 mb-3 border border-indigo-100">
-              <p class="text-[11px] font-semibold text-indigo-700 mb-2">THE MATRIX CODE 解釈</p>
-              ${titleLine}
-              ${fieldRows}
-              ${bodyText}
-              ${hwBlock}
-            </div>`;
-        }
 
         content.innerHTML = `
           <div class="flex items-center justify-between mb-3">
-            <h2 class="text-base font-bold text-gray-800">${esc(pos.name)}</h2>
+            <h2 class="text-base font-bold text-gray-800">${pos.name}</h2>
             <button class="close-detail w-7 h-7 rounded-full bg-gray-100 flex items-center justify-center text-gray-400 hover:text-gray-600 text-lg">&times;</button>
           </div>
-          <p class="text-xs text-gray-500 mb-4">【この数字が示すテーマ】${esc(pos.theme)}</p>
+          <p class="text-xs text-gray-500 mb-4">【この数字が示すテーマ】${pos.theme}</p>
           ${birthDaySection}
-          ${dsBlock}
           <div class="bg-fuchsia-50 rounded-xl p-4 mb-3">
             <p class="text-[11px] font-semibold text-purple-700 mb-1">核となる意味:</p>
-            <p class="text-xs text-gray-600 leading-relaxed">${esc(nd.core)}</p>
+            <p class="text-xs text-gray-600 leading-relaxed">${nd.core}</p>
           </div>
           <div class="bg-purple-50 rounded-xl p-4 mb-3">
             <p class="text-[11px] font-semibold text-purple-700 mb-1">基本的な特性:</p>
-            <p class="text-xs text-gray-600 leading-relaxed whitespace-pre-line">${esc(nd.traits)}</p>
+            <p class="text-xs text-gray-600 leading-relaxed whitespace-pre-line">${nd.traits}</p>
           </div>
-          <p class="text-[11px] text-gray-400 mb-3">対応カラー：${esc(nd.color)}</p>`;
+          <p class="text-[11px] text-gray-400 mb-3">対応カラー：${nd.color}</p>`;
       } else {
         content.innerHTML = `
           <div class="flex items-center justify-between mb-3">
-            <h2 class="text-base font-bold text-gray-800">${esc(pos.name)}</h2>
+            <h2 class="text-base font-bold text-gray-800">${pos.name}</h2>
             <button class="close-detail w-7 h-7 rounded-full bg-gray-100 flex items-center justify-center text-gray-400 hover:text-gray-600 text-lg">&times;</button>
           </div>
-          <p class="text-xs text-gray-500 mb-4">【この数字が示すテーマ】${esc(pos.theme)}</p>
+          <p class="text-xs text-gray-500 mb-4">【この数字が示すテーマ】${pos.theme}</p>
           <p class="text-xs text-purple-500 mb-3">さらに詳しく</p>
           <div class="bg-purple-50 rounded-xl p-4 space-y-3">
-            <p class="text-xs font-bold text-purple-700">より深い洞察をアンロック</p>
+            <p class="text-xs font-bold text-purple-700">🔐 より深い洞察をアンロック</p>
             <p class="text-[11px] text-gray-500 leading-relaxed">プレミアムプランで、あなたの数秘が持つ全ての意味と、具体的なアドバイスにアクセスしましょう。</p>
             <button class="btn-activate-premium w-full gradient-cta text-white rounded-full py-2.5 text-xs font-semibold">今すぐ全特典を体験する (DEVモード)</button>
           </div>`;
@@ -2353,52 +2117,18 @@ ${numContext}
       appendNumerologyChatBubble('user', question);
 
       const r = lastResults;
-
-      // Gather dataset interpretation snippets for key positions
-      let dsContext = '';
-      if (DATASET) {
-        const snippets = [];
-        const posMap = [
-          { pos: '運命数', num: r.lifePath },
-          { pos: '誕生数', num: r.destiny },
-          { pos: '成熟数', num: r.maturity },
-          { pos: '人格数', num: r.persona },
-          { pos: '成長数', num: r.spirit },
-          { pos: '克服数', num: r.ch1 },
-        ];
-        posMap.forEach(p => {
-          const cell = getDsCell(p.num, p.pos);
-          if (!cell) return;
-          const title = cell.title ? cell.title + ' ' : '';
-          const theme = cell.fields?.テーマ || cell.fields?.使命 || '';
-          const body = (cell.body || '').substring(0, 120);
-          if (title || theme || body) {
-            snippets.push(`[${p.pos} ${p.num}] ${title}${theme ? 'テーマ:' + theme + ' ' : ''}${body}`);
-          }
-        });
-        if (snippets.length) {
-          dsContext = '\n\n【THE MATRIX CODE 解釈（Lina Eda原典）】\n' + snippets.join('\n');
-        }
-        // Add compass keywords
-        const coreKw = DATASET.tables?.['羅針盤キーワード']?.['コアキーワード'] || {};
-        const kw = coreKw[String(r.lifePath)];
-        if (kw) {
-          dsContext += `\n\n【羅針盤キーワード（運命数${r.lifePath}）】コア:${kw['コアキーワード']} / ポジティブ:${kw['ポジティブ表現']} / シャドウ:${kw['シャドウ表現']}`;
-        }
-      }
-
       const systemPrompt = `あなたは数秘術の専門家です。以下の数秘データを踏まえてユーザーの質問に親切・丁寧に答えてください。
 
 【数秘プロファイル】
 - 運命数（ライフパス）: ${r.lifePath}
 - 誕生数: ${r.birthDay || '不明'}
-- 人格数: ${r.persona}
-- 社会数: ${r.ground}
+- 人格数: ${r.personality}
+- 社会数: ${r.social}
 - 成熟数: ${r.maturity}
-- 成長数: ${r.spirit}
-- 克服数: ${r.ch1}
-- 個人年: ${r.pYear || '不明'}
-- 個人月: ${r.pMonth || '不明'}${dsContext}
+- 成長数: ${r.growth}
+- 克服数: ${r.challenge}
+- 個人年: ${r.personalYear || '不明'}
+- 個人月: ${r.personalMonth || '不明'}
 
 具体的でパーソナルな回答を200〜300文字で答えてください。一般論ではなく、この人の数字の組み合わせに基づいた独自のアドバイスにしてください。`;
 
@@ -2451,302 +2181,6 @@ ${numContext}
     document.getElementById('numerology-chat-input').addEventListener('keydown', (e) => {
       if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendNumerologyChat(); }
     });
-
-    // =========================================================
-    // Dataset sections renderer
-    // =========================================================
-    function renderDatasetSections(r) {
-      if (!DATASET) return;
-      const t = DATASET.tables || {};
-
-      // ---- 色彩 & 宝石 ----
-      const colorDiv = document.getElementById('ds-color-gems');
-      if (colorDiv) {
-        colorDiv.innerHTML = '';
-        const positions = [
-          { label: '運命数 ' + r.lifePath, num: r.lifePath },
-          { label: '誕生数 ' + r.destiny,  num: r.destiny },
-          { label: '成熟数 ' + r.maturity, num: r.maturity },
-        ];
-        positions.forEach(p => {
-          const colorRec = (t['色彩'] || {})[String(p.num)];
-          const gemRec   = (t['宝石'] || {})[String(p.num)];
-          if (!colorRec && !gemRec) return;
-          const card = document.createElement('div');
-          card.className = 'bg-purple-50 rounded-xl p-3 border border-purple-100';
-          const titleEl = document.createElement('p');
-          titleEl.className = 'text-[11px] font-semibold text-purple-700 mb-1';
-          titleEl.textContent = p.label;
-          card.appendChild(titleEl);
-          if (colorRec) {
-            const c = document.createElement('p');
-            c.className = 'text-xs text-gray-600';
-            c.textContent = '色彩: ' + (colorRec['主要な色'] || '') + (colorRec['エネルギー的意味'] ? ' — ' + colorRec['エネルギー的意味'] : '');
-            card.appendChild(c);
-          }
-          if (gemRec) {
-            const g = document.createElement('p');
-            g.className = 'text-xs text-gray-600 mt-0.5';
-            g.textContent = '宝石: ' + (gemRec['主要な宝石・クリスタル'] || '') + (gemRec['効果'] ? ' — ' + gemRec['効果'] : '');
-            card.appendChild(g);
-          }
-          colorDiv.appendChild(card);
-        });
-      }
-
-      // ---- 相性 ----
-      const compatDiv = document.getElementById('ds-compatibility');
-      if (compatDiv) {
-        compatDiv.innerHTML = '';
-        const compatTable = (t['相性'] || {})['数字別テーブル'] || {};
-        const numStr = String(r.lifePath > 9 ? (r.lifePath === 11 ? 2 : r.lifePath === 22 ? 4 : r.lifePath === 33 ? 6 : r.lifePath) : r.lifePath);
-        const rec = compatTable[numStr];
-        if (rec) {
-          const rows = [
-            { label: '相性が良い傾向', val: rec['相性が良い傾向'], cls: 'text-green-700 bg-green-50 border-green-200' },
-            { label: '刺激し合う傾向', val: rec['刺激し合う傾向'], cls: 'text-amber-700 bg-amber-50 border-amber-200' },
-            { label: '課題が生まれやすい傾向', val: rec['課題が生まれやすい傾向'], cls: 'text-rose-700 bg-rose-50 border-rose-200' },
-          ];
-          rows.forEach(row => {
-            if (!row.val) return;
-            const d = document.createElement('div');
-            d.className = 'rounded-xl p-3 border ' + row.cls;
-            const lbl = document.createElement('p');
-            lbl.className = 'text-[11px] font-semibold mb-0.5';
-            lbl.textContent = row.label;
-            const val = document.createElement('p');
-            val.className = 'text-xs';
-            val.textContent = row.val;
-            d.appendChild(lbl);
-            d.appendChild(val);
-            compatDiv.appendChild(d);
-          });
-        } else {
-          const p = document.createElement('p');
-          p.className = 'text-xs text-gray-400';
-          p.textContent = 'データがありません。';
-          compatDiv.appendChild(p);
-        }
-      }
-
-      // ---- 9つの関係性 ----
-      const relDiv = document.getElementById('ds-relations');
-      if (relDiv) {
-        relDiv.innerHTML = '';
-        const relData = t['関係性9種'] || {};
-        Object.entries(relData).forEach(([name, rec]) => {
-          const card = document.createElement('div');
-          card.className = 'bg-indigo-50 rounded-xl p-3 border border-indigo-100';
-          const title = document.createElement('p');
-          title.className = 'text-[11px] font-bold text-indigo-700 mb-1';
-          title.textContent = name;
-          card.appendChild(title);
-          if (rec['数字の組み合わせ例']) {
-            const ex = document.createElement('p');
-            ex.className = 'text-[10px] text-indigo-500 mb-1';
-            ex.textContent = '例: ' + rec['数字の組み合わせ例'];
-            card.appendChild(ex);
-          }
-          if (rec['特徴']) {
-            const feat = document.createElement('p');
-            feat.className = 'text-xs text-gray-600';
-            feat.textContent = rec['特徴'];
-            card.appendChild(feat);
-          }
-          if (rec['アドバイス']) {
-            const adv = document.createElement('p');
-            adv.className = 'text-[11px] text-gray-500 mt-1';
-            adv.textContent = rec['アドバイス'];
-            card.appendChild(adv);
-          }
-          relDiv.appendChild(card);
-        });
-      }
-
-      // ---- 挑戦数 ----
-      const chalDiv = document.getElementById('ds-challenges');
-      if (chalDiv) {
-        chalDiv.innerHTML = '';
-        const chalData = t['挑戦数'] || {};
-        const chalNums = [
-          { label: '克服数 (第1挑戦)', num: r.ch1 },
-          { label: '第2挑戦数',         num: r.ch2 },
-          { label: '第3挑戦数',         num: r.ch3 },
-          { label: '第4挑戦数',         num: r.ch4 },
-        ];
-        chalNums.forEach(cn => {
-          const rec = chalData[String(cn.num)];
-          if (!rec) return;
-          const card = document.createElement('div');
-          card.className = 'bg-rose-50 rounded-xl p-4 border border-rose-100';
-          const title = document.createElement('p');
-          title.className = 'text-sm font-bold text-rose-700 mb-2';
-          title.textContent = cn.label + ': ' + cn.num + ' — ' + (rec['テーマ'] || '');
-          card.appendChild(title);
-          if (rec['課題の本質']) {
-            const body = document.createElement('p');
-            body.className = 'text-xs text-gray-600 leading-relaxed mb-2';
-            body.textContent = rec['課題の本質'];
-            card.appendChild(body);
-          }
-          if (Array.isArray(rec['乗り越え方']) && rec['乗り越え方'].length) {
-            const ul = document.createElement('ul');
-            ul.className = 'space-y-1 list-disc list-inside';
-            rec['乗り越え方'].forEach(item => {
-              const li = document.createElement('li');
-              li.className = 'text-[11px] text-gray-500';
-              li.textContent = item;
-              ul.appendChild(li);
-            });
-            card.appendChild(ul);
-          }
-          if (rec['乗り越えた時']) {
-            const ok = document.createElement('p');
-            ok.className = 'text-[11px] font-semibold text-rose-600 mt-2';
-            ok.textContent = '乗り越えた時: ' + rec['乗り越えた時'];
-            card.appendChild(ok);
-          }
-          chalDiv.appendChild(card);
-        });
-      }
-
-      // ---- 時のサイクル ----
-      const tcDiv = document.getElementById('ds-time-cycle');
-      if (tcDiv) {
-        tcDiv.innerHTML = '';
-        const cycleData = t['時サイクル'] || {};
-        const pyStr = String(r.pYear);
-        // Find matching key like "1（開始）"
-        const matchKey = Object.keys(cycleData).find(k => k.startsWith(pyStr + '（') || k.startsWith(pyStr + ' '));
-        const rec = matchKey ? cycleData[matchKey] : null;
-
-        const header = document.createElement('div');
-        header.className = 'bg-teal-50 rounded-xl p-3 mb-2 border border-teal-100';
-        const hn = document.createElement('p');
-        hn.className = 'text-sm font-bold text-teal-700 mb-1';
-        hn.textContent = '現在の個人年: ' + r.pYear + (matchKey ? ' — ' + matchKey : '');
-        header.appendChild(hn);
-        tcDiv.appendChild(header);
-
-        if (rec) {
-          const do_ = document.createElement('div');
-          do_.className = 'bg-green-50 rounded-xl p-3 border border-green-100';
-          const doLbl = document.createElement('p');
-          doLbl.className = 'text-[11px] font-semibold text-green-700 mb-1';
-          doLbl.textContent = '推奨行動';
-          const doVal = document.createElement('p');
-          doVal.className = 'text-xs text-gray-600';
-          doVal.textContent = rec['推奨行動'] || '';
-          do_.appendChild(doLbl);
-          do_.appendChild(doVal);
-          tcDiv.appendChild(do_);
-
-          const avoid = document.createElement('div');
-          avoid.className = 'bg-red-50 rounded-xl p-3 border border-red-100';
-          const avoidLbl = document.createElement('p');
-          avoidLbl.className = 'text-[11px] font-semibold text-red-700 mb-1';
-          avoidLbl.textContent = '避けるべき行動';
-          const avoidVal = document.createElement('p');
-          avoidVal.className = 'text-xs text-gray-600';
-          avoidVal.textContent = rec['避けるべき行動'] || '';
-          avoid.appendChild(avoidLbl);
-          avoid.appendChild(avoidVal);
-          tcDiv.appendChild(avoid);
-        }
-      }
-
-      // ---- 周期循環 ----
-      const periodDiv = document.getElementById('ds-period-cycle');
-      if (periodDiv) {
-        periodDiv.innerHTML = '';
-        const periodData = t['周期循環'] || {};
-        Object.entries(periodData).forEach(([yearKey, rec]) => {
-          const row = document.createElement('div');
-          row.className = 'flex gap-3 items-start';
-          const badge = document.createElement('span');
-          badge.className = 'flex-shrink-0 bg-purple-100 text-purple-700 text-[10px] font-bold rounded-full px-2 py-0.5 mt-0.5';
-          badge.textContent = yearKey;
-          const body = document.createElement('div');
-          const theme = document.createElement('p');
-          theme.className = 'text-xs font-semibold text-gray-700';
-          theme.textContent = rec['テーマ'] || '';
-          const action = document.createElement('p');
-          action.className = 'text-[11px] text-gray-500';
-          action.textContent = rec['キーアクション'] || '';
-          body.appendChild(theme);
-          body.appendChild(action);
-          row.appendChild(badge);
-          row.appendChild(body);
-          periodDiv.appendChild(row);
-        });
-      }
-
-      // ---- 羅針盤キーワード ----
-      const compassDiv = document.getElementById('ds-compass');
-      if (compassDiv) {
-        compassDiv.innerHTML = '';
-        const compassData = t['羅針盤キーワード'] || {};
-        const coreKw = compassData['コアキーワード'] || {};
-        const affirmation = compassData['アファメーション'] || {};
-        const numStr = String(r.lifePath > 9 ? (r.lifePath === 11 ? 11 : r.lifePath === 22 ? 22 : r.lifePath === 33 ? 33 : r.lifePath) : r.lifePath);
-        // Also show destiny
-        const nums = [...new Set([r.lifePath, r.destiny, r.maturity].map(n => String(n > 9 && n !== 11 && n !== 22 && n !== 33 ? Math.min(n, 9) : n)))];
-        nums.forEach(ns => {
-          const kw = coreKw[ns];
-          if (!kw) return;
-          const card = document.createElement('div');
-          card.className = 'bg-violet-50 rounded-xl p-4 border border-violet-100';
-          const title = document.createElement('p');
-          title.className = 'text-sm font-bold text-violet-700 mb-2';
-          title.textContent = '数 ' + ns + ': ' + (kw['コアキーワード'] || '');
-          card.appendChild(title);
-          const pos_ = document.createElement('p');
-          pos_.className = 'text-[11px] text-green-700 mb-0.5';
-          pos_.textContent = '+ ' + (kw['ポジティブ表現'] || '');
-          const neg_ = document.createElement('p');
-          neg_.className = 'text-[11px] text-rose-600';
-          neg_.textContent = '- ' + (kw['シャドウ表現'] || '');
-          card.appendChild(pos_);
-          card.appendChild(neg_);
-          const aff = affirmation[ns];
-          if (aff) {
-            const affEl = document.createElement('p');
-            affEl.className = 'text-[11px] text-violet-600 italic mt-2';
-            affEl.textContent = typeof aff === 'string' ? '"' + aff + '"' : '';
-            if (affEl.textContent !== '""') card.appendChild(affEl);
-          }
-          compassDiv.appendChild(card);
-        });
-      }
-
-      // ---- セフィロト ----
-      const sephDiv = document.getElementById('ds-sephirot');
-      if (sephDiv) {
-        sephDiv.innerHTML = '';
-        const sephData = t['セフィロト'] || {};
-        const numStr = String(r.lifePath > 9 ? (r.lifePath === 11 ? 11 : r.lifePath === 22 ? 22 : r.lifePath === 33 ? 33 : r.lifePath) : r.lifePath);
-        // Show all sephirot; highlight matching
-        Object.entries(sephData).forEach(([sephName, rec]) => {
-          const isMatch = String(rec['数字的対応']) === numStr;
-          const card = document.createElement('div');
-          card.className = 'rounded-xl p-3 border ' + (isMatch ? 'bg-yellow-50 border-yellow-300' : 'bg-gray-50 border-gray-100');
-          const title = document.createElement('p');
-          title.className = 'text-[11px] font-bold mb-0.5 ' + (isMatch ? 'text-yellow-700' : 'text-gray-600');
-          title.textContent = sephName + (isMatch ? ' ← あなたの運命数' : '');
-          const meaning = document.createElement('p');
-          meaning.className = 'text-[11px] text-gray-500';
-          meaning.textContent = (rec['数字的対応'] ? '数: ' + rec['数字的対応'] + ' | ' : '') + (rec['意味'] || '');
-          card.appendChild(title);
-          card.appendChild(meaning);
-          sephDiv.appendChild(card);
-        });
-      }
-    }
-
-    // =========================================================
-    // Kick off dataset load immediately (non-blocking)
-    // =========================================================
-    initDataset();
 
     // =========================================================
     // PDF Report Generation (jsPDF + html2canvas)
