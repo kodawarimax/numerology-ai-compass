@@ -23,6 +23,53 @@
     .gradient-cta:hover { background: linear-gradient(to right, #db2777, #e11d48); }
 
     /* ===== Numerology Chart ===== */
+
+    /* Outer two-column wrapper — diamond left, info-column right */
+    .chart-outer {
+      display: flex;
+      flex-direction: row;
+      align-items: flex-start;
+      gap: 0;
+      background: #f3eeff;
+      border: 1px solid #e9d5ff;
+      border-radius: 16px;
+      padding: 24px 16px 24px 20px;
+      width: 100%;
+      box-sizing: border-box;
+    }
+
+    /* Left column: diamond */
+    .chart-diamond-col {
+      flex: 1 1 0%;
+      min-width: 0;
+      position: relative;
+    }
+
+    /* Right column: info stack */
+    .chart-info-col {
+      flex: 0 0 auto;
+      width: 100px;
+      display: flex;
+      flex-direction: column;
+      align-items: stretch;
+      gap: 4px;
+      /* vertically center relative to parent — we'll use JS to nudge via margin-top */
+    }
+
+    /* Simple info rows (年齢/個人年/個人月/個人日) — NOT chart-box, no click handler */
+    .info-row {
+      background: rgba(255,255,255,0.92);
+      border: 1px solid #d8b4fe;
+      border-radius: 6px;
+      padding: 5px 8px;
+      font-size: 11px;
+      color: #6d28d9;
+      font-weight: 500;
+      white-space: nowrap;
+      text-align: center;
+      line-height: 1.4;
+    }
+
     .chart-area { position: relative; }
     .chart-row {
       display: flex;
@@ -44,33 +91,73 @@
       transition: transform 0.15s ease, box-shadow 0.15s ease;
       padding: 4px 16px;
       min-width: 74px;
+      position: relative;
+      box-shadow: 0 1px 2px rgba(124,58,237,0.12);
     }
-    .chart-box:hover { transform: scale(1.05); box-shadow: 0 3px 10px rgba(168,85,247,0.15); }
+    /* press-affordance via shadow (clearer than a dot, no notification-badge confusion) */
+    .chart-box:hover, .chart-box:focus-visible { transform: scale(1.05); box-shadow: 0 3px 10px rgba(168,85,247,0.22); }
     .chart-box .cb-num {
       font-family: 'Lora', serif;
       font-weight: 700;
-      font-size: 1.15rem;
-      color: #6b21a8;
+      font-size: 1.2rem;
+      color: #581c87;
       line-height: 1.2;
     }
     .chart-box .cb-lbl {
-      font-size: 9px;
-      color: #9333ea;
+      font-size: 11px;
+      color: #6b6f8a;
       font-weight: 500;
       margin-top: 1px;
       white-space: nowrap;
     }
+    .chart-box:focus-visible {
+      outline: 2px solid #7c3aed;
+      outline-offset: 2px;
+    }
+    /* center row = the 4 core numbers, emphasized vs goals/challenges */
+    #cell-persona, #cell-destiny, #cell-ground, #cell-lifepath {
+      background: rgba(245,240,255,0.97);
+      border-color: #a855f7;
+      border-width: 1.5px;
+    }
+    #cell-destiny {
+      border: 2.5px solid #7c3aed;
+      background: rgba(237,228,255,0.98);
+      box-shadow: 0 4px 16px rgba(124,58,237,0.35);
+    }
+    /* 社会数 → 運命数 を確実につなぐブリッジ（SVG非依存。隙間に密着、余剰は運命数の背面に隠れる） */
+    #cell-ground::after {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 100%;
+      width: 14px;
+      height: 2px;
+      background: #a855f7;
+      transform: translateY(-50%);
+      z-index: 0;
+      pointer-events: none;
+    }
+    /* first-time tap hint on the most important number */
+    @keyframes tapHint {
+      0%, 100% { box-shadow: 0 2px 8px rgba(168,85,247,0.25); }
+      50%      { box-shadow: 0 2px 16px rgba(168,85,247,0.55); }
+    }
+    #cell-destiny.hint { animation: tapHint 1.4s ease-in-out 3; }
     .period-lbl {
-      font-size: 8px;
-      color: #a78bfa;
+      font-size: 10px;
+      color: #6d28d9;
       text-align: center;
       padding: 3px 8px;
-      border: 1px solid #e9d5ff;
+      border: 1px solid #d8b4fe;
       border-radius: 5px;
-      background: rgba(255,255,255,0.6);
+      background: rgba(255,255,255,0.9);
       white-space: nowrap;
       line-height: 1.3;
     }
+    /* higher specificity so #view-result inline font-size can't override the chart labels */
+    .chart-area .period-lbl { font-size: 10px; }
+    .chart-area .info-row, .chart-info-col .info-row { font-size: 11px; }
     .chart-connector {
       width: 1px;
       background: #d8b4fe;
@@ -78,22 +165,8 @@
       position: relative;
       z-index: 0;
     }
-    .chart-branch {
-      position: relative;
-      display: flex;
-      justify-content: center;
-    }
-    .chart-branch::before,
-    .chart-branch::after {
-      content: '';
-      position: absolute;
-      top: 0;
-      width: 1.5px;
-      height: 100%;
-      background: #d8b4fe;
-    }
     /* SVG lines for diagonal connections */
-    .chart-svg {
+    .chart-lines {
       position: absolute;
       top: 0; left: 0;
       width: 100%;
@@ -101,7 +174,40 @@
       pointer-events: none;
       z-index: 0;
     }
-    .chart-svg line { stroke: #d8b4fe; stroke-width: 1.2; }
+    .chart-lines line { stroke: #cbb6f0; stroke-width: 1.3; }
+
+    /* Column-anchored tree grid (5 anchor columns + right breathing space) */
+    .chart-grid {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr) 0.8fr;
+      grid-auto-rows: minmax(0, auto);
+      row-gap: 16px;
+      column-gap: 8px;
+      align-items: center;
+      justify-items: center;
+      position: relative;
+      width: 100%;
+    }
+    .chart-grid > * { z-index: 1; }
+    .gc-A { grid-column: 1; }
+    .gc-B { grid-column: 2; }
+    .gc-C { grid-column: 3; }
+    .gc-D { grid-column: 4; }
+    .gc-E { grid-column: 5; }
+    .gc-F { grid-column: 6; }
+    .gr-1  { grid-row: 1; }
+    .gr-2  { grid-row: 2; }
+    .gr-3  { grid-row: 3; }
+    .gr-4  { grid-row: 4; }
+    .gr-5  { grid-row: 5; }
+    .gr-6  { grid-row: 6; }
+    .gr-7  { grid-row: 7; }
+    .gr-8  { grid-row: 8; }
+    .gr-9  { grid-row: 9; }
+    .gr-10 { grid-row: 10; }
+    .gr-11 { grid-row: 11; }
+    .gr-12 { grid-row: 12; }
+    .gr-13 { grid-row: 13; }
 
     .fade-in { animation: fadeIn 0.4s ease-out; }
     @keyframes fadeIn { from { opacity:0; transform:translateY(8px); } to { opacity:1; transform:translateY(0); } }
@@ -110,6 +216,62 @@
 
     /* Welcome modal */
     .modal-overlay { background: rgba(0,0,0,0.45); backdrop-filter: blur(3px); }
+
+    /* Section nav tabs: larger, clearer active state */
+    .nav-tab { font-size: 0.75rem !important; }
+    .nav-tab.text-purple-600 { background: #faf5ff; }
+
+    /* ===== Mobile: keep the whole chart on-screen, no horizontal scroll ===== */
+    @media (max-width: 767px) {
+      .chart-outer { flex-direction: column; padding: 16px 8px; }
+      .chart-grid {
+        grid-template-columns: repeat(5, minmax(0, 1fr)) minmax(0, 0.7fr);
+        column-gap: 3px;
+        row-gap: 14px;
+      }
+      /* connecting lines become visual noise on a small grid — hide SVG, draw a single central spine guide instead */
+      .chart-lines { display: none; }
+      .chart-grid::before {
+        content: '';
+        position: absolute;
+        left: 44%;
+        top: 0; bottom: 0;
+        width: 1px;
+        background: linear-gradient(to bottom, transparent, #d8b4fe 10%, #d8b4fe 90%, transparent);
+        transform: translateX(-50%);
+        z-index: 0;
+        pointer-events: none;
+      }
+      .chart-box { min-width: 0; max-width: 100%; padding: 6px 8px; min-height: 48px; }
+      .chart-box .cb-num { font-size: 1rem; line-height: 1.1; }
+      .chart-box .cb-lbl { font-size: 11px; }
+      .period-lbl {
+        font-size: 9px;
+        padding: 3px 4px;
+        line-height: 1.25;
+        white-space: normal;
+        word-break: keep-all;
+        min-width: 0;
+        max-width: 100%;
+        min-height: 30px;
+      }
+      .chart-area .period-lbl { font-size: 10px; }
+      .chart-area .cb-lbl { font-size: 11px; }
+      /* ease the center-row crowding on narrow screens */
+      #cell-persona, #cell-destiny, #cell-ground, #cell-lifepath { border-width: 1px; }
+      #cell-destiny { border-width: 2px; box-shadow: 0 3px 10px rgba(124,58,237,0.30); }
+      /* Info block (年齢/個人年/個人月/個人日) moves below the chart as a wrapped row */
+      .chart-info-col {
+        width: 100%;
+        flex-direction: row;
+        flex-wrap: wrap;
+        justify-content: center;
+        align-items: center;
+        gap: 6px;
+        margin-top: 14px !important;
+      }
+      .chart-info-col .info-row { font-size: 11px; padding: 4px 8px; white-space: nowrap; }
+    }
   </style>
 </head>
 <body class="bg-gray-50 min-h-screen">
@@ -232,11 +394,7 @@
       </div>
       <div class="text-center">
         <p class="text-sm font-bold text-gray-700" id="result-name">太郎</p>
-        <p class="text-[10px] text-gray-400">レベル 1: 数秘の使者</p>
-        <div class="flex items-center justify-between max-w-xs mx-auto mt-1 text-[10px] text-gray-400">
-          <span>XP: 0</span>
-          <span>次のレベルまで: 100 XP</span>
-        </div>
+        <p class="text-[11px] text-gray-400 mt-0.5">あなたの数秘プロファイル</p>
       </div>
     </div>
 
@@ -258,7 +416,7 @@
       </div>
     </div>
 
-    <div class="max-w-md mx-auto px-4 py-4 space-y-5">
+    <div class="max-w-3xl mx-auto px-4 py-4 space-y-5">
 
       <!-- ===== SECTION: 数秘チャート ===== -->
       <div id="section-chart">
@@ -268,151 +426,93 @@
         <p class="text-[10px] text-gray-400" id="chart-birthdate">生年月日: 5/15/1990</p>
       </div>
 
-      <!-- ===== NUMEROLOGY DIAMOND CHART [LAYOUT LOCKED — DO NOT MODIFY POSITIONS] ===== -->
-      <!--
-        FIXED LAYOUT (2026-04-13):
-        Row 0: 成熟数 (center)
-        Row 1: 第4目標期間 (center)
-        Row 2: 第3目標数 (center)
-        Row 3: 第3目標期間 (center)
-        Row 4: 成長数 (left, gap-16) / 第2目標数 (right)
-        Row 5: 第1目標期間 (left, gap-8) / 第2目標期間 (right)
-        Row 6: 人格数 (left) / 誕生数 (center) / 社会数 (right) — justify-between w-full px-1
-               運命数 hidden (計算のみ)
-        Row 7: 第1挑戦期間 (left, gap-8) / 第2挑戦期間 (right)
-        Row 8: 克服数 (left, gap-16) / 第2挑戦数 (right)
-        Row 9: 第3挑戦期間 (center)
-        Row 10: 第3挑戦数 (center)
-        Row 11: 第4挑戦期間 (center)
-        Row 12: 第4挑戦数 (center)
-        DO NOT change box order, gap values, or justify rules.
-      -->
-      <div class="bg-fuchsia-50/60 border border-fuchsia-200 rounded-xl p-6 pt-8 pb-8 shadow-sm">
-        <div class="chart-area flex flex-col items-center gap-0">
+      <!-- ===== NUMEROLOGY DIAMOND CHART — wide two-column layout ===== -->
+      <div class="chart-outer shadow-sm">
 
-          <!-- ========== GOALS (上半分: 逆ピラミッド) ========== -->
+        <!-- LEFT: diamond column -->
+        <div class="chart-diamond-col">
+          <div class="chart-area chart-grid" id="chart-area-inner">
 
-          <!-- 成熟数 (top) -->
-          <div class="chart-row">
-            <div class="chart-box" id="cell-maturity">
+            <!-- SVG connecting lines — coordinates updated by JS after render -->
+            <svg id="chart-lines-svg" class="chart-lines" viewBox="0 0 400 700" preserveAspectRatio="none"
+                 style="position:absolute; inset:0; width:100%; height:100%; z-index:0; pointer-events:none;"
+                 stroke="#cbb6f0" stroke-width="1.4" fill="none" stroke-linecap="round">
+              <!-- Lines are drawn by updateChartLines() in JS after layout is known -->
+            </svg>
+
+            <!-- ========== GOALS (上半分) — 列アンカー配置 ========== -->
+            <div class="chart-box gr-1 gc-C" id="cell-maturity">
               <span class="cb-num">-</span><span class="cb-lbl">成熟数</span>
             </div>
-          </div>
-          <div class="chart-connector h-3"></div>
+            <div class="period-lbl gr-2 gc-C" id="gp4-label">第4目標期間<br><span id="gp4-age"></span></div>
 
-          <!-- 第4目標期間 -->
-          <div class="chart-row">
-            <div class="period-lbl" id="gp4-label">第4目標期間<br><span id="gp4-age"></span></div>
-          </div>
-          <div class="chart-connector h-3"></div>
-
-          <!-- 第3目標数 -->
-          <div class="chart-row">
-            <div class="chart-box" id="cell-target3">
+            <div class="chart-box gr-3 gc-C" id="cell-target3">
               <span class="cb-num">-</span><span class="cb-lbl">第3目標数</span>
             </div>
-          </div>
-          <div class="chart-connector h-3"></div>
+            <div class="period-lbl gr-4 gc-C" id="gp3-label">第3目標期間<br><span id="gp3-age"></span></div>
 
-          <!-- 第3目標期間 -->
-          <div class="chart-row">
-            <div class="period-lbl" id="gp3-label">第3目標期間<br><span id="gp3-age"></span></div>
-          </div>
-          <div class="chart-connector h-2"></div>
-
-          <!-- 魂の数 / 第2目標数 (split) -->
-          <div class="chart-row gap-16">
-            <div class="chart-box" id="cell-spirit">
+            <div class="chart-box gr-5 gc-B" id="cell-spirit">
               <span class="cb-num">-</span><span class="cb-lbl">成長数</span>
             </div>
-            <div class="chart-box" id="cell-target2">
+            <div class="chart-box gr-5 gc-D" id="cell-target2">
               <span class="cb-num">-</span><span class="cb-lbl">第2目標数</span>
             </div>
-          </div>
-          <div class="chart-connector h-2"></div>
+            <div class="period-lbl gr-6 gc-B" id="gp1-label">第1目標期間<br><span id="gp1-age"></span></div>
+            <div class="period-lbl gr-6 gc-D" id="gp2-label">第2目標期間<br><span id="gp2-age"></span></div>
 
-          <!-- 第1目標期間 / 第2目標期間 -->
-          <div class="chart-row gap-8">
-            <div class="period-lbl" id="gp1-label">第1目標期間<br><span id="gp1-age"></span></div>
-            <div class="period-lbl" id="gp2-label">第2目標期間<br><span id="gp2-age"></span></div>
-          </div>
-          <div class="chart-connector h-2"></div>
-
-          <!-- ========== CENTER ROW: 人格数 / 誕生数 / 社会数 ========== -->
-          <div class="chart-row justify-between w-full px-1">
-            <div class="chart-box" id="cell-persona">
+            <!-- ========== CENTER ROW: 人格数 / 誕生数 / 社会数 ========== -->
+            <div class="chart-box gr-7 gc-A" id="cell-persona">
               <span class="cb-num">-</span><span class="cb-lbl">人格数</span>
             </div>
-            <div class="chart-box" id="cell-destiny">
+            <div class="chart-box gr-7 gc-C" id="cell-destiny">
               <span class="cb-num">-</span><span class="cb-lbl">誕生数</span>
             </div>
-            <div class="chart-box" id="cell-ground">
+            <div class="chart-box gr-7 gc-E" id="cell-ground" style="justify-self:end;">
               <span class="cb-num">-</span><span class="cb-lbl">社会数</span>
             </div>
-          </div>
-          <!-- 運命数 (center, below center row) -->
-          <div class="chart-connector h-2"></div>
-          <div class="chart-row">
-            <div class="chart-box" id="cell-lifepath">
+            <div class="chart-box gr-7 gc-F" id="cell-lifepath" style="justify-self:start;">
               <span class="cb-num">-</span><span class="cb-lbl">運命数</span>
             </div>
-          </div>
-          <div class="chart-connector h-2"></div>
 
-          <!-- ========== CHALLENGES (下半分: ピラミッド) ========== -->
+            <!-- ========== CHALLENGES (下半分) — 列アンカー配置 ========== -->
+            <div class="period-lbl gr-8 gc-B" id="cp1-label">第1挑戦期間<br><span id="cp1-age"></span></div>
+            <div class="period-lbl gr-8 gc-D" id="cp2-label">第2挑戦期間<br><span id="cp2-age"></span></div>
 
-          <!-- 第1挑戦期間 / 第2挑戦期間 -->
-          <div class="chart-row gap-8">
-            <div class="period-lbl" id="cp1-label">第1挑戦期間<br><span id="cp1-age"></span></div>
-            <div class="period-lbl" id="cp2-label">第2挑戦期間<br><span id="cp2-age"></span></div>
-          </div>
-          <div class="chart-connector h-2"></div>
-
-          <!-- 混沌数 / 第2挑戦数 -->
-          <div class="chart-row gap-16">
-            <div class="chart-box" id="cell-ch1">
+            <div class="chart-box gr-9 gc-B" id="cell-ch1">
               <span class="cb-num">-</span><span class="cb-lbl">克服数</span>
             </div>
-            <div class="chart-box" id="cell-ch2">
+            <div class="chart-box gr-9 gc-D" id="cell-ch2">
               <span class="cb-num">-</span><span class="cb-lbl">第2挑戦数</span>
             </div>
-          </div>
-          <div class="chart-connector h-3"></div>
 
-          <!-- 第3挑戦期間 -->
-          <div class="chart-row">
-            <div class="period-lbl" id="cp3-label">第3挑戦期間<br><span id="cp3-age"></span></div>
-          </div>
-          <div class="chart-connector h-3"></div>
-
-          <!-- 第3挑戦数 -->
-          <div class="chart-row">
-            <div class="chart-box" id="cell-ch3">
+            <div class="period-lbl gr-10 gc-C" id="cp3-label">第3挑戦期間<br><span id="cp3-age"></span></div>
+            <div class="chart-box gr-11 gc-C" id="cell-ch3">
               <span class="cb-num">-</span><span class="cb-lbl">第3挑戦数</span>
             </div>
-          </div>
-          <div class="chart-connector h-3"></div>
 
-          <!-- 第4挑戦期間 -->
-          <div class="chart-row">
-            <div class="period-lbl" id="cp4-label">第4挑戦期間<br><span id="cp4-age"></span></div>
-          </div>
-          <div class="chart-connector h-3"></div>
-
-          <!-- 第4挑戦数 (bottom) -->
-          <div class="chart-row">
-            <div class="chart-box" id="cell-ch4">
+            <div class="period-lbl gr-12 gc-C" id="cp4-label">第4挑戦期間<br><span id="cp4-age"></span></div>
+            <div class="chart-box gr-13 gc-C" id="cell-ch4">
               <span class="cb-num">-</span><span class="cb-lbl">第4挑戦数</span>
             </div>
-          </div>
 
-        </div>
+          </div><!-- /chart-area -->
+        </div><!-- /chart-diamond-col -->
 
-        <!-- Note -->
-        <p class="text-[9px] text-gray-400 mt-4 leading-relaxed text-center">
-          各数字のボックスをクリックすると、その数字が持つ意味や、あなたの人生における役割についての詳しい解説が表示されます。あなたの隠れた才能や可能性を探求しましょう。
-        </p>
-      </div>
+        <!-- RIGHT: info column — 年齢/個人年/個人月/個人日 stacked above 運命数 -->
+        <!-- margin-top is set by JS to align 運命数 with center row -->
+        <div class="chart-info-col" id="chart-info-col">
+          <div class="info-row"><span>年齢: </span><span id="info-age">-</span><span> 歳</span></div>
+          <div class="info-row"><span>個人年: </span><span id="info-pyear">-</span></div>
+          <div class="info-row"><span>個人月: </span><span id="info-pmonth">-</span></div>
+          <div class="info-row"><span>個人日: </span><span id="info-pday">-</span></div>
+        </div><!-- /chart-info-col -->
+
+      </div><!-- /chart-outer -->
+
+      <!-- Note -->
+      <p class="text-[11px] text-purple-400 mt-3 leading-relaxed text-center">
+        👆 各数字のボックスをタップすると、その数字が持つ意味や、あなたの人生における役割の詳しい解説が表示されます。
+      </p>
 
       <!-- Numerology Chat UI -->
       <div id="numerology-chat" class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden mt-4">
@@ -429,9 +529,19 @@
         </div>
       </div>
 
+      <!-- ② 3つの軸カード (自分軸・他人軸・導き軸) -->
+      <div id="card-three-axes" class="hidden bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+        <div class="gradient-header p-4 text-center">
+          <h3 class="text-base font-bold text-gray-800">3つの軸</h3>
+          <p class="text-[11px] text-gray-500 mt-1">あなたの数字が示す3方向の本質</p>
+        </div>
+        <div class="p-4 grid grid-cols-1 sm:grid-cols-3 gap-4" id="axes-grid"></div>
+      </div>
+
       <!-- PDF Download -->
       <button id="btn-download-pdf"
-        class="w-full bg-gray-800 text-white rounded-xl py-3 text-sm font-semibold hover:bg-gray-700 transition-all flex items-center justify-center gap-2 shadow-md">
+        style="background:linear-gradient(135deg,#6d28d9,#4c1d95)"
+        class="w-full text-white rounded-xl py-3 text-sm font-semibold hover:opacity-90 transition-all flex items-center justify-center gap-2 shadow-md">
         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
         数秘レポートPDFをダウンロード
       </button>
@@ -722,15 +832,15 @@
         <div class="p-5">
           <div class="grid grid-cols-3 gap-3 mb-4">
             <div class="bg-teal-50 rounded-xl p-3 text-center">
-              <p class="text-[10px] text-teal-500 font-medium">個人年</p>
+              <p class="text-[11px] text-teal-600 font-medium">個人年</p>
               <p class="font-lora text-2xl font-bold text-teal-700" id="display-pyear">-</p>
             </div>
             <div class="bg-teal-50 rounded-xl p-3 text-center">
-              <p class="text-[10px] text-teal-500 font-medium">個人月</p>
+              <p class="text-[11px] text-teal-600 font-medium">個人月</p>
               <p class="font-lora text-2xl font-bold text-teal-700" id="display-pmonth">-</p>
             </div>
             <div class="bg-teal-50 rounded-xl p-3 text-center">
-              <p class="text-[10px] text-teal-500 font-medium">個人日</p>
+              <p class="text-[11px] text-teal-600 font-medium">個人日</p>
               <p class="font-lora text-2xl font-bold text-teal-700" id="display-pday">-</p>
             </div>
           </div>
@@ -741,6 +851,25 @@
           <div id="cycle-description" class="mt-3 bg-purple-50 rounded-xl p-4 hidden">
             <p class="text-[11px] font-semibold text-purple-700 mb-1">個人年のテーマ</p>
             <p class="text-xs text-gray-600 leading-relaxed" id="cycle-desc-text"></p>
+          </div>
+          <!-- ④ 個人年予報 -->
+          <div id="personal-year-forecast" class="mt-3 hidden">
+            <div class="bg-indigo-50 rounded-xl p-4 border border-indigo-100">
+              <p class="text-[11px] font-semibold text-indigo-500 mb-1" id="pyr-title">今年のテーマ</p>
+              <!-- 優先4: テーマ文言を18px/700/purple に格上げ -->
+              <p id="pyr-theme-text" style="font-size:18px;font-weight:700;color:#6d28d9;line-height:1.3" class="mb-3"></p>
+              <!-- 優先4: 2列グリッド（PC）・1列（モバイル） -->
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div class="bg-green-50 rounded-lg p-3 border border-green-100">
+                  <p style="font-size:12px;font-weight:600" class="text-green-700 mb-1.5">推奨行動</p>
+                  <ul id="pyr-recommend" class="space-y-1"></ul>
+                </div>
+                <div class="bg-rose-50 rounded-lg p-3 border border-rose-100">
+                  <p style="font-size:12px;font-weight:600" class="text-rose-700 mb-1.5">避けたいこと</p>
+                  <ul id="pyr-avoid" class="space-y-1"></ul>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -775,6 +904,56 @@
 
       <!-- ===== SECTION: 詳細鑑定 (dataset-driven) ===== -->
       <div id="section-dataset" class="space-y-5">
+
+        <!-- ① 職業適性 -->
+        <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden" id="card-career-aptitude" style="display:none">
+          <div class="gradient-header p-4 text-center">
+            <h3 class="text-base font-bold text-gray-800">あなたの天職</h3>
+            <p class="text-[11px] text-gray-500 mt-1">数秘が示す職業適性と後半生の適職</p>
+          </div>
+          <div class="p-5 space-y-4" id="ds-career"></div>
+        </div>
+
+        <!-- ③ 相性診断 -->
+        <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+          <div class="gradient-header p-4 text-center">
+            <h3 class="text-base font-bold text-gray-800">他人との相性診断</h3>
+            <p style="font-size:11px" class="text-gray-500 mt-1">相手の生年月日を入力して相性を確かめる</p>
+          </div>
+          <div class="p-5 space-y-3">
+            <div class="grid grid-cols-3 gap-2">
+              <div>
+                <label for="compat-year" style="font-size:11px" class="block text-gray-500 mb-1">年</label>
+                <input type="number" id="compat-year" min="1900" max="2100" placeholder="1990"
+                  aria-label="相手の生まれた年（例: 1990）"
+                  style="min-height:44px"
+                  class="w-full border border-gray-200 rounded-lg px-2 py-2.5 text-sm text-center focus:ring-2 focus:ring-purple-300 outline-none">
+              </div>
+              <div>
+                <label for="compat-month" style="font-size:11px" class="block text-gray-500 mb-1">月</label>
+                <input type="number" id="compat-month" min="1" max="12" placeholder="3"
+                  aria-label="相手の生まれた月（1〜12）"
+                  style="min-height:44px"
+                  class="w-full border border-gray-200 rounded-lg px-2 py-2.5 text-sm text-center focus:ring-2 focus:ring-purple-300 outline-none">
+              </div>
+              <div>
+                <label for="compat-day" style="font-size:11px" class="block text-gray-500 mb-1">日</label>
+                <input type="number" id="compat-day" min="1" max="31" placeholder="3"
+                  aria-label="相手の生まれた日（1〜31）"
+                  style="min-height:44px"
+                  class="w-full border border-gray-200 rounded-lg px-2 py-2.5 text-sm text-center focus:ring-2 focus:ring-purple-300 outline-none">
+              </div>
+            </div>
+            <!-- 優先1: 固定エラー要素 role=alert -->
+            <div id="compat-error-msg" role="alert" aria-live="polite" tabindex="-1" class="hidden text-xs text-red-500 mt-1">生年月日を正しく入力してください。</div>
+            <button id="btn-compat-check"
+              style="min-height:48px"
+              class="w-full bg-purple-600 hover:bg-purple-700 text-white rounded-full py-3 text-sm font-semibold transition-all">
+              相性をみる
+            </button>
+            <div id="compat-result" class="hidden" aria-live="polite" aria-atomic="true"></div>
+          </div>
+        </div>
 
         <!-- 色彩 & 宝石 -->
         <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
@@ -816,7 +995,7 @@
         <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
           <div class="gradient-header p-4 text-center">
             <h3 class="text-base font-bold text-gray-800">時のサイクル（個人年詳細）</h3>
-            <p class="text-[10px] text-gray-500 mt-1">今の個人年が示す行動指針</p>
+            <p class="text-[11px] text-gray-500 mt-1">今の個人年が示す行動指針</p>
           </div>
           <div class="p-5 space-y-3" id="ds-time-cycle"></div>
         </div>
@@ -1052,6 +1231,83 @@
     document.getElementById('btn-font-reset').addEventListener('click', () => applyFontSize(FONT_DEFAULT));
 
     // =========================================================
+    // Chart layout: align info column & draw connecting lines
+    // =========================================================
+    function updateChartLayout() {
+      const areaEl = document.getElementById('chart-area-inner');
+      const infoCol = document.getElementById('chart-info-col');
+      const centerRow = document.getElementById('cell-destiny');
+      const lifepathBox = document.getElementById('cell-lifepath');
+      const svgEl = document.getElementById('chart-lines-svg');
+      if (!areaEl || !infoCol || !centerRow || !lifepathBox || !svgEl) return;
+
+      const areaRect = areaEl.getBoundingClientRect();
+      if (areaRect.height < 10) return; // not rendered yet
+
+      // -- Align info column (年齢/個人年/個人月/個人日) vertically centered on the center row --
+      const centerRect = centerRow.getBoundingClientRect();
+      const infoBlockH = infoCol.offsetHeight;
+      const centerTop = centerRect.top - areaRect.top;
+      const wantedMarginTop = centerTop + (centerRect.height / 2) - (infoBlockH / 2);
+      infoCol.style.marginTop = Math.max(0, wantedMarginTop) + 'px';
+
+      // -- Draw SVG connecting lines --
+      const W = areaRect.width;
+      const H = areaRect.height;
+      svgEl.setAttribute('viewBox', '0 0 ' + W + ' ' + H);
+
+      // Helper: get box center relative to areaEl
+      function center(id) {
+        const el = document.getElementById(id);
+        if (!el) return null;
+        const r = el.getBoundingClientRect();
+        return {
+          x: r.left - areaRect.left + r.width / 2,
+          y: r.top  - areaRect.top  + r.height / 2
+        };
+      }
+
+      const ids = ['cell-maturity','cell-target3','cell-spirit','cell-target2',
+                   'cell-persona','cell-destiny','cell-ground',
+                   'cell-ch1','cell-ch2','cell-ch3','cell-ch4'];
+      const c = {};
+      ids.forEach(id => { c[id] = center(id); });
+
+      // Pairs to connect (diamond topology)
+      const pairs = [
+        ['cell-maturity','cell-target3'],
+        ['cell-target3','cell-spirit'],
+        ['cell-target3','cell-target2'],
+        ['cell-spirit','cell-persona'],
+        ['cell-spirit','cell-destiny'],
+        ['cell-target2','cell-ground'],
+        ['cell-target2','cell-destiny'],
+        // center horizontal axis
+        ['cell-persona','cell-destiny'],
+        ['cell-destiny','cell-ground'],
+        ['cell-ground','cell-lifepath'],
+        // lower half
+        ['cell-persona','cell-ch1'],
+        ['cell-destiny','cell-ch1'],
+        ['cell-destiny','cell-ch2'],
+        ['cell-ground','cell-ch2'],
+        ['cell-ch1','cell-ch3'],
+        ['cell-ch2','cell-ch3'],
+        ['cell-ch3','cell-ch4'],
+      ];
+
+      let linesHTML = '';
+      pairs.forEach(([a, b]) => {
+        if (!c[a] || !c[b]) return;
+        linesHTML += `<line x1="${c[a].x.toFixed(1)}" y1="${c[a].y.toFixed(1)}" x2="${c[b].x.toFixed(1)}" y2="${c[b].y.toFixed(1)}"/>`;
+      });
+
+      // 社会数 → 運命数 の接続は CSS (#cell-ground::after) で描画する（SVG viewBox座標系の不整合を回避）
+
+      svgEl.innerHTML = linesHTML;
+    }
+
+    // =========================================================
     // Form submit → calculate & show result view
     // =========================================================
     document.getElementById('birth-form').addEventListener('submit', (e) => {
@@ -1116,8 +1372,24 @@
       };
       for (const [id, val] of Object.entries(boxMap)) {
         const el = document.getElementById(id);
-        if (el) el.querySelector('.cb-num').textContent = val;
+        if (!el) continue;
+        el.querySelector('.cb-num').textContent = val;
+        const lbl = el.querySelector('.cb-lbl');
+        el.setAttribute('aria-label', `${lbl ? lbl.textContent : ''} ${val}。タップで詳しい解説を表示`);
       }
+
+      // Update right-column info cells
+      const infoAge = document.getElementById('info-age');
+      const infoPyear = document.getElementById('info-pyear');
+      const infoPmonth = document.getElementById('info-pmonth');
+      const infoPday = document.getElementById('info-pday');
+      if (infoAge) infoAge.textContent = r.age;
+      if (infoPyear) infoPyear.textContent = r.pYear;
+      if (infoPmonth) infoPmonth.textContent = r.pMonth;
+      if (infoPday) infoPday.textContent = r.pDay;
+
+      // Align info column + draw SVG lines after layout settles
+      requestAnimationFrame(() => { requestAnimationFrame(updateChartLayout); });
 
       // Update period ages
       const pa = r.periods;
@@ -1136,8 +1408,11 @@
       r.birthDay = day;
       lastResults = r;
 
-      // Populate dataset-driven sections
+      // Populate dataset-driven sections (also triggers ①②③④ rendering)
       renderDatasetSections(r);
+      // ② and ④ are independent of DATASET; always render
+      renderThreeAxes(r);
+      renderPersonalYearForecast(r.pYear);
 
       // Update personal cycles display
       document.getElementById('display-pyear').textContent = r.pYear;
@@ -1181,6 +1456,7 @@
       viewForm.classList.add('hidden');
       viewResult.classList.remove('hidden');
       window.scrollTo(0, 0);
+      setTimeout(() => document.getElementById('cell-destiny')?.classList.add('hint'), 350);
     });
 
     // Close welcome modal
@@ -1341,6 +1617,7 @@
     };
 
     function showDetail(cellId) {
+      document.querySelector('#cell-destiny.hint')?.classList.remove('hint');
       if (!lastResults) return;
       const pos = positionData[cellId];
       if (!pos) return;
@@ -1468,6 +1745,20 @@
 
     document.querySelectorAll('.chart-box').forEach(box => {
       box.addEventListener('click', () => showDetail(box.id));
+      box.setAttribute('role', 'button');
+      box.setAttribute('tabindex', '0');
+      box.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); showDetail(box.id); }
+      });
+    });
+    // Modal: Esc key and backdrop-click close (a11y)
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && !detailModal.classList.contains('hidden')) {
+        detailModal.classList.add('hidden'); document.body.style.overflow = '';
+      }
+    });
+    detailModal.addEventListener('click', (e) => {
+      if (e.target === detailModal) { detailModal.classList.add('hidden'); document.body.style.overflow = ''; }
     });
 
     // =========================================================
@@ -2455,6 +2746,346 @@ ${numContext}
     // =========================================================
     // Dataset sections renderer
     // =========================================================
+    // =========================================================
+    // ② 3つの軸: AXIS_DEF
+    // =========================================================
+    const AXIS_DEF = [
+      {
+        id: 'axis-self',
+        name: '自分軸',
+        sub: '内なる本質',
+        catch: 'ありのままの自分の核',
+        desc: 'あなたが生まれ持つ"本来の核"。素のままの性質と人生の目的を示します。',
+        items: [
+          { label: '誕生数', key: 'destiny' },
+          { label: '運命数', key: 'lifePath' },
+        ],
+        color: 'purple',
+      },
+      {
+        id: 'axis-other',
+        name: '他人軸',
+        sub: '外から見た自分',
+        catch: '社会の中での見られ方',
+        desc: '社会の中での"見られ方"。第一印象と対外的な役割を示します。',
+        items: [
+          { label: '人格数', key: 'persona' },
+          { label: '社会数', key: 'ground' },
+        ],
+        color: 'indigo',
+      },
+      {
+        id: 'axis-guide',
+        name: '導き軸',
+        sub: '向かう方向',
+        catch: '人生が向かう方向',
+        desc: '人生がこれから"向かっていく方向"。成長と成熟のテーマを示します。',
+        items: [
+          { label: '成長数', key: 'spirit' },
+          { label: '第2目標数', key: 'target2' },
+          { label: '第3目標数', key: 'target3' },
+          { label: '成熟数', key: 'maturity' },
+        ],
+        color: 'violet',
+      },
+    ];
+
+    // 羅針盤キーワードから自然文サマリーを生成（Fix3: キーワード羅列→文章化）
+    function getAxisSummary(items, r) {
+      if (!DATASET) return '';
+      const t = DATASET.tables || {};
+      const coreKw = (t['羅針盤キーワード'] || {})['コアキーワード'] || {};
+
+      // 各数字のポジティブ表現を取得
+      const positives = [];
+      const cores = [];
+      items.forEach(item => {
+        const val = r[item.key];
+        if (val == null) return;
+        const lookupN = (val > 9 && val !== 11 && val !== 22 && val !== 33) ? Math.min(val, 9) : val;
+        const kw = coreKw[String(lookupN)];
+        if (!kw) return;
+        if (kw['ポジティブ表現']) positives.push(kw['ポジティブ表現'].split('・')[0]);
+        if (kw['コアキーワード']) cores.push(kw['コアキーワード'].split('・')[0]);
+      });
+
+      if (positives.length === 0 && cores.length === 0) {
+        // fallback to numDB
+        const vals = items.map(i => r[i.key]).filter(v => v != null);
+        const parts = vals.map(v => {
+          const nd = numDB[v] || numDB[Math.min(v, 9)];
+          return nd ? (nd.core || '').split('。')[0].slice(0, 18) : null;
+        }).filter(Boolean);
+        return parts.join('、') + (parts.length ? 'な傾向があります。' : '');
+      }
+
+      // 重複語を除去（同一数字が複数ポジションに入る場合の「AでありながらA」を防ぐ）
+      const uniqPos = [...new Set(positives)];
+      const uniqCore = [...new Set(cores)];
+
+      // 文章として自然に接続
+      if (uniqPos.length >= 2) {
+        return uniqPos[0] + 'でありながら' + uniqPos[1] + 'な面も持つ、バランス感覚に優れた傾向があります。';
+      }
+      if (uniqPos.length === 1) {
+        // 構成する数字が同じ value に揃っている＝一貫した性質
+        if (positives.length >= 2) {
+          return uniqPos[0] + 'という性質が一貫して強く表れる、軸のぶれない傾向があります。';
+        }
+        return uniqPos[0] + 'な性質を核に持ち、' + (uniqCore[0] || '') + 'を発揮する力があります。';
+      }
+      return uniqCore.join(' × ') + 'のエネルギーが融合しています。';
+    }
+
+    function renderThreeAxes(r) {
+      const grid = document.getElementById('axes-grid');
+      const card = document.getElementById('card-three-axes');
+      if (!grid || !card) return;
+      grid.innerHTML = '';
+      AXIS_DEF.forEach(axis => {
+        const col = axis.color;
+        const bg     = `bg-${col}-50`;
+        const border = `border-${col}-200`;
+        const hdr    = `text-${col}-700`;
+        const chip   = `bg-${col}-100 text-${col}-700`;
+        const subCls = `text-${col}-500`;
+        const descCls = `text-${col}-600`;
+
+        const summary = getAxisSummary(axis.items, r);
+
+        const div = document.createElement('div');
+        div.className = `rounded-xl p-4 border ${bg} ${border}`;
+
+        // 軸名
+        const title = document.createElement('p');
+        title.className = `text-sm font-bold ${hdr} mb-0.5`;
+        title.textContent = axis.name;
+        div.appendChild(title);
+
+        // Fix1: 定義文（軸の意味）
+        const defEl = document.createElement('p');
+        defEl.className = `text-[11px] ${descCls} leading-snug mb-2`;
+        defEl.textContent = axis.desc;
+        div.appendChild(defEl);
+
+        // 数字チップ
+        const chips = document.createElement('div');
+        chips.className = 'flex flex-wrap gap-1 mb-2';
+        axis.items.forEach(item => {
+          const val = r[item.key];
+          if (val == null) return;
+          const c = document.createElement('span');
+          // 優先3: バッジ min-height:22px、font-size≥11px
+          c.className = `inline-flex items-center gap-1 rounded-full px-2 py-0.5 font-semibold ${chip}`;
+          c.style.fontSize = '11px';
+          c.style.minHeight = '22px';
+          c.textContent = `${item.label} ${val}`;
+          chips.appendChild(c);
+        });
+        div.appendChild(chips);
+
+        // Fix3: 文章化サマリー — 軸タイトルより小さく(12px/gray-500)
+        if (summary) {
+          const sum = document.createElement('p');
+          sum.style.fontSize = '12px';
+          sum.style.color = '#6b7280';
+          sum.className = 'leading-snug mt-1';
+          sum.textContent = summary;
+          div.appendChild(sum);
+        }
+
+        grid.appendChild(div);
+      });
+      card.classList.remove('hidden');
+    }
+
+    // =========================================================
+    // ④ PERSONAL_YEAR_DB
+    // =========================================================
+    const PERSONAL_YEAR_DB = {
+      1: { theme: '種まき・新しい始まり', recommend: ['起業・転職・新挑戦を始める', '自分の意思で決断する', '新しい環境に踏み出す'], avoid: ['過去の引きずり', '優柔不断・先延ばし'] },
+      2: { theme: '育成・協調・忍耐', recommend: ['協力関係を深める', '裏方の蓄積・準備', 'パートナーシップを育む'], avoid: ['焦りや無理な加速', '何でも一人で抱え込む'] },
+      3: { theme: '表現・社交・喜び', recommend: ['積極的に発信・創作する', '人との出会いを楽しむ', 'クリエイティブな活動'], avoid: ['浪費・遊びすぎ', '表面的な付き合いだけ'] },
+      4: { theme: '基盤固め・努力', recommend: ['仕組みや体制を整備する', '継続的な努力を重ねる', '計画を着実に実行する'], avoid: ['大型投資・無理な拡張', '近道や手抜きを求める'] },
+      5: { theme: '変化・自由・冒険', recommend: ['旅・転居・関係の刷新', '新しい体験に飛び込む', '自由な発想で動く'], avoid: ['変化を拒否して停滞する', '逃避・放棄'] },
+      6: { theme: '愛・責任・家庭', recommend: ['結婚・家族への投資', '信頼関係を深める', '地域・コミュニティへの貢献'], avoid: ['自己犠牲・過干渉', '感情を無視して進む'] },
+      7: { theme: '内省・学び・霊性', recommend: ['学習・瞑想・執筆に集中する', '専門性を深める', '静かな時間を確保する'], avoid: ['大型拡張・急な外向き行動', '感情の抑圧・孤立しすぎ'] },
+      8: { theme: '収穫・権力・物質', recommend: ['大型契約・値上げ・出版', '責任ある立場に挑む', '長期的成果を刈り取る'], avoid: ['拝金・物質主義に偏る', '人間関係を軽視する'] },
+      9: { theme: '手放し・完成・浄化', recommend: ['整理・慈善・卒業に取り組む', '古い習慣・関係の見直し', '次のサイクルへの準備'], avoid: ['PY9で新規開始（翌年PY1で）', '手放すべきものへの執着'] },
+    };
+
+    function renderPersonalYearForecast(pYear) {
+      const container = document.getElementById('personal-year-forecast');
+      if (!container) return;
+      // Master year normalization
+      let pyBase = pYear;
+      let masterNote = '';
+      if (pYear === 11) { pyBase = 2; masterNote = ' ※マスター年（11）高エネルギー'; }
+      else if (pYear === 22) { pyBase = 4; masterNote = ' ※マスター年（22）高エネルギー'; }
+      else if (pYear === 33) { pyBase = 6; masterNote = ' ※マスター年（33）高エネルギー'; }
+      const db = PERSONAL_YEAR_DB[pyBase];
+      if (!db) return;
+
+      const titleEl = document.getElementById('pyr-title');
+      const themeEl = document.getElementById('pyr-theme-text');
+      const recList  = document.getElementById('pyr-recommend');
+      const avoidList = document.getElementById('pyr-avoid');
+      if (!titleEl || !themeEl || !recList || !avoidList) return;
+
+      titleEl.textContent = '個人年 ' + pYear + ' の予報' + masterNote;
+      themeEl.textContent = db.theme;
+      recList.innerHTML = db.recommend.map(t => `<li class="text-[11px] text-green-700 flex items-start gap-1"><span class="mt-0.5 flex-shrink-0">+</span>${esc(t)}</li>`).join('');
+      avoidList.innerHTML = db.avoid.map(t => `<li class="text-[11px] text-rose-700 flex items-start gap-1"><span class="mt-0.5 flex-shrink-0">-</span>${esc(t)}</li>`).join('');
+      container.classList.remove('hidden');
+    }
+
+    // =========================================================
+    // ③ 相性診断ボタン（優先1: 厳密バリデーション + role=alert エラー分離）
+    // =========================================================
+    function compatShowError(msg) {
+      const errEl = document.getElementById('compat-error-msg');
+      const resultDiv = document.getElementById('compat-result');
+      if (errEl) {
+        errEl.textContent = msg || '生年月日を正しく入力してください。';
+        errEl.classList.remove('hidden');
+        errEl.focus && errEl.focus();
+      }
+      if (resultDiv) resultDiv.classList.add('hidden');
+    }
+    function compatHideError() {
+      const errEl = document.getElementById('compat-error-msg');
+      if (errEl) errEl.classList.add('hidden');
+    }
+
+    document.getElementById('btn-compat-check').addEventListener('click', function() {
+      if (!lastResults) return;
+      const pyRaw = document.getElementById('compat-year').value.trim();
+      const pmRaw = document.getElementById('compat-month').value.trim();
+      const pdRaw = document.getElementById('compat-day').value.trim();
+      const resultDiv = document.getElementById('compat-result');
+      if (!resultDiv) return;
+
+      // 優先1: 厳密チェック（NaN・空・範囲）
+      const py = Number(pyRaw);
+      const pm = Number(pmRaw);
+      const pd = Number(pdRaw);
+      if (!pyRaw || !pmRaw || !pdRaw || isNaN(py) || isNaN(pm) || isNaN(pd) ||
+          !Number.isInteger(py) || !Number.isInteger(pm) || !Number.isInteger(pd) ||
+          py < 1900 || py > 2100 || pm < 1 || pm > 12 || pd < 1 || pd > 31) {
+        compatShowError('生年月日を正しく入力してください（年:1900-2100、月:1-12、日:1-31）。');
+        return;
+      }
+
+      const partnerDate = new Date(py, pm - 1, pd);
+      // 月ロールオーバーチェック（例: 2/31 は 3/3 になってしまう）
+      if (isNaN(partnerDate.getTime()) ||
+          partnerDate.getFullYear() !== py ||
+          partnerDate.getMonth() !== pm - 1 ||
+          partnerDate.getDate() !== pd) {
+        compatShowError('その日付は存在しません。正しい日付を入力してください。');
+        return;
+      }
+      compatHideError();
+
+      const partnerLP = Numerology.lifePath(partnerDate);
+      const myLP = lastResults.lifePath;
+
+      if (!DATASET) {
+        resultDiv.classList.remove('hidden');
+        resultDiv.innerHTML = '<p class="text-xs text-gray-400 text-center">データ読み込み中です。しばらくお待ちください。</p>';
+        return;
+      }
+
+      const t = DATASET.tables || {};
+      const compatTable = (t['相性'] || {})['数字別テーブル'] || {};
+      const patterns = (t['相性'] || {})['関係パターン'] || {};
+      const coreKw = (t['羅針盤キーワード'] || {})['コアキーワード'] || {};
+
+      // Normalize myLP for lookup (master numbers → single digit for table)
+      const myLPStr = String(myLP > 9 ? (myLP === 11 ? 2 : myLP === 22 ? 4 : myLP === 33 ? 6 : myLP) : myLP);
+      const rec = compatTable[myLPStr];
+
+      // Fix2: 相手運命数の意味1行
+      const partnerNorm = (partnerLP > 9 && partnerLP !== 11 && partnerLP !== 22 && partnerLP !== 33) ? Math.min(partnerLP, 9) : partnerLP;
+      const partnerKw = coreKw[String(partnerNorm)];
+      const partnerMeaning = partnerKw
+        ? (partnerKw['コアキーワード'] || '') + '：' + (partnerKw['ポジティブ表現'] || '')
+        : (numDB[partnerLP] || numDB[Math.min(partnerLP, 9)] || {}).core || '';
+
+      let stars = '★★';
+      let typeName = '補完できる相性';
+      let patternKey = '';
+      let desc = '';
+      let advice = '互いの違いを尊重しながら、それぞれの強みを活かす場面を意識しましょう。';
+      let bgCls = 'bg-blue-50 border-blue-200';
+      let textCls = 'text-blue-700';
+      let badgeCls = 'bg-blue-100 text-blue-700';
+
+      if (rec) {
+        const parseNums = (s) => (s || '').split(',').map(x => parseInt(x.trim())).filter(n => !isNaN(n));
+        const good = parseNums(rec['相性が良い傾向']);
+        const stim = parseNums(rec['刺激し合う傾向']);
+        const chal = parseNums(rec['課題が生まれやすい傾向']);
+
+        if (good.includes(partnerLP)) {
+          stars = '★★★';
+          typeName = '自然な好相性';
+          patternKey = '共鳴型';
+          desc = (patterns['共鳴型'] || {})['説明'] || '';
+          advice = '同じ方向を向いて進める2人。焦らず深め合うことで関係がより豊かになります。';
+          bgCls = 'bg-green-50 border-green-200';
+          textCls = 'text-green-700';
+          badgeCls = 'bg-green-100 text-green-700';
+        } else if (stim.includes(partnerLP)) {
+          stars = '★★';
+          typeName = '高め合う刺激の相性';
+          patternKey = '刺激型';
+          const growDesc = (patterns['成長型'] || {})['説明'] || '';
+          const stimDesc = (patterns['刺激型'] || {})['説明'] || '';
+          desc = stimDesc || growDesc;
+          advice = '互いの違いがエネルギーになります。摩擦を恐れず対話を続けることで成長できます。';
+          bgCls = 'bg-amber-50 border-amber-200';
+          textCls = 'text-amber-700';
+          badgeCls = 'bg-amber-100 text-amber-700';
+        } else if (chal.includes(partnerLP)) {
+          stars = '★';
+          typeName = '学びの相性（乗り越えると最強）';
+          patternKey = '課題型';
+          desc = (patterns['課題型'] || {})['説明'] || '';
+          advice = '課題は成長のチャンス。お互いの価値観を言語化し、共通点を探すことが鍵です。';
+          bgCls = 'bg-rose-50 border-rose-200';
+          textCls = 'text-rose-700';
+          badgeCls = 'bg-rose-100 text-rose-700';
+        } else {
+          patternKey = '補完型';
+          desc = '互いに補い合い、それぞれが持つ異なる強みを合わせることで大きな力になります。';
+          advice = '違いを活かした役割分担が、2人の関係を豊かにしてくれます。';
+        }
+      }
+
+      resultDiv.classList.remove('hidden');
+      resultDiv.innerHTML = `
+        <div class="rounded-xl p-4 border ${bgCls} space-y-3">
+          <div class="flex items-center gap-2 flex-wrap">
+            <span class="text-base font-bold ${textCls}">${esc(stars)} ${esc(typeName)}</span>
+            ${patternKey ? `<span class="inline-flex items-center text-[11px] font-semibold rounded-full px-2.5 py-1 ${badgeCls}">${esc(patternKey)}</span>` : ''}
+          </div>
+          <p class="text-[11px] text-gray-500">相手の運命数: <strong class="${textCls}">${partnerLP}</strong>　あなたの運命数: <strong>${myLP}</strong></p>
+          ${partnerMeaning ? `<div class="bg-white/70 rounded-lg px-3 py-2 border border-gray-100">
+            <p style="font-size:11px;color:#6b7280;font-weight:600" class="mb-0.5">相手の運命数 ${partnerLP} の本質</p>
+            <p style="font-size:11px" class="text-gray-700 leading-snug">${esc(partnerMeaning)}</p>
+          </div>` : ''}
+          ${desc ? `<div>
+            <p style="font-size:11px" class="font-semibold ${textCls} mb-0.5">関係パターン</p>
+            <p style="font-size:12px" class="text-gray-600 leading-relaxed">${esc(desc)}</p>
+          </div>` : ''}
+          <div class="bg-white/70 rounded-lg px-3 py-2 border border-gray-100">
+            <p style="font-size:11px" class="font-semibold text-purple-600 mb-0.5">💡 一言アドバイス</p>
+            <p style="font-size:11px" class="text-gray-700 leading-snug">${esc(advice)}</p>
+          </div>
+        </div>`;
+    });
+
     function renderDatasetSections(r) {
       if (!DATASET) return;
       const t = DATASET.tables || {};
@@ -2740,6 +3371,159 @@ ${numContext}
           card.appendChild(meaning);
           sephDiv.appendChild(card);
         });
+      }
+
+      // ---- ① 職業適性 ----
+      const careerDiv = document.getElementById('ds-career');
+      const careerCard = document.getElementById('card-career-aptitude');
+      if (careerDiv && careerCard) {
+        careerDiv.innerHTML = '';
+        const ocTable = (t['職業適性'] || {})['誕生数別'] || {};
+        const mnTable = (t['職業適性'] || {})['マスターナンバー別'] || {};
+        const matTable = t['成熟数職業適性詳細'] || {};
+
+        // Normalize lifePath for lookup
+        const lpKey = String(r.lifePath);
+        const lpBase = (r.lifePath > 9 && r.lifePath !== 11 && r.lifePath !== 22 && r.lifePath !== 33)
+          ? String(Math.min(r.lifePath, 9)) : lpKey;
+        const isMaster = (r.lifePath === 11 || r.lifePath === 22 || r.lifePath === 33);
+
+        // 羅針盤から橋渡し文用ポジティブ表現を取得 (Fix4)
+        const coreKwCareer = (t['羅針盤キーワード'] || {})['コアキーワード'] || {};
+        function getCareerBridge(num, label) {
+          const n = (num > 9 && num !== 11 && num !== 22 && num !== 33) ? Math.min(num, 9) : num;
+          const kw = coreKwCareer[String(n)];
+          if (kw && kw['ポジティブ表現']) {
+            const pos = kw['ポジティブ表現'].split('・').slice(0, 2).join('・');
+            return label + ' ' + num + ' のあなたは' + pos + 'な性質を持つため、これらの仕事で本来の力を発揮します。';
+          }
+          const nd = numDB[num] || numDB[Math.min(num, 9)];
+          if (nd) {
+            const core = (nd.core || '').split('。')[0].slice(0, 30);
+            return label + ' ' + num + ' のあなたは' + core + 'という強みから、これらの仕事で力を発揮します。';
+          }
+          return '';
+        }
+
+        // Block A: 誕生数別 天職
+        const destKey = String(r.destiny > 9 ? Math.min(r.destiny, 9) : r.destiny);
+        const destRec = ocTable[destKey] || ocTable[lpBase];
+        if (destRec) {
+          const block = document.createElement('div');
+          block.className = 'bg-purple-50 rounded-xl p-4 border border-purple-100';
+          const ttl = document.createElement('p');
+          ttl.className = 'text-sm font-bold text-purple-700 mb-1';
+          ttl.textContent = 'あなたの天職（誕生数 ' + r.destiny + '）';
+          block.appendChild(ttl);
+          // Fix4: 橋渡し文
+          const bridge = getCareerBridge(r.destiny, '誕生数');
+          if (bridge) {
+            const bridgeEl = document.createElement('p');
+            bridgeEl.className = 'text-[11px] text-purple-600 leading-snug mb-2';
+            bridgeEl.textContent = bridge;
+            block.appendChild(bridgeEl);
+          }
+          const aptStr = destRec['適性職業・役割'] || '';
+          if (aptStr) {
+            const chips = document.createElement('div');
+            chips.className = 'flex flex-wrap gap-1 mb-2';
+            aptStr.split('・').filter(Boolean).forEach(job => {
+              const c = document.createElement('span');
+              c.className = 'bg-purple-100 text-purple-700 rounded-full font-medium';
+              c.style.cssText = 'font-size:11px;padding:3px 10px;min-height:24px;line-height:1.4;display:inline-flex;align-items:center';
+              c.textContent = job.trim();
+              chips.appendChild(c);
+            });
+            block.appendChild(chips);
+          }
+          const notApt = destRec['向かない職業・役割'];
+          if (notApt) {
+            const na = document.createElement('p');
+            // 優先5: gray-400→gray-500、11px でコントラストAA確保
+            na.className = 'text-gray-500 mt-1';
+            na.style.fontSize = '11px';
+            na.textContent = '向いていない: ' + notApt;
+            block.appendChild(na);
+          }
+          careerDiv.appendChild(block);
+        }
+
+        // Block B: マスターナンバー別 (if applicable)
+        if (isMaster && mnTable[lpKey]) {
+          const mnRec = mnTable[lpKey];
+          const block = document.createElement('div');
+          block.className = 'bg-indigo-50 rounded-xl p-4 border border-indigo-100';
+          const ttl = document.createElement('p');
+          ttl.className = 'text-sm font-bold text-indigo-700 mb-2';
+          ttl.textContent = '※マスターナンバー ' + lpKey + ' の天職';
+          block.appendChild(ttl);
+          const aptStr = mnRec['適性職業・役割'] || '';
+          if (aptStr) {
+            const chips = document.createElement('div');
+            chips.className = 'flex flex-wrap gap-1';
+            aptStr.split('・').filter(Boolean).forEach(job => {
+              const c = document.createElement('span');
+              c.className = 'bg-indigo-100 text-indigo-700 rounded-full font-medium';
+              c.style.cssText = 'font-size:11px;padding:3px 10px;min-height:24px;line-height:1.4;display:inline-flex;align-items:center';
+              c.textContent = job.trim();
+              chips.appendChild(c);
+            });
+            block.appendChild(chips);
+          }
+          careerDiv.appendChild(block);
+        }
+
+        // Block C: 成熟数 後半生の適職
+        const matKey = String(r.maturity > 9 ? Math.min(r.maturity, 9) : r.maturity);
+        const matRec = matTable[matKey];
+        if (matRec) {
+          const block = document.createElement('div');
+          block.className = 'bg-violet-50 rounded-xl p-4 border border-violet-100';
+          const ttl = document.createElement('p');
+          ttl.className = 'text-sm font-bold text-violet-700 mb-1';
+          ttl.textContent = '人生後半の適職（成熟数 ' + r.maturity + '）';
+          block.appendChild(ttl);
+          // Fix4: 橋渡し文
+          const matBridge = getCareerBridge(r.maturity, '成熟数');
+          if (matBridge) {
+            const matBridgeEl = document.createElement('p');
+            matBridgeEl.className = 'text-[11px] text-violet-600 leading-snug mb-2';
+            matBridgeEl.textContent = matBridge;
+            block.appendChild(matBridgeEl);
+          }
+          if (matRec['本質']) {
+            const ess = document.createElement('p');
+            ess.className = 'text-[11px] text-violet-600 font-semibold mb-1';
+            ess.textContent = '本質: ' + matRec['本質'];
+            block.appendChild(ess);
+          }
+          if (matRec['後半生の開花']) {
+            const bloom = document.createElement('p');
+            bloom.className = 'text-xs text-gray-600 mb-2';
+            bloom.textContent = '後半生の開花: ' + matRec['後半生の開花'];
+            block.appendChild(bloom);
+          }
+          if (Array.isArray(matRec['適性職業']) && matRec['適性職業'].length) {
+            const ul = document.createElement('ul');
+            ul.className = 'space-y-0.5 mb-2';
+            matRec['適性職業'].forEach(j => {
+              const li = document.createElement('li');
+              li.className = 'text-[11px] text-gray-600 flex items-start gap-1';
+              li.innerHTML = '<span class="text-violet-400 flex-shrink-0 mt-0.5">+</span>' + esc(j);
+              ul.appendChild(li);
+            });
+            block.appendChild(ul);
+          }
+          if (Array.isArray(matRec['強み']) && matRec['強み'].length) {
+            const str = document.createElement('p');
+            str.className = 'text-[10px] text-gray-500 mt-1';
+            str.textContent = '強み: ' + matRec['強み'].join('・');
+            block.appendChild(str);
+          }
+          careerDiv.appendChild(block);
+        }
+
+        careerCard.style.display = careerDiv.children.length > 0 ? '' : 'none';
       }
     }
 
