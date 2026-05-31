@@ -843,6 +843,7 @@
         <button class="nav-tab flex-1 py-2.5 text-[10px] font-medium text-gray-400 border-b-2 border-transparent" data-target="section-palm">手相占い</button>
         <button class="nav-tab flex-1 py-2.5 text-[10px] font-medium text-gray-400 border-b-2 border-transparent" data-target="section-cycles">サイクル</button>
         <button class="nav-tab flex-1 py-2.5 text-[10px] font-medium text-gray-400 border-b-2 border-transparent" data-target="section-dataset">詳細鑑定</button>
+        <button class="nav-tab flex-1 py-2.5 text-[10px] font-medium text-gray-400 border-b-2 border-transparent" data-target="section-strengths">強み診断</button>
       </div>
     </div>
 
@@ -1561,6 +1562,514 @@
 
       </div><!-- /section-dataset -->
 
+      <!-- ===== SECTION: 強み診断 ===== -->
+      <div id="section-strengths" class="space-y-5">
+
+        <!-- Intro / Start State -->
+        <div id="str-intro" class="bg-white shadow-sm border border-gray-100 rounded-xl p-5 space-y-4">
+          <div class="text-center">
+            <h3 class="text-base font-bold text-purple-700">強み診断</h3>
+            <p class="text-[10px] text-purple-400 mt-0.5">あなた固有の強みを発見する</p>
+          </div>
+          <p class="text-xs text-gray-600 leading-relaxed">
+            これは自己申告式の強み診断です。約120の二択に直感で答えると、24の強みの中であなたに強く働くものが順位で見えます。所要15〜25分。
+          </p>
+          <p class="text-[10px] text-gray-500 leading-relaxed bg-purple-50 rounded-lg p-3 border border-purple-100">
+            正解はありません。「こうありたい」ではなく「実際の自分」で答えてください。本診断は独自開発の指標です。
+          </p>
+          <div id="str-intro-buttons" class="space-y-2">
+            <button id="str-btn-start" class="w-full gradient-cta text-white rounded-full py-3 font-semibold text-sm shadow-lg">診断を始める</button>
+            <div id="str-resume-area" class="hidden space-y-2">
+              <button id="str-btn-resume" class="w-full bg-purple-50 text-purple-700 border border-purple-200 rounded-full py-2.5 font-semibold text-sm">前回の結果を見る</button>
+              <button id="str-btn-restart" class="w-full bg-gray-50 text-gray-500 border border-gray-200 rounded-full py-2 text-xs">最初からやり直す</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Question Flow -->
+        <div id="str-question-area" class="bg-white shadow-sm border border-gray-100 rounded-xl p-5 space-y-4 hidden">
+          <!-- Progress -->
+          <div class="space-y-1">
+            <div class="flex justify-between text-[10px] text-gray-400">
+              <span id="str-q-counter">115 / 115</span>
+              <span id="str-q-pct">99%</span>
+            </div>
+            <div class="w-full bg-gray-100 rounded-full h-1.5">
+              <div id="str-q-bar" class="bg-purple-400 h-1.5 rounded-full transition-all duration-300" style="width: 99%;"></div>
+            </div>
+          </div>
+          <!-- Pair display -->
+          <div class="space-y-3">
+            <div class="text-center text-[10px] text-gray-400 font-medium uppercase tracking-wide">あなたにより近いのは？</div>
+            <div class="grid grid-cols-2 gap-3">
+              <div id="str-q-left" class="rounded-xl bg-purple-50 border border-purple-100 p-3 text-xs text-gray-700 leading-relaxed min-h-[64px] flex items-center justify-center text-center">完遂するまでの粘り強さが誰より自分の武器だと思っている</div>
+              <div id="str-q-right" class="rounded-xl bg-indigo-50 border border-indigo-100 p-3 text-xs text-gray-700 leading-relaxed min-h-[64px] flex items-center justify-center text-center">新しい出会いを次々と開いていくことに生きがいを感じる</div>
+            </div>
+            <!-- 5-point segmented control -->
+            <div class="space-y-2">
+              <div class="flex items-center gap-1">
+                <button class="str-seg flex-1 py-2 rounded-lg text-[10px] font-medium border transition-colors duration-150 border-purple-300 text-purple-700 bg-purple-50 hover:bg-purple-100" data-val="-2">左に強く</button>
+                <button class="str-seg flex-1 py-2 rounded-lg text-[10px] font-medium border transition-colors duration-150 border-gray-200 text-gray-500 bg-white hover:bg-gray-50" data-val="-1">やや左</button>
+                <button class="str-seg flex-1 py-2 rounded-lg text-[10px] font-medium border transition-colors duration-150 border-gray-200 text-gray-400 bg-white hover:bg-gray-50" data-val="0">どちらでも</button>
+                <button class="str-seg flex-1 py-2 rounded-lg text-[10px] font-medium border transition-colors duration-150 border-gray-200 text-gray-500 bg-white hover:bg-gray-50" data-val="1">やや右</button>
+                <button class="str-seg flex-1 py-2 rounded-lg text-[10px] font-medium border transition-colors duration-150 border-indigo-300 text-indigo-700 bg-indigo-50 hover:bg-indigo-100" data-val="2">右に強く</button>
+              </div>
+              <p id="str-q-hint" class="text-[10px] text-center text-gray-400">選択すると次の質問に進みます</p>
+            </div>
+          </div>
+          <!-- Nav buttons -->
+          <div class="flex gap-2">
+            <button id="str-btn-prev" class="flex-1 py-2 border border-gray-200 rounded-full text-xs text-gray-500 hover:bg-gray-50 disabled:opacity-30">戻る</button>
+            <button id="str-btn-skip" class="flex-1 py-2 border border-gray-200 rounded-full text-xs text-gray-400 hover:bg-gray-50">スキップ</button>
+          </div>
+        </div>
+
+        <!-- Results Screen -->
+        <div id="str-results-area" class="hidden space-y-4">
+
+          <!-- Top5 signature -->
+          <div class="bg-white shadow-sm border border-gray-100 rounded-xl overflow-hidden">
+            <div class="gradient-header p-4 text-center">
+              <h3 class="text-base font-bold text-gray-800">あなたのトップ強み</h3>
+              <p class="text-[10px] text-gray-500 mt-1">最も強く働く5つのシグネチャー強み</p>
+            </div>
+            <div id="str-top5-cards" class="p-4 space-y-3"><div class="border border-gray-100 rounded-xl p-4 space-y-2">
+            <div class="flex items-center gap-2">
+              <span class="w-7 h-7 rounded-full bg-purple-100 text-purple-700 font-bold text-sm flex items-center justify-center flex-shrink-0">1</span>
+              <div class="flex-1 min-w-0">
+                <div class="flex items-center gap-2 flex-wrap">
+                  <span class="font-bold text-sm text-gray-800">完遂力</span>
+                  <span class="text-[10px] font-medium px-1.5 py-0.5 rounded-md border text-purple-700 bg-purple-50 border-purple-200">形にする力</span>
+                </div>
+              </div>
+              <span class="text-xs font-bold text-purple-600">0%</span>
+            </div>
+            <div class="w-full bg-gray-100 rounded-full h-1.5">
+              <div class="bg-purple-400 h-1.5 rounded-full" style="width:0%"></div>
+            </div>
+            <p class="text-[11px] text-gray-600 leading-relaxed">決めたことを最後までやり遂げ、成果が出るまで止まらない。</p>
+            <div class="bg-amber-50 border border-amber-100 rounded-lg p-2.5 space-y-1">
+              <p class="text-[10px] font-semibold text-amber-700">強みの影</p>
+              <p class="text-[10px] text-amber-600 leading-relaxed">量をこなすこと自体が目的化し、休むことに罪悪感を抱く。</p>
+            </div>
+            <div class="bg-purple-50 border border-purple-100 rounded-lg p-2.5 space-y-1">
+              <p class="text-[10px] font-semibold text-purple-700">行動指針</p>
+              <p class="text-[10px] text-purple-600 leading-relaxed">今週、一番大事な約束を一つだけ選び、それを最後までやり切る。</p>
+            </div>
+          </div><div class="border border-gray-100 rounded-xl p-4 space-y-2">
+            <div class="flex items-center gap-2">
+              <span class="w-7 h-7 rounded-full bg-purple-100 text-purple-700 font-bold text-sm flex items-center justify-center flex-shrink-0">2</span>
+              <div class="flex-1 min-w-0">
+                <div class="flex items-center gap-2 flex-wrap">
+                  <span class="font-bold text-sm text-gray-800">段取り構築</span>
+                  <span class="text-[10px] font-medium px-1.5 py-0.5 rounded-md border text-purple-700 bg-purple-50 border-purple-200">形にする力</span>
+                </div>
+              </div>
+              <span class="text-xs font-bold text-purple-600">0%</span>
+            </div>
+            <div class="w-full bg-gray-100 rounded-full h-1.5">
+              <div class="bg-purple-400 h-1.5 rounded-full" style="width:0%"></div>
+            </div>
+            <p class="text-[11px] text-gray-600 leading-relaxed">複数の要素を組み替え、最も効率的な進め方を設計する。</p>
+            <div class="bg-amber-50 border border-amber-100 rounded-lg p-2.5 space-y-1">
+              <p class="text-[10px] font-semibold text-amber-700">強みの影</p>
+              <p class="text-[10px] text-amber-600 leading-relaxed">自分の最適解に固執し、他人のやり方を受け入れにくい。</p>
+            </div>
+            <div class="bg-purple-50 border border-purple-100 rounded-lg p-2.5 space-y-1">
+              <p class="text-[10px] font-semibold text-purple-700">行動指針</p>
+              <p class="text-[10px] text-purple-600 leading-relaxed">次のプロジェクト着手前に、ステップを紙に書き出して確認する。</p>
+            </div>
+          </div><div class="border border-gray-100 rounded-xl p-4 space-y-2">
+            <div class="flex items-center gap-2">
+              <span class="w-7 h-7 rounded-full bg-purple-100 text-purple-700 font-bold text-sm flex items-center justify-center flex-shrink-0">3</span>
+              <div class="flex-1 min-w-0">
+                <div class="flex items-center gap-2 flex-wrap">
+                  <span class="font-bold text-sm text-gray-800">自律力</span>
+                  <span class="text-[10px] font-medium px-1.5 py-0.5 rounded-md border text-purple-700 bg-purple-50 border-purple-200">形にする力</span>
+                </div>
+              </div>
+              <span class="text-xs font-bold text-purple-600">0%</span>
+            </div>
+            <div class="w-full bg-gray-100 rounded-full h-1.5">
+              <div class="bg-purple-400 h-1.5 rounded-full" style="width:0%"></div>
+            </div>
+            <p class="text-[11px] text-gray-600 leading-relaxed">秩序とルーティンを保ち、決めた基準を自分に課し続ける。</p>
+            <div class="bg-amber-50 border border-amber-100 rounded-lg p-2.5 space-y-1">
+              <p class="text-[10px] font-semibold text-amber-700">強みの影</p>
+              <p class="text-[10px] text-amber-600 leading-relaxed">予定外の変化に弱く、融通が利かないと見られる。</p>
+            </div>
+            <div class="bg-purple-50 border border-purple-100 rounded-lg p-2.5 space-y-1">
+              <p class="text-[10px] font-semibold text-purple-700">行動指針</p>
+              <p class="text-[10px] text-purple-600 leading-relaxed">毎朝同じ時間に小さなルーティンを一つ始め、3週間続ける。</p>
+            </div>
+          </div><div class="border border-gray-100 rounded-xl p-4 space-y-2">
+            <div class="flex items-center gap-2">
+              <span class="w-7 h-7 rounded-full bg-purple-100 text-purple-700 font-bold text-sm flex items-center justify-center flex-shrink-0">4</span>
+              <div class="flex-1 min-w-0">
+                <div class="flex items-center gap-2 flex-wrap">
+                  <span class="font-bold text-sm text-gray-800">再起力</span>
+                  <span class="text-[10px] font-medium px-1.5 py-0.5 rounded-md border text-purple-700 bg-purple-50 border-purple-200">形にする力</span>
+                </div>
+              </div>
+              <span class="text-xs font-bold text-purple-600">0%</span>
+            </div>
+            <div class="w-full bg-gray-100 rounded-full h-1.5">
+              <div class="bg-purple-400 h-1.5 rounded-full" style="width:0%"></div>
+            </div>
+            <p class="text-[11px] text-gray-600 leading-relaxed">壊れたもの・停滞したものを立て直し、回復させることに力を発揮する。</p>
+            <div class="bg-amber-50 border border-amber-100 rounded-lg p-2.5 space-y-1">
+              <p class="text-[10px] font-semibold text-amber-700">強みの影</p>
+              <p class="text-[10px] text-amber-600 leading-relaxed">問題探しが癖になり、うまくいっている所まで粗探ししてしまう。</p>
+            </div>
+            <div class="bg-purple-50 border border-purple-100 rounded-lg p-2.5 space-y-1">
+              <p class="text-[10px] font-semibold text-purple-700">行動指針</p>
+              <p class="text-[10px] text-purple-600 leading-relaxed">行き詰まった課題を一つ選び、問題の根本をリストアップして着手する。</p>
+            </div>
+          </div><div class="border border-gray-100 rounded-xl p-4 space-y-2">
+            <div class="flex items-center gap-2">
+              <span class="w-7 h-7 rounded-full bg-purple-100 text-purple-700 font-bold text-sm flex items-center justify-center flex-shrink-0">5</span>
+              <div class="flex-1 min-w-0">
+                <div class="flex items-center gap-2 flex-wrap">
+                  <span class="font-bold text-sm text-gray-800">引受力</span>
+                  <span class="text-[10px] font-medium px-1.5 py-0.5 rounded-md border text-purple-700 bg-purple-50 border-purple-200">形にする力</span>
+                </div>
+              </div>
+              <span class="text-xs font-bold text-purple-600">0%</span>
+            </div>
+            <div class="w-full bg-gray-100 rounded-full h-1.5">
+              <div class="bg-purple-400 h-1.5 rounded-full" style="width:0%"></div>
+            </div>
+            <p class="text-[11px] text-gray-600 leading-relaxed">引き受けた約束を必ず守り、最後まで責任を背負い切る。</p>
+            <div class="bg-amber-50 border border-amber-100 rounded-lg p-2.5 space-y-1">
+              <p class="text-[10px] font-semibold text-amber-700">強みの影</p>
+              <p class="text-[10px] text-amber-600 leading-relaxed">抱え込みすぎて手放せず、自分を追い込む。</p>
+            </div>
+            <div class="bg-purple-50 border border-purple-100 rounded-lg p-2.5 space-y-1">
+              <p class="text-[10px] font-semibold text-purple-700">行動指針</p>
+              <p class="text-[10px] text-purple-600 leading-relaxed">引き受けた約束を可視化するリストを作り、毎日確認する習慣を持つ。</p>
+            </div>
+          </div></div>
+          </div>
+
+          <!-- Domain balance radar -->
+          <div class="bg-white shadow-sm border border-gray-100 rounded-xl overflow-hidden">
+            <div class="gradient-header p-4 text-center">
+              <h3 class="text-sm font-bold text-gray-800">4領域バランス</h3>
+            </div>
+            <div class="p-4 flex flex-col items-center gap-4">
+              <svg id="str-radar-svg" width="220" height="220" viewBox="-110 -110 220 220"><polygon points="1.3777276490407724e-15,-22.5 22.5,0 1.3777276490407724e-15,22.5 -22.5,2.7554552980815448e-15" fill="none" stroke="#e5e7eb" stroke-width="0.8"></polygon><polygon points="2.7554552980815448e-15,-45 45,0 2.7554552980815448e-15,45 -45,5.5109105961630896e-15" fill="none" stroke="#e5e7eb" stroke-width="0.8"></polygon><polygon points="4.133182947122317e-15,-67.5 67.5,0 4.133182947122317e-15,67.5 -67.5,8.266365894244634e-15" fill="none" stroke="#e5e7eb" stroke-width="0.8"></polygon><polygon points="5.5109105961630896e-15,-90 90,0 5.5109105961630896e-15,90 -90,1.1021821192326179e-14" fill="none" stroke="#e5e7eb" stroke-width="0.8"></polygon><line x1="0" y1="0" x2="5.5109105961630896e-15" y2="-90" stroke="#e5e7eb" stroke-width="0.8"></line><line x1="0" y1="0" x2="90" y2="0" stroke="#e5e7eb" stroke-width="0.8"></line><line x1="0" y1="0" x2="5.5109105961630896e-15" y2="90" stroke="#e5e7eb" stroke-width="0.8"></line><line x1="0" y1="0" x2="-90" y2="1.1021821192326179e-14" stroke="#e5e7eb" stroke-width="0.8"></line><polygon points="0,0 0,0 0,0 0,0" fill="rgba(124,58,237,0.2)" stroke="#7c3aed" stroke-width="2"></polygon><text x="6.490628035480972e-15" y="-106" text-anchor="middle" dominant-baseline="middle" font-size="8" fill="#7c3aed" font-weight="600">形にする力</text><text x="106" y="0" text-anchor="middle" dominant-baseline="middle" font-size="8" fill="#0f766e" font-weight="600">火をつける力</text><text x="6.490628035480972e-15" y="106" text-anchor="middle" dominant-baseline="middle" font-size="8" fill="#b45309" font-weight="600">つなぐ力</text><text x="-106" y="1.2981256070961945e-14" text-anchor="middle" dominant-baseline="middle" font-size="8" fill="#1d4ed8" font-weight="600">見通す力</text></svg>
+              <div id="str-domain-legend" class="grid grid-cols-2 gap-2 w-full text-[10px]"><div class="flex items-center gap-1.5">
+            <span class="w-2 h-2 rounded-sm flex-shrink-0" style="background:#7c3aed"></span>
+            <span class="text-[10px] text-gray-600">形にする力 <span class="font-bold" style="color:#7c3aed">0%</span></span>
+          </div><div class="flex items-center gap-1.5">
+            <span class="w-2 h-2 rounded-sm flex-shrink-0" style="background:#0f766e"></span>
+            <span class="text-[10px] text-gray-600">火をつける力 <span class="font-bold" style="color:#0f766e">0%</span></span>
+          </div><div class="flex items-center gap-1.5">
+            <span class="w-2 h-2 rounded-sm flex-shrink-0" style="background:#b45309"></span>
+            <span class="text-[10px] text-gray-600">つなぐ力 <span class="font-bold" style="color:#b45309">0%</span></span>
+          </div><div class="flex items-center gap-1.5">
+            <span class="w-2 h-2 rounded-sm flex-shrink-0" style="background:#1d4ed8"></span>
+            <span class="text-[10px] text-gray-600">見通す力 <span class="font-bold" style="color:#1d4ed8">0%</span></span>
+          </div></div>
+            </div>
+          </div>
+
+          <!-- Combination insight -->
+          <div class="bg-white shadow-sm border border-gray-100 rounded-xl p-4 space-y-2">
+            <h4 class="text-xs font-bold text-purple-700">組み合わせの洞察</h4>
+            <p id="str-combo-text" class="text-xs text-gray-600 leading-relaxed">あなたの最も強い力は「完遂力」です。決めたことを最後までやり遂げ、成果が出るまで止まらないということが、あなたの行動の核心にあります。そこに「段取り構築」が加わることで、複数の要素を組み替え、最も効率的な進め方を設計するという側面も際立ちます。さらに「自律力」があなたの強みの幅を広げており、秩序とルーティンを保ち、決めた基準を自分に課し続けることを自然に行う力があります。この組み合わせは、あなたが最も輝く場面で独自の価値を生み出します。</p>
+          </div>
+
+          <!-- Numerology cross-reference (shown only if lastResults available) -->
+          <div id="str-num-cross" class="hidden bg-white shadow-sm border border-gray-100 rounded-xl p-4 space-y-2">
+            <h4 class="text-xs font-bold text-purple-700">強み × 数秘の接点</h4>
+            <p id="str-num-cross-text" class="text-xs text-gray-600 leading-relaxed"></p>
+          </div>
+
+          <!-- Full 24 ranking (collapsible) -->
+          <div class="bg-white shadow-sm border border-gray-100 rounded-xl overflow-hidden">
+            <button id="str-toggle-full" class="w-full p-4 text-left flex justify-between items-center text-xs font-bold text-gray-700 hover:bg-gray-50">
+              <span>24強み 全ランキング</span>
+              <span id="str-toggle-icon" class="text-gray-400">▼</span>
+            </button>
+            <div id="str-full-ranking" class="hidden px-4 pb-4 space-y-2"><div class="flex items-center gap-2">
+            <span class="w-5 text-[10px] text-gray-400 text-right flex-shrink-0">1</span>
+            <div class="flex-1 min-w-0">
+              <div class="flex items-center justify-between mb-0.5">
+                <span class="text-[11px] font-medium text-gray-700">完遂力</span>
+                <span class="text-[10px] text-gray-400">0%</span>
+              </div>
+              <div class="w-full bg-gray-100 rounded-full h-1">
+                <div class="h-1 rounded-full" style="width:0%;background:#7c3aed"></div>
+              </div>
+            </div>
+          </div><div class="flex items-center gap-2">
+            <span class="w-5 text-[10px] text-gray-400 text-right flex-shrink-0">2</span>
+            <div class="flex-1 min-w-0">
+              <div class="flex items-center justify-between mb-0.5">
+                <span class="text-[11px] font-medium text-gray-700">段取り構築</span>
+                <span class="text-[10px] text-gray-400">0%</span>
+              </div>
+              <div class="w-full bg-gray-100 rounded-full h-1">
+                <div class="h-1 rounded-full" style="width:0%;background:#7c3aed"></div>
+              </div>
+            </div>
+          </div><div class="flex items-center gap-2">
+            <span class="w-5 text-[10px] text-gray-400 text-right flex-shrink-0">3</span>
+            <div class="flex-1 min-w-0">
+              <div class="flex items-center justify-between mb-0.5">
+                <span class="text-[11px] font-medium text-gray-700">自律力</span>
+                <span class="text-[10px] text-gray-400">0%</span>
+              </div>
+              <div class="w-full bg-gray-100 rounded-full h-1">
+                <div class="h-1 rounded-full" style="width:0%;background:#7c3aed"></div>
+              </div>
+            </div>
+          </div><div class="flex items-center gap-2">
+            <span class="w-5 text-[10px] text-gray-400 text-right flex-shrink-0">4</span>
+            <div class="flex-1 min-w-0">
+              <div class="flex items-center justify-between mb-0.5">
+                <span class="text-[11px] font-medium text-gray-700">再起力</span>
+                <span class="text-[10px] text-gray-400">0%</span>
+              </div>
+              <div class="w-full bg-gray-100 rounded-full h-1">
+                <div class="h-1 rounded-full" style="width:0%;background:#7c3aed"></div>
+              </div>
+            </div>
+          </div><div class="flex items-center gap-2">
+            <span class="w-5 text-[10px] text-gray-400 text-right flex-shrink-0">5</span>
+            <div class="flex-1 min-w-0">
+              <div class="flex items-center justify-between mb-0.5">
+                <span class="text-[11px] font-medium text-gray-700">引受力</span>
+                <span class="text-[10px] text-gray-400">0%</span>
+              </div>
+              <div class="w-full bg-gray-100 rounded-full h-1">
+                <div class="h-1 rounded-full" style="width:0%;background:#7c3aed"></div>
+              </div>
+            </div>
+          </div><div class="flex items-center gap-2">
+            <span class="w-5 text-[10px] text-gray-400 text-right flex-shrink-0">6</span>
+            <div class="flex-1 min-w-0">
+              <div class="flex items-center justify-between mb-0.5">
+                <span class="text-[11px] font-medium text-gray-700">一点集中</span>
+                <span class="text-[10px] text-gray-400">0%</span>
+              </div>
+              <div class="w-full bg-gray-100 rounded-full h-1">
+                <div class="h-1 rounded-full" style="width:0%;background:#7c3aed"></div>
+              </div>
+            </div>
+          </div><div class="flex items-center gap-2">
+            <span class="w-5 text-[10px] text-gray-400 text-right flex-shrink-0">7</span>
+            <div class="flex-1 min-w-0">
+              <div class="flex items-center justify-between mb-0.5">
+                <span class="text-[11px] font-medium text-gray-700">着火力</span>
+                <span class="text-[10px] text-gray-400">0%</span>
+              </div>
+              <div class="w-full bg-gray-100 rounded-full h-1">
+                <div class="h-1 rounded-full" style="width:0%;background:#0f766e"></div>
+              </div>
+            </div>
+          </div><div class="flex items-center gap-2">
+            <span class="w-5 text-[10px] text-gray-400 text-right flex-shrink-0">8</span>
+            <div class="flex-1 min-w-0">
+              <div class="flex items-center justify-between mb-0.5">
+                <span class="text-[11px] font-medium text-gray-700">言葉力</span>
+                <span class="text-[10px] text-gray-400">0%</span>
+              </div>
+              <div class="w-full bg-gray-100 rounded-full h-1">
+                <div class="h-1 rounded-full" style="width:0%;background:#0f766e"></div>
+              </div>
+            </div>
+          </div><div class="flex items-center gap-2">
+            <span class="w-5 text-[10px] text-gray-400 text-right flex-shrink-0">9</span>
+            <div class="flex-1 min-w-0">
+              <div class="flex items-center justify-between mb-0.5">
+                <span class="text-[11px] font-medium text-gray-700">牽引力</span>
+                <span class="text-[10px] text-gray-400">0%</span>
+              </div>
+              <div class="w-full bg-gray-100 rounded-full h-1">
+                <div class="h-1 rounded-full" style="width:0%;background:#0f766e"></div>
+              </div>
+            </div>
+          </div><div class="flex items-center gap-2">
+            <span class="w-5 text-[10px] text-gray-400 text-right flex-shrink-0">10</span>
+            <div class="flex-1 min-w-0">
+              <div class="flex items-center justify-between mb-0.5">
+                <span class="text-[11px] font-medium text-gray-700">卓越追求</span>
+                <span class="text-[10px] text-gray-400">0%</span>
+              </div>
+              <div class="w-full bg-gray-100 rounded-full h-1">
+                <div class="h-1 rounded-full" style="width:0%;background:#0f766e"></div>
+              </div>
+            </div>
+          </div><div class="flex items-center gap-2">
+            <span class="w-5 text-[10px] text-gray-400 text-right flex-shrink-0">11</span>
+            <div class="flex-1 min-w-0">
+              <div class="flex items-center justify-between mb-0.5">
+                <span class="text-[11px] font-medium text-gray-700">胆力</span>
+                <span class="text-[10px] text-gray-400">0%</span>
+              </div>
+              <div class="w-full bg-gray-100 rounded-full h-1">
+                <div class="h-1 rounded-full" style="width:0%;background:#0f766e"></div>
+              </div>
+            </div>
+          </div><div class="flex items-center gap-2">
+            <span class="w-5 text-[10px] text-gray-400 text-right flex-shrink-0">12</span>
+            <div class="flex-1 min-w-0">
+              <div class="flex items-center justify-between mb-0.5">
+                <span class="text-[11px] font-medium text-gray-700">場開き力</span>
+                <span class="text-[10px] text-gray-400">0%</span>
+              </div>
+              <div class="w-full bg-gray-100 rounded-full h-1">
+                <div class="h-1 rounded-full" style="width:0%;background:#0f766e"></div>
+              </div>
+            </div>
+          </div><div class="flex items-center gap-2">
+            <span class="w-5 text-[10px] text-gray-400 text-right flex-shrink-0">13</span>
+            <div class="flex-1 min-w-0">
+              <div class="flex items-center justify-between mb-0.5">
+                <span class="text-[11px] font-medium text-gray-700">共鳴力</span>
+                <span class="text-[10px] text-gray-400">0%</span>
+              </div>
+              <div class="w-full bg-gray-100 rounded-full h-1">
+                <div class="h-1 rounded-full" style="width:0%;background:#b45309"></div>
+              </div>
+            </div>
+          </div><div class="flex items-center gap-2">
+            <span class="w-5 text-[10px] text-gray-400 text-right flex-shrink-0">14</span>
+            <div class="flex-1 min-w-0">
+              <div class="flex items-center justify-between mb-0.5">
+                <span class="text-[11px] font-medium text-gray-700">和成力</span>
+                <span class="text-[10px] text-gray-400">0%</span>
+              </div>
+              <div class="w-full bg-gray-100 rounded-full h-1">
+                <div class="h-1 rounded-full" style="width:0%;background:#b45309"></div>
+              </div>
+            </div>
+          </div><div class="flex items-center gap-2">
+            <span class="w-5 text-[10px] text-gray-400 text-right flex-shrink-0">15</span>
+            <div class="flex-1 min-w-0">
+              <div class="flex items-center justify-between mb-0.5">
+                <span class="text-[11px] font-medium text-gray-700">育成力</span>
+                <span class="text-[10px] text-gray-400">0%</span>
+              </div>
+              <div class="w-full bg-gray-100 rounded-full h-1">
+                <div class="h-1 rounded-full" style="width:0%;background:#b45309"></div>
+              </div>
+            </div>
+          </div><div class="flex items-center gap-2">
+            <span class="w-5 text-[10px] text-gray-400 text-right flex-shrink-0">16</span>
+            <div class="flex-1 min-w-0">
+              <div class="flex items-center justify-between mb-0.5">
+                <span class="text-[11px] font-medium text-gray-700">結縁力</span>
+                <span class="text-[10px] text-gray-400">0%</span>
+              </div>
+              <div class="w-full bg-gray-100 rounded-full h-1">
+                <div class="h-1 rounded-full" style="width:0%;background:#b45309"></div>
+              </div>
+            </div>
+          </div><div class="flex items-center gap-2">
+            <span class="w-5 text-[10px] text-gray-400 text-right flex-shrink-0">17</span>
+            <div class="flex-1 min-w-0">
+              <div class="flex items-center justify-between mb-0.5">
+                <span class="text-[11px] font-medium text-gray-700">包容力</span>
+                <span class="text-[10px] text-gray-400">0%</span>
+              </div>
+              <div class="w-full bg-gray-100 rounded-full h-1">
+                <div class="h-1 rounded-full" style="width:0%;background:#b45309"></div>
+              </div>
+            </div>
+          </div><div class="flex items-center gap-2">
+            <span class="w-5 text-[10px] text-gray-400 text-right flex-shrink-0">18</span>
+            <div class="flex-1 min-w-0">
+              <div class="flex items-center justify-between mb-0.5">
+                <span class="text-[11px] font-medium text-gray-700">個眼力</span>
+                <span class="text-[10px] text-gray-400">0%</span>
+              </div>
+              <div class="w-full bg-gray-100 rounded-full h-1">
+                <div class="h-1 rounded-full" style="width:0%;background:#b45309"></div>
+              </div>
+            </div>
+          </div><div class="flex items-center gap-2">
+            <span class="w-5 text-[10px] text-gray-400 text-right flex-shrink-0">19</span>
+            <div class="flex-1 min-w-0">
+              <div class="flex items-center justify-between mb-0.5">
+                <span class="text-[11px] font-medium text-gray-700">洞察思考</span>
+                <span class="text-[10px] text-gray-400">0%</span>
+              </div>
+              <div class="w-full bg-gray-100 rounded-full h-1">
+                <div class="h-1 rounded-full" style="width:0%;background:#1d4ed8"></div>
+              </div>
+            </div>
+          </div><div class="flex items-center gap-2">
+            <span class="w-5 text-[10px] text-gray-400 text-right flex-shrink-0">20</span>
+            <div class="flex-1 min-w-0">
+              <div class="flex items-center justify-between mb-0.5">
+                <span class="text-[11px] font-medium text-gray-700">探究心</span>
+                <span class="text-[10px] text-gray-400">0%</span>
+              </div>
+              <div class="w-full bg-gray-100 rounded-full h-1">
+                <div class="h-1 rounded-full" style="width:0%;background:#1d4ed8"></div>
+              </div>
+            </div>
+          </div><div class="flex items-center gap-2">
+            <span class="w-5 text-[10px] text-gray-400 text-right flex-shrink-0">21</span>
+            <div class="flex-1 min-w-0">
+              <div class="flex items-center justify-between mb-0.5">
+                <span class="text-[11px] font-medium text-gray-700">発想力</span>
+                <span class="text-[10px] text-gray-400">0%</span>
+              </div>
+              <div class="w-full bg-gray-100 rounded-full h-1">
+                <div class="h-1 rounded-full" style="width:0%;background:#1d4ed8"></div>
+              </div>
+            </div>
+          </div><div class="flex items-center gap-2">
+            <span class="w-5 text-[10px] text-gray-400 text-right flex-shrink-0">22</span>
+            <div class="flex-1 min-w-0">
+              <div class="flex items-center justify-between mb-0.5">
+                <span class="text-[11px] font-medium text-gray-700">構想力</span>
+                <span class="text-[10px] text-gray-400">0%</span>
+              </div>
+              <div class="w-full bg-gray-100 rounded-full h-1">
+                <div class="h-1 rounded-full" style="width:0%;background:#1d4ed8"></div>
+              </div>
+            </div>
+          </div><div class="flex items-center gap-2">
+            <span class="w-5 text-[10px] text-gray-400 text-right flex-shrink-0">23</span>
+            <div class="flex-1 min-w-0">
+              <div class="flex items-center justify-between mb-0.5">
+                <span class="text-[11px] font-medium text-gray-700">道筋力</span>
+                <span class="text-[10px] text-gray-400">0%</span>
+              </div>
+              <div class="w-full bg-gray-100 rounded-full h-1">
+                <div class="h-1 rounded-full" style="width:0%;background:#1d4ed8"></div>
+              </div>
+            </div>
+          </div><div class="flex items-center gap-2">
+            <span class="w-5 text-[10px] text-gray-400 text-right flex-shrink-0">24</span>
+            <div class="flex-1 min-w-0">
+              <div class="flex items-center justify-between mb-0.5">
+                <span class="text-[11px] font-medium text-gray-700">深考力</span>
+                <span class="text-[10px] text-gray-400">0%</span>
+              </div>
+              <div class="w-full bg-gray-100 rounded-full h-1">
+                <div class="h-1 rounded-full" style="width:0%;background:#1d4ed8"></div>
+              </div>
+            </div>
+          </div></div>
+          </div>
+
+          <!-- Actions -->
+          <div class="space-y-2 pb-2">
+            <button id="str-btn-pdf" class="w-full gradient-cta text-white rounded-full py-3 font-semibold text-sm shadow-lg">結果をPDF出力</button>
+            <button id="str-btn-redo" class="w-full bg-gray-50 text-gray-500 border border-gray-200 rounded-full py-2.5 text-xs">もう一度診断する</button>
+          </div>
+
+        </div><!-- /str-results-area -->
+
+      </div>
+
+
       <footer class="text-center py-4">
         <p class="text-[10px] text-gray-300">&copy; 2026 数秘AIライフコンパス. あなたの輝く人生を心から応援しています。</p>
         <p class="text-[9px] text-gray-300 mt-0.5">Powered by Gemini.</p>
@@ -1996,6 +2505,7 @@
       // Store results for detail modal
       r.birthDay = day;
       lastResults = r;
+      window.__refreshStrengthsNumCross && window.__refreshStrengthsNumCross();
 
       // Populate dataset-driven sections (also triggers ①②③④ rendering)
       renderDatasetSections(r);
@@ -2098,6 +2608,7 @@
         // Scroll to section
         const target = document.getElementById(tab.dataset.target);
         if (target) target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        if (tab.dataset.target === 'section-strengths') { window.__refreshStrengthsNumCross && window.__refreshStrengthsNumCross(); }
       });
     });
 
@@ -5209,9 +5720,92 @@ ${completedLines.length > 0 ? `- 揃いライン: ${completedLines.map(l => l.na
 
       content.innerHTML = reportHtml;
 
+      // ── 図の埋め込み（非同期・失敗してもテキストレポートは維持）
+      await injectChartAndMandalaImages(content);
+
       loading.classList.add('hidden');
       content.classList.remove('hidden');
       pdfBtn.classList.remove('hidden');
+    }
+
+    // ------- VISUAL INJECTION: チャート図 & マンダラ図を精密レポートに埋め込む -------
+    async function injectChartAndMandalaImages(contentEl) {
+      // Helper: clone an element into an off-screen container, capture with html2canvas, return dataURL
+      async function captureElement(srcEl, containerWidth) {
+        if (!srcEl) return null;
+        const wrap = document.createElement('div');
+        wrap.style.cssText = `position:absolute;left:-9999px;top:0;width:${containerWidth}px;background:#fff;padding:8px;`;
+        const clone = srcEl.cloneNode(true);
+        // Ensure clone is visible and has dimensions
+        clone.style.position = 'relative';
+        clone.style.display = 'block';
+        wrap.appendChild(clone);
+        document.body.appendChild(wrap);
+        // Small delay for layout stabilisation
+        await new Promise(res => setTimeout(res, 120));
+        try {
+          const canvas = await html2canvas(wrap, {
+            scale: 1.5,
+            useCORS: true,
+            backgroundColor: '#ffffff',
+            windowWidth: containerWidth + 16,
+            logging: false,
+          });
+          return canvas.toDataURL('image/png');
+        } finally {
+          document.body.removeChild(wrap);
+        }
+      }
+
+      // ── 1. 数秘チャート図 を序章の直後に挿入
+      try {
+        const chartSrc = document.getElementById('chart-area-inner');
+        if (chartSrc) {
+          const dataUrl = await captureElement(chartSrc, 460);
+          if (dataUrl && dataUrl.length > 500) {
+            const introChapter = contentEl.querySelector('#pr-ch-intro');
+            if (introChapter) {
+              const figWrap = document.createElement('div');
+              figWrap.className = 'pr-chapter';
+              figWrap.id = 'pr-ch-chart-visual';
+              figWrap.style.cssText = 'text-align:center;';
+              figWrap.innerHTML = `
+                <h2>あなたの数秘チャート</h2>
+                <img src="${dataUrl}" alt="数秘チャート図" style="max-width:100%;height:auto;border-radius:8px;margin:8px auto 6px;display:block;" />
+                <p style="font-size:0.75rem;color:#9ca3af;margin-top:4px;">▲ 6ポジション・影響力強度・接続線を含む数秘チャート</p>`;
+              introChapter.insertAdjacentElement('afterend', figWrap);
+            }
+          }
+        }
+      } catch(e) {
+        console.warn('[PR] チャート図の埋め込みに失敗しました（テキストレポートは維持）:', e.message);
+      }
+
+      // ── 2. マンダラ図 を「強みの構造」章の冒頭に挿入
+      try {
+        const mandalaSrc = document.getElementById('mandala-grid-wrap');
+        if (mandalaSrc) {
+          const dataUrl = await captureElement(mandalaSrc, 340);
+          if (dataUrl && dataUrl.length > 500) {
+            const mandalaChapter = contentEl.querySelector('#pr-ch-mandala');
+            if (mandalaChapter) {
+              const firstH2 = mandalaChapter.querySelector('h2');
+              const figWrap = document.createElement('div');
+              figWrap.style.cssText = 'text-align:center;margin:10px 0 14px;';
+              figWrap.innerHTML = `
+                <img src="${dataUrl}" alt="数秘マンダラ図" style="max-width:100%;height:auto;border-radius:8px;display:block;margin:0 auto 4px;" />
+                <p style="font-size:0.75rem;color:#9ca3af;margin:0;">▲ 数秘マンダラ — 影響力の集中と揃い（1〜9の分布）</p>`;
+              if (firstH2) {
+                firstH2.insertAdjacentElement('afterend', figWrap);
+              } else {
+                mandalaChapter.prepend(figWrap);
+              }
+            }
+          }
+        }
+      } catch(e) {
+        console.warn('[PR] マンダラ図の埋め込みに失敗しました（テキストレポートは維持）:', e.message);
+      }
     }
 
     // ------- PDF SAVE FOR PRECISION REPORT -------
@@ -5958,6 +6552,668 @@ ${palmAnalysisResult?.findings ? '- AI画像分析所見: ' + palmAnalysisResult
         btn.disabled = false;
       }
     });
+  
+
+  // =========================================================
+    // 強み診断モジュール (Strengths Assessment Module)
+    // 独自開発の指標 — 24強み × 4領域
+    // =========================================================
+    (() => {
+      'use strict';
+
+      // ----------------------------------------------------------
+      // 1. TAXONOMY: 4 domains × 6 strengths = 24
+      // ----------------------------------------------------------
+      const DOMAINS = {
+        shape:   { label: '形にする力', sub: '着実に実現する', color: '#7c3aed', light: '#ede9fe' },
+        ignite:  { label: '火をつける力', sub: '人を動かし広げる', color: '#0f766e', light: '#ccfbf1' },
+        connect: { label: 'つなぐ力', sub: '関係を育て束ねる', color: '#b45309', light: '#fef3c7' },
+        discern: { label: '見通す力', sub: '考え抜き道を見出す', color: '#1d4ed8', light: '#dbeafe' },
+      };
+
+      const STRENGTHS = [
+        // shape
+        { id:'kansui',   domain:'shape',   name:'完遂力',     def:'決めたことを最後までやり遂げ、成果が出るまで止まらない。',       shadow:'量をこなすこと自体が目的化し、休むことに罪悪感を抱く。' },
+        { id:'dandori',  domain:'shape',   name:'段取り構築',  def:'複数の要素を組み替え、最も効率的な進め方を設計する。',           shadow:'自分の最適解に固執し、他人のやり方を受け入れにくい。' },
+        { id:'jiritsu',  domain:'shape',   name:'自律力',     def:'秩序とルーティンを保ち、決めた基準を自分に課し続ける。',         shadow:'予定外の変化に弱く、融通が利かないと見られる。' },
+        { id:'saiki',    domain:'shape',   name:'再起力',     def:'壊れたもの・停滞したものを立て直し、回復させることに力を発揮する。', shadow:'問題探しが癖になり、うまくいっている所まで粗探ししてしまう。' },
+        { id:'hikiuke',  domain:'shape',   name:'引受力',     def:'引き受けた約束を必ず守り、最後まで責任を背負い切る。',           shadow:'抱え込みすぎて手放せず、自分を追い込む。' },
+        { id:'itten',    domain:'shape',   name:'一点集中',   def:'目標を一つに絞り、寄り道を削いでまっすぐ進む。',               shadow:'視野が狭まり、周囲の変化や他者の事情を見落とす。' },
+        // ignite
+        { id:'chakka',   domain:'ignite',  name:'着火力',     def:'まず動き出すことで停滞を破り、議論を行動に変える。',             shadow:'拙速に走り、準備不足のまま人を巻き込む。' },
+        { id:'kotoba',   domain:'ignite',  name:'言葉力',     def:'考えや情景を言葉にして、人の心に届ける。',                     shadow:'語りが先行し、聞くことと実行が後回しになる。' },
+        { id:'kenin',    domain:'ignite',  name:'牽引力',     def:'場の主導権を握り、決断を下して人を引っ張る。',                   shadow:'押しが強すぎて、異論を封じてしまう。' },
+        { id:'takuetsu', domain:'ignite',  name:'卓越追求',   def:'平均では満足せず、強みを一級品まで磨き上げる。',                 shadow:'弱点や粗さに苛立ち、完璧でないものを認めにくい。' },
+        { id:'tanryoku', domain:'ignite',  name:'胆力',       def:'不確実な状況でも揺るがず、自分の判断を信じて進める。',           shadow:'過信に傾き、助言を聞き流す。' },
+        { id:'bahiraki', domain:'ignite',  name:'場開き力',   def:'初対面でも壁をつくらず、人とのつながりを次々に開く。',           shadow:'広く浅くなり、深い関係づくりが後回しになる。' },
+        // connect
+        { id:'kyomei',   domain:'connect', name:'共鳴力',     def:'相手の感情を自分のことのように感じ取り、寄り添う。',             shadow:'他人の感情を背負い込み、自分が消耗する。' },
+        { id:'wanari',   domain:'connect', name:'和成力',     def:'対立を避け、合意点を見つけて場をまとめる。',                   shadow:'波風を恐れて、必要な対立や本音を避けてしまう。' },
+        { id:'ikusei',   domain:'connect', name:'育成力',     def:'人の伸びしろを見つけ、成長を後押しすることに喜びを感じる。',     shadow:'相手の自立を待てず、世話を焼きすぎる。' },
+        { id:'ketsuen',  domain:'connect', name:'結縁力',     def:'少数の人と深く長く結ばれ、本物の信頼を築く。',                   shadow:'内輪に閉じ、新しい関係に踏み出しにくい。' },
+        { id:'houyou',   domain:'connect', name:'包容力',     def:'誰も排除せず、輪の外にいる人を内側へ迎え入れる。',               shadow:'全員を入れようとして、基準や境界が曖昧になる。' },
+        { id:'kogan',    domain:'connect', name:'個眼力',     def:'一人ひとりの個性の違いを見抜き、その人に合わせて関わる。',       shadow:'一般化やルール化が苦手で、仕組みづくりに時間がかかる。' },
+        // discern
+        { id:'dosatsu',  domain:'discern', name:'洞察思考',   def:'事実とデータを突き合わせ、論理で本質を見抜く。',                 shadow:'検証を求めすぎて、決断や行動が遅れる。' },
+        { id:'tankyu',   domain:'discern', name:'探究心',     def:'知らないことを学び、情報や知識を集め続ける。',                   shadow:'学ぶこと自体に満足し、活用や完了に至らない。' },
+        { id:'hasso',    domain:'discern', name:'発想力',     def:'一見無関係なものを結びつけ、新しいアイデアを生む。',             shadow:'アイデアを出して満足し、実装まで運ばない。' },
+        { id:'koso',     domain:'discern', name:'構想力',     def:'まだ見ぬ未来の姿を描き、人をその絵で鼓舞する。',               shadow:'理想に酔い、足元の現実を軽んじる。' },
+        { id:'michisuji',domain:'discern', name:'道筋力',     def:'複数の選択肢から最短の進路を選び出し、障害を予見する。',         shadow:'常に別ルートを探し、決めた道に腰を据えにくい。' },
+        { id:'shinko',   domain:'discern', name:'深考力',     def:'一人で深く考える時間を持ち、思索から意味を取り出す。',           shadow:'内にこもりすぎ、発信や協働が遅れる。' },
+      ];
+
+      const S = {};
+      STRENGTHS.forEach(s => { S[s.id] = s; });
+
+      // Action tips for each strength (for detail cards)
+      const TIPS = {
+        kansui:    '今週、一番大事な約束を一つだけ選び、それを最後までやり切る。',
+        dandori:   '次のプロジェクト着手前に、ステップを紙に書き出して確認する。',
+        jiritsu:   '毎朝同じ時間に小さなルーティンを一つ始め、3週間続ける。',
+        saiki:     '行き詰まった課題を一つ選び、問題の根本をリストアップして着手する。',
+        hikiuke:   '引き受けた約束を可視化するリストを作り、毎日確認する習慣を持つ。',
+        itten:     '今日は「一つだけ」に集中する時間を90分確保し、通知を切って臨む。',
+        chakka:    'まず小さく動き始め、考えながら走る勇気を今日一つの場面で試す。',
+        kotoba:    '伝えたいことを話す前に一文に凝縮し、その一文を軸にして話す。',
+        kenin:     '結論が出ていない場で、自分が決断を宣言することで場を動かす。',
+        takuetsu:  '今取り組んでいる仕事で「あと10%磨けること」を一つ見つけて実行する。',
+        tanryoku:  '不確かな状況で、あえて決断し行動した経験を振り返り記録する。',
+        bahiraki:  '今週、まだ深く知らない人に自分から声をかけ、一歩だけ踏み込む。',
+        kyomei:    '誰かの話を聞く時、アドバイスをやめて「うなずき」だけに徹する時間を作る。',
+        wanari:    'チームの意見が割れた時、まず全員が納得できる共通点を声に出して確認する。',
+        ikusei:    '誰か一人の成長ポイントを今週観察し、具体的なフィードバックを一言伝える。',
+        ketsuen:   '大切な関係の相手に、近況を尋ねる一言のメッセージを今日送る。',
+        houyou:    '今いる場で「まだ発言していない人」に声をかけ、輪に引き込む。',
+        kogan:     '次に会う人の特徴や関心を事前に思い浮かべ、その人向けの言葉を用意する。',
+        dosatsu:   '直感で判断したことを一つ選び、根拠となる事実と数字を書き出して検証する。',
+        tankyu:    '今日学んだことを一行にまとめ、誰かに話すか記録する習慣を始める。',
+        hasso:     '全く異なる2つのことを並べて「共通点は何か」と問い、新しい接続を探す。',
+        koso:      '1年後の理想像を絵か文章で描き、今日の行動との繋がりを確かめる。',
+        michisuji: '目標に向けた選択肢を3つ挙げ、最も遠回りを省ける道を一つ選んで進む。',
+        shinko:    '考えるための静かな時間を30分確保し、途中で浮かんだことを書き留める。',
+      };
+
+      // ----------------------------------------------------------
+      // 2. ITEM BANK — 120 original forced-choice pairs
+      // Each: {a: id, b: id, ta: statement(left), tb: statement(right)}
+      // Target: each of 24 ids appears 9-11 times
+      // ----------------------------------------------------------
+      const ITEMS = [
+        // --- block 1: shape internal ---
+        {a:'kansui',  b:'dandori',   ta:'やると決めたら、終わるまで他のことに手をつけたくない',             tb:'何かを始める前に全体の段取りを整理しないと落ち着かない'},
+        {a:'jiritsu', b:'itten',     ta:'毎日同じリズムで積み上げることに安心感と誇りを感じる',             tb:'今日やるべき一つのことだけに絞り込むと力が出る'},
+        {a:'saiki',   b:'hikiuke',   ta:'崩れかけた状況を立て直すのが一番得意な仕事だと感じる',             tb:'頼まれたことは途中でやめたことがほとんどない'},
+        {a:'kansui',  b:'jiritsu',   ta:'完成させることへの執着が、自分の一番の原動力だ',                   tb:'ルールや習慣を自分で決めて、それを守り続けることが心地よい'},
+        {a:'dandori', b:'saiki',     ta:'複雑な仕事を頼まれると、まず段取りから組み立てる',                  tb:'うまくいっていないことがあると、原因を突き止めずにはいられない'},
+        {a:'hikiuke', b:'itten',     ta:'約束した以上は何があっても果たすのが当たり前だと思っている',       tb:'あれもこれもは苦手で、一点突破が自分のスタイルだ'},
+        // --- block 2: ignite internal ---
+        {a:'chakka',  b:'kenin',     ta:'まず動き出すことで、場の空気を変えられると信じている',             tb:'誰かがリードしなければ自分が前に出て引っ張りたくなる'},
+        {a:'kotoba',  b:'takuetsu',  ta:'伝えたいことを言葉にする瞬間が、最もエネルギーが高まる',           tb:'同じことをするなら一番うまくやれる水準まで磨きたい'},
+        {a:'tanryoku',b:'bahiraki',  ta:'先が見えない場面でも、自分の判断を信じて進める',                   tb:'初対面の人とでも、すぐ打ち解けて話せる'},
+        {a:'chakka',  b:'kotoba',    ta:'長い議論より「まずやってみよう」の一言で動かしたい',               tb:'相手の心に残る表現を選ぶのに時間をかける'},
+        {a:'kenin',   b:'takuetsu',  ta:'決まらない場では、自分が決めて引っ張りたくなる',                   tb:'平均的な仕上がりでは満足できず、もう一段上を目指す'},
+        {a:'tanryoku',b:'chakka',    ta:'不確かな状況でも、腹を決めて踏み込める',                           tb:'悩んでいる人の背中を押すことで場が動くのが好きだ'},
+        // --- block 3: connect internal ---
+        {a:'kyomei',  b:'wanari',    ta:'相手の表情が曇ると、理由が分かる前に胸がざわつく',                 tb:'対立しそうな場では、まず全員の落としどころを探す'},
+        {a:'ikusei',  b:'ketsuen',   ta:'誰かが成長するのを見届けることが一番の報酬だ',                     tb:'広く浅くより、少数の人と深く長くつながりたい'},
+        {a:'houyou',  b:'kogan',     ta:'グループの外にいる人が気になり、自然と声をかけてしまう',           tb:'同じ言葉でも、人によってまったく違う伝え方が必要だと感じる'},
+        {a:'kyomei',  b:'ikusei',    ta:'悲しんでいる人の隣にただいられることに意味があると思う',           tb:'誰かの可能性に気づくと、それを伸ばしたくてたまらない'},
+        {a:'wanari',  b:'houyou',    ta:'意見がバラバラな場をまとめるのが得意だと感じる',                   tb:'誰一人取り残されない場を作ることに大切さを感じる'},
+        {a:'ketsuen', b:'kogan',     ta:'長年の関係ほど価値があると心から思う',                             tb:'人それぞれの個性に気づき、関わり方を変えるのが自然にできる'},
+        // --- block 4: discern internal ---
+        {a:'dosatsu', b:'tankyu',    ta:'感情より、事実と筋道で物事を判断したい',                           tb:'分からないことに出会うと、深く掘り下げずにはいられない'},
+        {a:'hasso',   b:'koso',      ta:'一見関係のないものが突然繋がる瞬間が最高に楽しい',                 tb:'5年後10年後の理想像を思い描くと、力が湧いてくる'},
+        {a:'michisuji',b:'shinko',   ta:'目標への最短ルートを見つけることで本領を発揮できる',               tb:'一人で静かに考え込む時間が、自分には欠かせない'},
+        {a:'dosatsu', b:'hasso',     ta:'データや根拠がなければ確信を持って動けない',                       tb:'前例にとらわれない新しい組み合わせを試すのが好きだ'},
+        {a:'tankyu',  b:'koso',      ta:'知識の幅が広がるほど、自分の軸が太くなると感じる',                 tb:'遠い未来の絵を描いて、そこから逆算して今を考える'},
+        {a:'michisuji',b:'dosatsu',  ta:'複数の選択肢を並べて最善を選ぶ作業が得意だ',                       tb:'直感に頼らず、丁寧に論理を積み上げて答えを出したい'},
+        // --- block 5: cross-domain ---
+        {a:'kansui',  b:'hasso',     ta:'やると決めたことをやり遂げるまで気持ちが落ち着かない',             tb:'次々と浮かぶ新しいアイデアを試すのがたまらなく楽しい'},
+        {a:'kyomei',  b:'dosatsu',   ta:'相手の感情の動きを全身で受け取る感覚が自分にはある',               tb:'感情より、事実と論理で動きたいという欲求が常にある'},
+        {a:'koso',    b:'itten',     ta:'5年後10年後の理想像を思い描くと、今の苦労が苦にならない',         tb:'遠い未来より、今日やるべき一つに集中したい'},
+        {a:'kenin',   b:'wanari',    ta:'決まらない場では、自分が決めて引っ張りたくなる',                   tb:'対立しそうな場では、まず全員の落としどころを探す'},
+        {a:'bahiraki',b:'ketsuen',   ta:'初対面の人とでも、すぐ打ち解けて話せる',                           tb:'広く浅くより、少数の人と深く長くつながりたい'},
+        {a:'dandori', b:'michisuji', ta:'どんな仕事も段取りを立ててから動く癖がある',                       tb:'ゴールへの最短ルートを見つけることに情熱を感じる'},
+        {a:'hikiuke', b:'tanryoku',  ta:'頼まれたことは、何があっても最後までやり遂げたい',                 tb:'不確かな状況でも腹を決めて踏み込める度胸がある'},
+        {a:'kotoba',  b:'shinko',    ta:'考えていることを言葉で表現する瞬間が最も自分らしい',               tb:'内側でじっくり考え抜いてから表に出したいタイプだ'},
+        {a:'saiki',   b:'tankyu',    ta:'停滞している状況を立て直すことが自分の出番だと感じる',             tb:'知らないことに出会うと、まず深く学んでから動く'},
+        {a:'ikusei',  b:'takuetsu',  ta:'人の成長を見守ることが最大のやりがいだ',                           tb:'自分の仕事を一流の水準まで磨くことに喜びを感じる'},
+        {a:'jiritsu', b:'dosatsu',   ta:'自分で決めたルールを守り通すことに価値を置いている',               tb:'行動の前に根拠を確認し、納得してから動く習慣がある'},
+        // --- block 6: more cross-domain ---
+        {a:'chakka',  b:'shinko',    ta:'とにかく動き出すことで活路が開けると信じている',                   tb:'動く前に一人で深く考える時間を必ず確保する'},
+        {a:'kansui',  b:'kogan',     ta:'最後までやりきることへのこだわりが誰より強い',                     tb:'人によってアプローチを変えることが自然にできる'},
+        {a:'houyou',  b:'itten',     ta:'誰でも受け入れる広い場を作ることが好きだ',                         tb:'今日一番大切なことに全力を集中させるのが自分流だ'},
+        {a:'michisuji',b:'kenin',    ta:'先を見通し、最善の道を示すことが自分の役割だ',                     tb:'先頭に立って人を牽引することに充実感を覚える'},
+        {a:'tankyu',  b:'hikiuke',   ta:'探求し続けることで自分の可能性が広がると感じる',                   tb:'引き受けた責任を最後まで果たすことが誇りだ'},
+        {a:'bahiraki',b:'wanari',    ta:'誰とでも打ち解ける力が、場の空気を変えてくれる',                   tb:'対立を溶かして合意をつくることに力を注ぐ'},
+        {a:'koso',    b:'saiki',     ta:'大きな理想を描いて人を鼓舞するのが自分らしい',                     tb:'壊れたものを立て直す作業に本来の自分が出る'},
+        {a:'takuetsu',b:'kyomei',    ta:'卓越した仕上がりにこだわることが自分の基準だ',                     tb:'相手の気持ちに深く寄り添うことが自分の在り方だ'},
+        {a:'dandori', b:'ketsuen',   ta:'効率的な進め方を設計する時間が一番充実している',                   tb:'長く深い信頼関係を育てることが何より大切だ'},
+        {a:'jiritsu', b:'bahiraki',  ta:'コツコツとルーティンを守り続けることが自分の強さだ',               tb:'初対面の人に壁を作らず話しかけられるのが得意だ'},
+        // --- block 7: more cross-domain ---
+        {a:'hasso',   b:'ikusei',    ta:'新しい視点やアイデアを生み出すことが自分の核心にある',             tb:'人の伸びしろを見つけて育てることに情熱を感じる'},
+        {a:'tanryoku',b:'kogan',     ta:'どんな局面でも自分の判断軸がぶれないことが誇りだ',               tb:'一人ひとりの個性を見抜き、その人に合わせて動く'},
+        {a:'wanari',  b:'dandori',   ta:'チームがまとまる場を作ることが自分の得意な仕事だ',               tb:'複雑な課題は段取りを整えてから始めないと不安だ'},
+        {a:'shinko',  b:'hikiuke',   ta:'深く考え抜くことで、本当の答えが見えてくると思う',               tb:'引き受けた約束を必ず守ることが自分の芯にある'},
+        {a:'kotoba',  b:'houyou',    ta:'自分の思いを言葉にして届ける瞬間が最も充実している',             tb:'誰もが輪に入れる場所を作ることを大切にしている'},
+        {a:'kansui',  b:'michisuji', ta:'やり遂げることにかける執念が自分の一番の財産だ',                 tb:'目標への最短経路を描き、無駄を省いて進むのが好きだ'},
+        {a:'itten',   b:'tankyu',    ta:'一つに絞り込んで掘り下げることで真価が出る',                     tb:'幅広く学び続けることで自分の引き出しが増える'},
+        {a:'saiki',   b:'chakka',    ta:'停滞を立て直す仕事に本来の力が出る',                             tb:'まず動き出して状況を変えることが得意だ'},
+        {a:'ketsuen', b:'dosatsu',   ta:'少数の相手との深い信頼を長期間育てることが喜びだ',               tb:'事実と論理を積み上げて本質を見抜くことが好きだ'},
+        {a:'kenin',   b:'hasso',     ta:'自分が前に出て決断を下すことで物事が動く',                       tb:'既成概念を外した新しいアイデアが面白くてたまらない'},
+        // --- block 8: shape × discern/connect cross ---
+        {a:'dandori', b:'dosatsu',   ta:'計画を立てる時間がいつも最も生産的に感じる',                     tb:'データを見ながら本質を絞り込む作業が大好きだ'},
+        {a:'chakka',  b:'takuetsu',  ta:'まず動き出すことで道が開けるという確信がある',                   tb:'どこまでも質を上げることへの情熱が自分を突き動かす'},
+        {a:'hikiuke', b:'ikusei',    ta:'約束した責任を担い続けることが自分のアイデンティティだ',         tb:'人が育つ瞬間に立ち会えることが何より嬉しい'},
+        {a:'jiritsu', b:'wanari',    ta:'自分で決めた規律を守り続けることに充実感がある',                 tb:'全員が納得できる合意を生み出すことが自分の役割だ'},
+        {a:'itten',   b:'kyomei',    ta:'今日一つのことに全エネルギーを注ぎ込む時が一番充実している',     tb:'相手の感情に寄り添い、一緒に感じることができる'},
+        {a:'kansui',  b:'tankyu',    ta:'完成させること自体に強い喜びを感じる',                           tb:'学ぶことへの欲求が自分を常に前へ押し出している'},
+        // --- block 9: ignite × connect cross ---
+        {a:'chakka',  b:'kyomei',    ta:'動き出すことで場が変わるのを肌で感じる',                         tb:'相手の感情の波を受け取りながら関わることが得意だ'},
+        {a:'kotoba',  b:'ketsuen',   ta:'言葉で相手の心を動かせる瞬間が最も生きている感じがする',         tb:'深い関係の中で交わす言葉に最も価値を感じる'},
+        {a:'kenin',   b:'houyou',    ta:'引っ張る役割を担うことで自分のエンジンが回る',                   tb:'誰も置いてかない場を守ることが自分の使命だ'},
+        {a:'takuetsu',b:'kogan',     ta:'自分の仕事を一番高い水準で仕上げることに執着がある',             tb:'一人ひとりの個性を活かす関わり方ができると充実する'},
+        {a:'tanryoku',b:'wanari',    ta:'腹を決めて進む場面で本来の力が出る',                             tb:'場をまとめ、みんなが動ける状態を作ることが得意だ'},
+        {a:'bahiraki',b:'ikusei',    ta:'新しいつながりを開いていくことに生きがいを感じる',               tb:'誰かが成長するのを後押しすることが最大の喜びだ'},
+        // --- block 10: discern × shape cross ---
+        {a:'hasso',   b:'dandori',   ta:'既存の枠を外したアイデアを出す瞬間が一番好きだ',               tb:'段取りを整えてから動くことが自分のスタイルだ'},
+        {a:'koso',    b:'jiritsu',   ta:'大きな構想を描くと、今日の行動の意味が変わる',                 tb:'自分で決めたルーティンを守り続けることが力の源だ'},
+        {a:'michisuji',b:'hikiuke',  ta:'最善ルートを見つけることに集中できると最高の状態になる',       tb:'どんな状況でも引き受けた責任は最後まで背負い切る'},
+        {a:'shinko',  b:'kansui',    ta:'一人で深く考える時間が、自分の最大の武器だ',                   tb:'始めたことを最後まで完遂することが自分の誇りだ'},
+        {a:'dosatsu', b:'saiki',     ta:'問題の核心を論理的に捉えることが得意だ',                       tb:'うまくいっていない状況を立て直すことに燃える'},
+        {a:'itten',   b:'wanari',    ta:'今日のたった一つに絞り込む判断が、自分の最高の状態を生む',   tb:'対立を溶かして合意点を見つけることが自分の得意な仕事だ'},
+        // --- block 11: mixed variety ---
+        {a:'bahiraki',b:'dosatsu',   ta:'会ったばかりの人とすぐ仲良くなれる自分が好きだ',               tb:'感情より事実を大切にし、論理的に考えるのが得意だ'},
+        {a:'ikusei',  b:'michisuji', ta:'誰かの可能性を引き出す時が一番力が出る',                       tb:'目標への道筋を整理し、最短で進む方法を考えるのが好きだ'},
+        {a:'ketsuen', b:'chakka',    ta:'一人の人と長い時間をかけて深く関わることが好きだ',             tb:'まず動き始めることで周りを巻き込んでいく'},
+        {a:'houyou',  b:'shinko',    ta:'輪の外にいる人を見つけて内側に迎え入れることが自然にできる',   tb:'深く考える時間を大切にし、思索の末に答えを出す'},
+        {a:'kogan',   b:'hasso',     ta:'人それぞれに合った関わり方を見つけることが得意だ',             tb:'新しい組み合わせや視点が湧いてくると生き生きとする'},
+        {a:'tanryoku',b:'kyomei',    ta:'迷う場面でも自分の判断を信じて一歩踏み出せる',               tb:'相手の感情に共鳴しながら関わることが自分の在り方だ'},
+        {a:'dandori', b:'koso',      ta:'行動の前に計画を立て直す時間が一番充実している',             tb:'理想の未来を描いて人を鼓舞することが自分の力だ'},
+        {a:'saiki',   b:'wanari',    ta:'壊れかけた関係や状況を立て直す作業が得意だ',                 tb:'全員が納得できる落としどころを見つけるのが得意だ'},
+        {a:'itten',   b:'bahiraki',  ta:'一点に全力を集中させる時、最も自分らしくいられる',           tb:'新しい出会いや場を次々に開いていくことが好きだ'},
+        {a:'kotoba',  b:'tankyu',    ta:'言葉を磨いて届けることが自分の核心の仕事だ',                 tb:'学び続けることで思考の幅が広がるのを楽しんでいる'},
+        // --- block 12: final variety to balance counts ---
+        {a:'jiritsu', b:'kenin',     ta:'自分で決めた規律を守り通す姿勢が自分の基盤だ',               tb:'場の主導権を握り、引っ張ることで力が発揮される'},
+        {a:'hikiuke', b:'houyou',    ta:'引き受けた約束を最後まで守り抜くことが自分の芯だ',           tb:'誰でも受け入れる場を作ることが自分の使命感に繋がる'},
+        {a:'kansui',  b:'kenin',     ta:'最後までやり遂げる執着心が誰より強いと自負している',         tb:'場をリードして決断を下すことが最も自分らしい'},
+        {a:'takuetsu',b:'shinko',    ta:'一流の仕上がりを追求することへの情熱が自分を動かしている',   tb:'一人で深く考え抜いてから行動に移すのが自分のやり方だ'},
+        {a:'koso',    b:'bahiraki',  ta:'大きな構想で人を鼓舞することに生きがいを感じる',             tb:'初対面でも自然に壁が取れて話せることが自分の武器だ'},
+        {a:'michisuji',b:'kyomei',   ta:'最善の道筋を選び出すことで本来の力が発揮される',           tb:'相手の感情の揺れを感じ取り、寄り添うことが得意だ'},
+        {a:'tankyu',  b:'wanari',    ta:'知識を集め探求する時間が一番自分らしく感じる',               tb:'意見が割れた場をまとめることに達成感を覚える'},
+        {a:'kansui',  b:'kotoba',    ta:'やりきることへの強い執着が自分を前に進める原動力だ',       tb:'言葉を選んで届けることが、自分の最も誠実な表現だ'},
+        {a:'ikusei',  b:'koso',     ta:'誰かの成長に携わる時に最も生き生きとする',                     tb:'まだ見ぬ未来を描いて人を鼓舞することが力の源だ'},
+        {a:'jiritsu', b:'tanryoku',  ta:'自分で決めたルールを守り通すことが揺るぎない基盤だ',       tb:'先の見えない状況でも自分の判断を信じ抜ける強さがある'},
+        {a:'saiki',   b:'kotoba',    ta:'うまくいっていない状況を立て直すことに自分のエンジンがかかる', tb:'言葉を通じて人の心に届ける瞬間が最も自分らしい'},
+        {a:'chakka',  b:'kogan',     ta:'まず行動を起こして状況を変えるのが自分のやり方だ',         tb:'一人ひとりの違いを読んで関わり方を変えることが好きだ'},
+        {a:'ketsuen', b:'hasso',     ta:'長年かけて育てた深い絆が自分の最大の財産だ',               tb:'既成概念を超えた発想が自然と浮かんでくる瞬間が好きだ'},
+        {a:'hikiuke', b:'dosatsu',   ta:'一度引き受けたことは、必ずやり遂げるのが自分の芯だ',         tb:'事実と根拠を積み上げて判断することが自分の習慣だ'},
+        {a:'ketsuen', b:'michisuji', ta:'長期の深い信頼関係こそ自分が最も力を発揮できる場所だ',     tb:'最善の進路を素早く見つけ出すことに情熱を感じる'},
+        {a:'koso',    b:'takuetsu',  ta:'理想の未来を描いて人を動かすことが自分の得意技だ',         tb:'どんな仕事も最高水準まで磨き上げることへの執着がある'},
+        {a:'shinko',  b:'ikusei',    ta:'深く考え抜いた言葉や判断が、自分の一番の武器だ',           tb:'人の伸びしろを見出して育てることが自分の使命だ'},
+        {a:'bahiraki',b:'tankyu',    ta:'知らない人と話す機会が増えるほど自分の幅が広がる',         tb:'知らないことを学び続けることで自分の幅が広がる'},
+        {a:'dandori', b:'houyou',    ta:'効率的な進め方を設計する作業が最も生産的だと感じる',       tb:'誰もが安心して居られる場を作ることが自分の役割だ'},
+        {a:'kenin',   b:'shinko',    ta:'引っ張る役割を担う時こそ自分が最も生き生きしている',       tb:'一人で深く考える時間こそ自分のエンジンを再充電する'},
+        {a:'takuetsu',b:'wanari',    ta:'最高の仕上がりにこだわることが自分の誇りの源だ',           tb:'全員が合意できる場をまとめることが自分の強みだ'},
+        {a:'kogan',   b:'saiki',     ta:'一人ひとりを個別に見て関わることで力が発揮される',         tb:'壊れかけた状況を立て直す瞬間に本来の自分が出る'},
+        {a:'kyomei',  b:'hasso',     ta:'相手の感情を感じ取りながら話すことが自然にできる',         tb:'既存の枠を超えた発想が浮かぶ瞬間が最も楽しい'},
+        {a:'itten',   b:'dandori',   ta:'一点集中することで他の人の何倍もの成果が出ると信じている', tb:'段取りを整えてから動くことで失敗を防いできた'},
+        // --- block 13: final balance block ---
+        {a:'jiritsu', b:'hasso',     ta:'毎日のルーティンが積み重なることで本物の力が育つと信じている', tb:'新しいアイデアが次々に浮かんでくる状態が一番自分らしい'},
+        {a:'kotoba',  b:'michisuji', ta:'言葉の力で人の心に明かりを灯せると信じている',                 tb:'複数の選択肢を整理して最善の一手を見つけ出すのが好きだ'},
+        {a:'tanryoku',b:'dandori',   ta:'状況がどう転んでも判断を保留せず動き続けられる',               tb:'行動に移す前に段取りを整えることで無駄のない動きができる'},
+        {a:'tanryoku',b:'ikusei',    ta:'腹を決めて踏み込む力が、最も困難な場面で輝く',               tb:'人が成長する瞬間に立ち会える喜びが仕事の核心にある'},
+        {a:'jiritsu', b:'ketsuen',   ta:'自分で課したルールを守り続けることが自信の源になる',           tb:'深く長く続く関係の中でこそ本来の力が発揮される'},
+        {a:'kogan',   b:'dosatsu',   ta:'相手によって言葉や関わり方を自在に変えることが得意だ',       tb:'論理的な根拠を積み上げて本質を見抜くことに喜びを感じる'},
+        {a:'houyou',  b:'michisuji', ta:'誰もが安心できる輪を広げることが自分の自然な姿だ',           tb:'目標への最善ルートを素早く見つけ出すことに集中できる'},
+        {a:'kansui',  b:'bahiraki',  ta:'完遂するまでの粘り強さが誰より自分の武器だと思っている',     tb:'新しい出会いを次々と開いていくことに生きがいを感じる'},
+      ];
+
+      // ----------------------------------------------------------
+      // 3. SCORING ENGINE
+      // ----------------------------------------------------------
+      const LS_KEY = 'strengths_v1';
+
+      function computeResults(answers) {
+        // answers: {itemIdx: v} where v in {-2,-1,0,1,2}
+        const raw = {}, cnt = {};
+        STRENGTHS.forEach(s => { raw[s.id] = 0; cnt[s.id] = 0; });
+        ITEMS.forEach((item, idx) => {
+          cnt[item.a]++;
+          cnt[item.b]++;
+          const v = answers[idx];
+          if (v === undefined || v === null) return;
+          if (v < 0) raw[item.a] += Math.min(2, -v);
+          if (v > 0) raw[item.b] += Math.min(2, v);
+        });
+        const intensity = {};
+        STRENGTHS.forEach(s => {
+          intensity[s.id] = cnt[s.id] > 0 ? (raw[s.id] / (cnt[s.id] * 2)) * 100 : 0;
+        });
+        // Ranking
+        const ranked = STRENGTHS.slice().sort((a, b) => intensity[b.id] - intensity[a.id]);
+        // Domain distribution
+        const domainSums = {};
+        Object.keys(DOMAINS).forEach(d => { domainSums[d] = 0; });
+        STRENGTHS.forEach(s => { domainSums[s.domain] += intensity[s.id]; });
+        const total = Object.values(domainSums).reduce((a, b) => a + b, 0) || 1;
+        const domainPct = {};
+        Object.keys(DOMAINS).forEach(d => { domainPct[d] = (domainSums[d] / total) * 100; });
+        return { intensity, ranked, domainPct, answers };
+      }
+
+      function saveState(obj) {
+        try { localStorage.setItem(LS_KEY, JSON.stringify(obj)); } catch(e) {}
+      }
+      function loadState() {
+        try { const s = localStorage.getItem(LS_KEY); return s ? JSON.parse(s) : null; } catch(e) { return null; }
+      }
+
+      // ----------------------------------------------------------
+      // 4. RENDER HELPERS
+      // ----------------------------------------------------------
+      function esc(str) {
+        return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+      }
+
+      function renderRadar(svg, domainPct) {
+        const domains = Object.keys(DOMAINS);
+        const n = domains.length; // 4
+        const R = 90, cx = 0, cy = 0;
+        const angles = domains.map((_, i) => (Math.PI * 2 * i / n) - Math.PI / 2);
+        // grid rings
+        const rings = [25, 50, 75, 100];
+        let html = '';
+        rings.forEach(pct => {
+          const pts = angles.map(a => {
+            const r = R * pct / 100;
+            return `${cx + r * Math.cos(a)},${cy + r * Math.sin(a)}`;
+          }).join(' ');
+          html += `<polygon points="${pts}" fill="none" stroke="#e5e7eb" stroke-width="0.8"/>`;
+        });
+        // axes
+        angles.forEach((a, i) => {
+          const x = cx + R * Math.cos(a), y = cy + R * Math.sin(a);
+          html += `<line x1="${cx}" y1="${cy}" x2="${x}" y2="${y}" stroke="#e5e7eb" stroke-width="0.8"/>`;
+        });
+        // data polygon
+        const dataPts = angles.map((a, i) => {
+          const pct = domainPct[domains[i]] || 0;
+          const r = R * pct / 100;
+          return `${cx + r * Math.cos(a)},${cy + r * Math.sin(a)}`;
+        }).join(' ');
+        html += `<polygon points="${dataPts}" fill="rgba(124,58,237,0.2)" stroke="#7c3aed" stroke-width="2"/>`;
+        // labels
+        angles.forEach((a, i) => {
+          const lx = cx + (R + 16) * Math.cos(a);
+          const ly = cy + (R + 16) * Math.sin(a);
+          const dom = DOMAINS[domains[i]];
+          html += `<text x="${lx}" y="${ly}" text-anchor="middle" dominant-baseline="middle" font-size="8" fill="${dom.color}" font-weight="600">${esc(dom.label)}</text>`;
+        });
+        svg.innerHTML = html;
+      }
+
+      function renderTop5(container, ranked, intensity) {
+        const domainColors = {
+          shape:   'text-purple-700 bg-purple-50 border-purple-200',
+          ignite:  'text-teal-700 bg-teal-50 border-teal-200',
+          connect: 'text-amber-700 bg-amber-50 border-amber-200',
+          discern: 'text-blue-700 bg-blue-50 border-blue-200',
+        };
+        container.innerHTML = '';
+        ranked.slice(0, 5).forEach((s, idx) => {
+          const pct = Math.round(intensity[s.id]);
+          const dom = DOMAINS[s.domain];
+          const card = document.createElement('div');
+          card.className = 'border border-gray-100 rounded-xl p-4 space-y-2';
+          card.innerHTML = `
+            <div class="flex items-center gap-2">
+              <span class="w-7 h-7 rounded-full bg-purple-100 text-purple-700 font-bold text-sm flex items-center justify-center flex-shrink-0">${idx + 1}</span>
+              <div class="flex-1 min-w-0">
+                <div class="flex items-center gap-2 flex-wrap">
+                  <span class="font-bold text-sm text-gray-800">${esc(s.name)}</span>
+                  <span class="text-[10px] font-medium px-1.5 py-0.5 rounded-md border ${domainColors[s.domain] || ''}">${esc(dom.label)}</span>
+                </div>
+              </div>
+              <span class="text-xs font-bold text-purple-600">${pct}%</span>
+            </div>
+            <div class="w-full bg-gray-100 rounded-full h-1.5">
+              <div class="bg-purple-400 h-1.5 rounded-full" style="width:${pct}%"></div>
+            </div>
+            <p class="text-[11px] text-gray-600 leading-relaxed">${esc(s.def)}</p>
+            <div class="bg-amber-50 border border-amber-100 rounded-lg p-2.5 space-y-1">
+              <p class="text-[10px] font-semibold text-amber-700">強みの影</p>
+              <p class="text-[10px] text-amber-600 leading-relaxed">${esc(s.shadow)}</p>
+            </div>
+            <div class="bg-purple-50 border border-purple-100 rounded-lg p-2.5 space-y-1">
+              <p class="text-[10px] font-semibold text-purple-700">行動指針</p>
+              <p class="text-[10px] text-purple-600 leading-relaxed">${esc(TIPS[s.id] || '')}</p>
+            </div>
+          `;
+          container.appendChild(card);
+        });
+      }
+
+      function renderFullRanking(container, ranked, intensity) {
+        const domainLabel = {
+          shape:   '形にする力',
+          ignite:  '火をつける力',
+          connect: 'つなぐ力',
+          discern: '見通す力',
+        };
+        const domainColors = {
+          shape:   '#7c3aed',
+          ignite:  '#0f766e',
+          connect: '#b45309',
+          discern: '#1d4ed8',
+        };
+        container.innerHTML = '';
+        ranked.forEach((s, idx) => {
+          const pct = Math.round(intensity[s.id]);
+          const color = domainColors[s.domain] || '#7c3aed';
+          const row = document.createElement('div');
+          row.className = 'flex items-center gap-2';
+          row.innerHTML = `
+            <span class="w-5 text-[10px] text-gray-400 text-right flex-shrink-0">${idx + 1}</span>
+            <div class="flex-1 min-w-0">
+              <div class="flex items-center justify-between mb-0.5">
+                <span class="text-[11px] font-medium text-gray-700">${esc(s.name)}</span>
+                <span class="text-[10px] text-gray-400">${pct}%</span>
+              </div>
+              <div class="w-full bg-gray-100 rounded-full h-1">
+                <div class="h-1 rounded-full" style="width:${pct}%;background:${color}"></div>
+              </div>
+            </div>
+          `;
+          container.appendChild(row);
+        });
+      }
+
+      function buildComboText(ranked) {
+        if (!ranked || ranked.length < 2) return '';
+        const top = ranked.slice(0, 3);
+        const s1 = top[0], s2 = top[1], s3 = top.length > 2 ? top[2] : null;
+        let text = `あなたの最も強い力は「${s1.name}」です。${s1.def.replace('。', '')}ということが、あなたの行動の核心にあります。`;
+        text += `そこに「${s2.name}」が加わることで、${s2.def.replace('。', '')}という側面も際立ちます。`;
+        if (s3) {
+          text += `さらに「${s3.name}」があなたの強みの幅を広げており、${s3.def.replace('。', '')}ことを自然に行う力があります。`;
+        }
+        text += `この組み合わせは、あなたが最も輝く場面で独自の価値を生み出します。`;
+        return text;
+      }
+
+      function buildNumCrossText(ranked) {
+        if (!ranked || ranked.length < 1) return null;
+        // Try to read lastResults from script scope
+        let nr = null;
+        try { nr = window.__strLastResults || (typeof lastResults !== 'undefined' ? lastResults : null); } catch(e) {}
+        if (!nr || !nr.lifePath) return null;
+        const s1 = ranked[0];
+        const lp = nr.lifePath;
+        const dest = nr.destiny;
+        return `あなたの最も強い「${s1.name}」は、運命数${lp}の${lp <= 4 ? '堅実で着実な' : lp <= 6 ? '愛と奉仕の' : lp <= 8 ? '探求と達成の' : '完成と普遍の'}エネルギーと深く共鳴します。` +
+               `誕生数${dest}が示す内面の衝動と組み合わさることで、「${s1.name}」は単なる得意技を超え、あなたが自然体でいられる領域を指し示しています。`;
+      }
+
+      function renderDomainLegend(container, domainPct) {
+        container.innerHTML = '';
+        Object.keys(DOMAINS).forEach(dk => {
+          const dom = DOMAINS[dk];
+          const pct = Math.round(domainPct[dk] || 0);
+          const div = document.createElement('div');
+          div.className = 'flex items-center gap-1.5';
+          div.innerHTML = `
+            <span class="w-2 h-2 rounded-sm flex-shrink-0" style="background:${dom.color}"></span>
+            <span class="text-[10px] text-gray-600">${esc(dom.label)} <span class="font-bold" style="color:${dom.color}">${pct}%</span></span>
+          `;
+          container.appendChild(div);
+        });
+      }
+
+      // ----------------------------------------------------------
+      // 5. CONTROLLER
+      // ----------------------------------------------------------
+      let curIdx = 0;
+      let answers = {}; // {itemIdx: v}
+      let selectedVal = null;
+      let results = null;
+
+      const elIntro    = document.getElementById('str-intro');
+      const elQArea    = document.getElementById('str-question-area');
+      const elResArea  = document.getElementById('str-results-area');
+      const elResumeArea = document.getElementById('str-resume-area');
+
+      const elCounter  = document.getElementById('str-q-counter');
+      const elPct      = document.getElementById('str-q-pct');
+      const elBar      = document.getElementById('str-q-bar');
+      const elLeft     = document.getElementById('str-q-left');
+      const elRight    = document.getElementById('str-q-right');
+      const elHint     = document.getElementById('str-q-hint');
+      const elPrev     = document.getElementById('str-btn-prev');
+      const elSkip     = document.getElementById('str-btn-skip');
+
+      const TOTAL = ITEMS.length;
+
+      function showIntro() {
+        elIntro.classList.remove('hidden');
+        elQArea.classList.add('hidden');
+        elResArea.classList.add('hidden');
+        // Check saved state
+        const saved = loadState();
+        if (saved && (saved.results || Object.keys(saved.answers || {}).length > 0)) {
+          document.getElementById('str-resume-area').classList.remove('hidden');
+        } else {
+          document.getElementById('str-resume-area').classList.add('hidden');
+        }
+      }
+
+      function startFresh() {
+        curIdx = 0; answers = {}; selectedVal = null; results = null;
+        saveState({ answers });
+        showQuestion(0);
+      }
+
+      function showQuestion(idx) {
+        elIntro.classList.add('hidden');
+        elQArea.classList.remove('hidden');
+        elResArea.classList.add('hidden');
+        curIdx = idx;
+        selectedVal = answers[idx] !== undefined ? answers[idx] : null;
+        const item = ITEMS[idx];
+        elLeft.textContent  = item.ta;
+        elRight.textContent = item.tb;
+        elCounter.textContent = `${idx + 1} / ${TOTAL}`;
+        const pct = Math.round(idx / TOTAL * 100);
+        elPct.textContent = pct + '%';
+        elBar.style.width  = pct + '%';
+        elPrev.disabled = (idx === 0);
+        // Highlight selected seg
+        document.querySelectorAll('.str-seg').forEach(btn => {
+          const v = parseInt(btn.dataset.val, 10);
+          const sel = selectedVal !== null && v === selectedVal;
+          btn.classList.toggle('ring-2', sel);
+          btn.classList.toggle('ring-purple-400', sel && v < 0);
+          btn.classList.toggle('ring-indigo-400', sel && v >= 0);
+          btn.classList.toggle('font-bold', sel);
+        });
+        elHint.textContent = selectedVal !== null ? '回答済み — 次へ進むか戻れます' : '選択すると次の質問に進みます';
+      }
+
+      function advance() {
+        if (curIdx + 1 < TOTAL) {
+          showQuestion(curIdx + 1);
+        } else {
+          finishTest();
+        }
+      }
+
+      function finishTest() {
+        results = computeResults(answers);
+        saveState({ answers, results });
+        showResults(results);
+      }
+
+      function showResults(res) {
+        elIntro.classList.add('hidden');
+        elQArea.classList.add('hidden');
+        elResArea.classList.remove('hidden');
+        results = res;
+        // Top5
+        renderTop5(document.getElementById('str-top5-cards'), res.ranked, res.intensity);
+        // Radar
+        renderRadar(document.getElementById('str-radar-svg'), res.domainPct);
+        // Domain legend
+        renderDomainLegend(document.getElementById('str-domain-legend'), res.domainPct);
+        // Combo text
+        document.getElementById('str-combo-text').textContent = buildComboText(res.ranked);
+        // Numerology cross-ref
+        const crossText = buildNumCrossText(res.ranked);
+        const crossEl = document.getElementById('str-num-cross');
+        if (crossText) {
+          document.getElementById('str-num-cross-text').textContent = crossText;
+          crossEl.classList.remove('hidden');
+        } else {
+          crossEl.classList.add('hidden');
+        }
+        // Full ranking (initially hidden)
+        renderFullRanking(document.getElementById('str-full-ranking'), res.ranked, res.intensity);
+      }
+
+      // -- Segmented control events --
+      document.querySelectorAll('.str-seg').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const v = parseInt(btn.dataset.val, 10);
+          selectedVal = v;
+          answers[curIdx] = v;
+          saveState({ answers });
+          // Highlight
+          document.querySelectorAll('.str-seg').forEach(b => {
+            const bv = parseInt(b.dataset.val, 10);
+            const sel = bv === v;
+            b.classList.toggle('ring-2', sel);
+            b.classList.toggle('ring-purple-400', sel && v < 0);
+            b.classList.toggle('ring-indigo-400', sel && v >= 0);
+            b.classList.toggle('font-bold', sel);
+          });
+          elHint.textContent = '回答済み — 次の質問へ移ります';
+          // Auto-advance after brief delay
+          setTimeout(() => {
+            if (answers[curIdx] !== undefined) advance();
+          }, 350);
+        });
+      });
+
+      // -- Prev --
+      elPrev.addEventListener('click', () => {
+        if (curIdx > 0) showQuestion(curIdx - 1);
+      });
+
+      // -- Skip --
+      elSkip.addEventListener('click', () => {
+        advance();
+      });
+
+      // -- Start button --
+      document.getElementById('str-btn-start').addEventListener('click', () => { startFresh(); });
+
+      // -- Resume button --
+      document.getElementById('str-btn-resume').addEventListener('click', () => {
+        const saved = loadState();
+        if (saved && saved.results) {
+          showResults(saved.results);
+        } else if (saved && saved.answers) {
+          answers = saved.answers;
+          const lastAnswered = Math.max(-1, ...Object.keys(answers).map(Number));
+          showQuestion(Math.min(lastAnswered + 1, TOTAL - 1));
+        } else {
+          startFresh();
+        }
+      });
+
+      // -- Restart button --
+      document.getElementById('str-btn-restart').addEventListener('click', () => {
+        try { localStorage.removeItem(LS_KEY); } catch(e) {}
+        document.getElementById('str-resume-area').classList.add('hidden');
+        startFresh();
+      });
+
+      // -- Redo button --
+      document.getElementById('str-btn-redo').addEventListener('click', () => {
+        try { localStorage.removeItem(LS_KEY); } catch(e) {}
+        startFresh();
+      });
+
+      // -- Toggle full ranking --
+      document.getElementById('str-toggle-full').addEventListener('click', () => {
+        const el = document.getElementById('str-full-ranking');
+        const icon = document.getElementById('str-toggle-icon');
+        const hidden = el.classList.toggle('hidden');
+        icon.textContent = hidden ? '▼' : '▲';
+      });
+
+      // -- PDF export --
+      document.getElementById('str-btn-pdf').addEventListener('click', async () => {
+        if (!results) return;
+        const btn = document.getElementById('str-btn-pdf');
+        const origText = btn.innerHTML;
+        btn.innerHTML = 'PDF生成中...'; btn.disabled = true;
+        try {
+          const { jsPDF } = window.jspdf;
+          const el = document.getElementById('str-results-area');
+          const canvas = await html2canvas(el, { scale: 2, useCORS: true, backgroundColor: '#f9fafb' });
+          const imgData = canvas.toDataURL('image/jpeg', 0.85);
+          const pdf = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
+          const pw = pdf.internal.pageSize.getWidth();
+          const ph = pdf.internal.pageSize.getHeight();
+          const margin = 10;
+          const imgW = pw - margin * 2;
+          const imgH = (canvas.height / canvas.width) * imgW;
+          let posY = margin;
+          let remaining = imgH;
+          let srcY = 0;
+          while (remaining > 0) {
+            const pageH = Math.min(ph - margin * 2, remaining);
+            const sliceCanvas = document.createElement('canvas');
+            const scale = canvas.width / imgW;
+            sliceCanvas.width = canvas.width;
+            sliceCanvas.height = pageH * scale;
+            const ctx = sliceCanvas.getContext('2d');
+            ctx.drawImage(canvas, 0, srcY * scale, canvas.width, pageH * scale, 0, 0, canvas.width, pageH * scale);
+            pdf.addImage(sliceCanvas.toDataURL('image/jpeg', 0.82), 'JPEG', margin, posY, imgW, pageH);
+            remaining -= pageH;
+            srcY += pageH;
+            if (remaining > 0) { pdf.addPage(); posY = margin; }
+          }
+          pdf.save('強み診断_結果.pdf');
+        } catch(e) {
+          alert('PDF生成中にエラーが発生しました。');
+        } finally {
+          btn.innerHTML = origText; btn.disabled = false;
+        }
+      });
+
+      // -- Expose a global hook so the numerology cross-reference can refresh --
+      // showResults() computes the cross-ref once. On the localStorage-restore path it
+      // runs at page load before numerology, so lastResults is null and the panel hides.
+      // This lets the main script re-run just the cross-ref portion later (after
+      // numerology sets lastResults, or when the user navigates to this tab).
+      window.__refreshStrengthsNumCross = function () {
+        if (!results) return;
+        if (elResArea.classList.contains('hidden')) return;
+        const crossText = buildNumCrossText(results.ranked);
+        const crossEl = document.getElementById('str-num-cross');
+        if (crossText) {
+          document.getElementById('str-num-cross-text').textContent = crossText;
+          crossEl.classList.remove('hidden');
+        } else {
+          crossEl.classList.add('hidden');
+        }
+      };
+
+      // Init
+      showIntro();
+
+    })();
   </script>
 </body>
 </html>
