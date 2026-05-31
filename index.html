@@ -17,14 +17,23 @@
     }
   </script>
   <style>
+    /* ===== Design Tokens (P0: 統一) ===== */
+    :root {
+      --radius-card: 16px;
+      --radius-pill: 9999px;
+      --shadow-card: 0 2px 12px rgba(124,58,237,0.08);
+      --shadow-float: 0 8px 28px rgba(124,58,237,0.14);
+      --brand-purple: #7c3aed;
+    }
+
     body { font-family: 'Inter', system-ui, sans-serif; font-size: 14px; }
     .gradient-header { background: linear-gradient(135deg, #f3e8ff 0%, #fce7f3 50%, #e0e7ff 100%); }
-    .gradient-cta { background: linear-gradient(to right, #ec4899, #f43f5e); }
-    .gradient-cta:hover { background: linear-gradient(to right, #db2777, #e11d48); }
+    .gradient-cta { background: linear-gradient(135deg, #7c3aed, #6d28d9); }
+    .gradient-cta:hover { opacity: 0.9; background: linear-gradient(135deg, #7c3aed, #6d28d9); }
 
     /* ===== Precision Report ===== */
     /* Phase 1: タイポグラフィ改善 */
-    .pr-chapter { background: #fff; border-radius: 16px; border: 1px solid #e9d5ff; padding: 20px 18px; margin-bottom: 24px; box-shadow: 0 1px 4px rgba(124,58,237,0.06); }
+    .pr-chapter { background: #fff; border-radius: var(--radius-card); border: 1px solid #e9d5ff; padding: 20px 18px; margin-bottom: 24px; box-shadow: var(--shadow-card); }
     .pr-chapter h2 { font-family: 'Lora', serif; font-size: 17px; font-weight: 700; color: #6b21a8; margin: 0 0 10px; border-left: 3px solid #a855f7; padding-left: 10px; line-height: 1.4; }
     @media (min-width: 640px) { .pr-chapter h2 { font-size: 19px; } }
     @media (min-width: 768px) { .pr-chapter h2 { font-size: 20px; } }
@@ -36,7 +45,7 @@
     .pr-num-header { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
     .pr-num-label { font-size: 0.78rem; font-weight: 600; color: #9ca3af; text-transform: uppercase; letter-spacing: 0.04em; }
     .pr-infl-bar { height: 4px; border-radius: 2px; background: #e9d5ff; margin: 6px 0 10px; overflow: hidden; }
-    .pr-infl-fill { height: 100%; border-radius: 2px; background: linear-gradient(90deg, #a855f7, #ec4899); }
+    .pr-infl-fill { height: 100%; border-radius: 2px; background: linear-gradient(90deg, #a855f7, #c084fc); }
     .pr-tag { display: inline-block; font-size: 0.68rem; font-weight: 600; border-radius: 99px; padding: 1px 8px; margin-right: 4px; margin-bottom: 4px; }
     .pr-tag-strength { background: #dcfce7; color: #166534; }
     .pr-tag-shadow { background: #fef2f2; color: #991b1b; }
@@ -55,15 +64,94 @@
     /* Phase 2: 章番号装飾 */
     .pr-chapter-num { display: block; font-size: 11px; font-weight: 700; color: #a8a29e; letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 4px; }
     /* Phase 2: 重点章カード */
-    .pr-chapter--featured { background: linear-gradient(135deg, #faf5ff, #fdf4ff); border: 1.5px solid #d8b4fe; box-shadow: 0 4px 12px rgba(124,58,237,0.10); margin-bottom: 32px; }
+    .pr-chapter--featured { background: linear-gradient(135deg, #faf5ff, #fdf4ff); border: 1.5px solid #d8b4fe; box-shadow: var(--shadow-float); margin-bottom: 32px; }
     /* Phase 2: 結びカード */
     .pr-chapter--closing { background: linear-gradient(135deg, #6b21a8, #9333ea); border-color: #7c3aed; }
+    /* 核心3行サマリー */
+    .pr-core-summary {
+      background: linear-gradient(135deg, #4a1d96, #7e22ce 60%, #9d174d);
+      border-radius: var(--radius-card);
+      padding: 18px 20px;
+      margin-bottom: 20px;
+      color: #fff;
+    }
+    .pr-core-summary__label {
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.6);
+      margin-bottom: 8px;
+    }
+    .pr-core-summary__line {
+      font-family: 'Lora', serif;
+      font-size: 14px;
+      line-height: 1.8;
+      color: rgba(255,255,255,0.95);
+      padding-left: 10px;
+      border-left: 2px solid rgba(253,230,138,0.5);
+      margin-bottom: 6px;
+    }
+    .pr-core-summary__line strong { color: #fde68a; }
+    .pr-core-summary__line:last-child { margin-bottom: 0; }
+    /* 章目次 */
+    .pr-toc {
+      background: rgba(243,238,255,0.6);
+      border: 1px solid #e9d5ff;
+      border-radius: var(--radius-card);
+      padding: 14px 16px;
+      margin-bottom: 20px;
+    }
+    .pr-toc__label {
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: #9ca3af;
+      margin-bottom: 8px;
+    }
+    .pr-toc__list {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+    .pr-toc__item {
+      display: flex;
+      align-items: baseline;
+      gap: 8px;
+      font-size: 12px;
+      color: #6b21a8;
+      line-height: 1.5;
+    }
+    .pr-toc__num {
+      font-family: 'Lora', serif;
+      font-size: 10px;
+      font-weight: 700;
+      color: #a78bfa;
+      flex-shrink: 0;
+      width: 20px;
+    }
+    .pr-toc__link {
+      display: flex;
+      align-items: baseline;
+      gap: 8px;
+      color: #6b21a8;
+      text-decoration: none;
+      font-size: 12px;
+      line-height: 1.5;
+      width: 100%;
+    }
+    .pr-toc__link:hover { color: #7c3aed; text-decoration: underline; }
+    .pr-toc__item { display: block; }
     .pr-chapter--closing h2 { color: #fff; border-left-color: rgba(255,255,255,0.5); }
     .pr-chapter--closing p { color: rgba(255,255,255,0.92); font-weight: 400; }
     .pr-chapter--closing p strong { color: #fde68a; }
     /* 天職カード — 3軸・相性カードと統一トーン */
-    .voc-section { background: #fff; border-radius: 16px; border: 1px solid #e9d5ff; padding: 16px 16px 14px; margin-bottom: 10px; box-shadow: 0 1px 4px rgba(124,58,237,0.06); }
-    .voc-section--core { background: linear-gradient(135deg,#faf5ff,#fce7f3); border: 1.5px solid #d8b4fe; box-shadow: 0 3px 10px rgba(124,58,237,0.10); }
+    .voc-section { background: #fff; border-radius: var(--radius-card); border: 1px solid #e9d5ff; padding: 16px 16px 14px; margin-bottom: 10px; box-shadow: var(--shadow-card); }
+    .voc-section--core { background: linear-gradient(135deg,#faf5ff,#fce7f3); border: 1.5px solid #d8b4fe; box-shadow: var(--shadow-float); }
     .voc-section--a { background: linear-gradient(135deg,#eef2ff,#f5f3ff); border: 1px solid #c7d2fe; }
     .voc-section--b { background: linear-gradient(135deg,#f5f3ff,#fdf4ff); border: 1px solid #ddd6fe; }
     .voc-section__title { font-family: 'Lora', serif; font-size: 13px; font-weight: 700; color: #6b21a8; border-left: 3px solid #a855f7; padding-left: 8px; margin-bottom: 6px; line-height: 1.4; }
@@ -76,7 +164,7 @@
     .voc-section--a .voc-section__desc { border-left-color: #a5b4fc; }
     .voc-section__chips { display: flex; flex-wrap: wrap; gap: 4px; }
     .voc-chip { font-size: 11px; padding: 3px 10px; min-height: 24px; line-height: 1.4; display: inline-flex; align-items: center; border-radius: 99px; font-weight: 500; }
-    .voc-chip--core { background: linear-gradient(135deg,#7c3aed,#db2777); color: #fff; font-weight: 700; font-size: 12px; padding: 4px 12px; min-height: 26px; }
+    .voc-chip--core { background: linear-gradient(135deg,#7c3aed,#6d28d9); color: #fff; font-weight: 700; font-size: 12px; padding: 4px 12px; min-height: 26px; }
     .voc-chip--a { background: #e0e7ff; color: #3730a3; }
     .voc-chip--b { background: #ede9fe; color: #5b21b6; }
     /* Phase 2: 引用ブロック */
@@ -115,7 +203,8 @@
       flex-direction: row;
       align-items: flex-start;
       gap: 0;
-      background: #f3eeff;
+      /* 案C 成長グラデーション: 下=根(土) → 中=幹(木肌) → 上=枝葉(新緑) */
+      background: linear-gradient(to top, #f1ebe0 0%, #f6f1ea 50%, #eef4f0 100%);
       border: 1px solid #e9d5ff;
       border-radius: 16px;
       padding: 24px 16px 24px 20px;
@@ -184,7 +273,7 @@
     .chart-box .cb-num {
       font-family: 'Lora', serif;
       font-weight: 700;
-      font-size: 1.2rem;
+      font-size: 1.5rem;
       color: #581c87;
       line-height: 1.2;
     }
@@ -294,8 +383,8 @@
     .gr-12 { grid-row: 12; }
     .gr-13 { grid-row: 13; }
 
-    .fade-in { animation: fadeIn 0.4s ease-out; }
-    @keyframes fadeIn { from { opacity:0; transform:translateY(8px); } to { opacity:1; transform:translateY(0); } }
+    .fade-in { animation: fadeIn 0.3s ease; }
+    @keyframes fadeIn { from { opacity:0; transform:translateY(6px); } to { opacity:1; transform:translateY(0); } }
 
     /* ===== 数秘マンダラ — 5×5 Grid (正典レイアウト) ===== */
     .mandala-grid {
@@ -321,7 +410,7 @@
     }
     .mandala-col-header .mch-tri {
       display: block;
-      font-size: 9px;
+      font-size: 10px;
       color: #7c3aed;
       margin-bottom: 1px;
     }
@@ -347,7 +436,7 @@
       max-width: 50px;
     }
     .mandala-row-header .mrh-tri {
-      font-size: 9px;
+      font-size: 10px;
       display: block;
       margin-bottom: 1px;
     }
@@ -483,7 +572,7 @@
       position: absolute;
       top: 2px;
       left: 2px;
-      font-size: 9px;
+      font-size: 10px;
       line-height: 1;
       background: #facc15;
       color: #78350f;
@@ -522,9 +611,9 @@
       .mandala-cell .mc-num { font-size: 1rem; }
       .mandala-cell .mc-char { font-size: 11px; }
       /* #1: 上辺ラベル — テキスト最小化（▲+数字のみ） */
-      .mandala-col-header { font-size: 9px; padding: 2px 1px; }
+      .mandala-col-header { font-size: 10px; padding: 2px 1px; }
       .mandala-col-header .mch-tri { margin-bottom: 0; }
-      .mandala-col-header .mch-nums { font-size: 9px; }
+      .mandala-col-header .mch-nums { font-size: 10px; }
       /* #1: 左辺を▲色のみ — テキスト・数字列を非表示 */
       .mandala-row-header {
         min-width: 20px;
@@ -571,8 +660,8 @@
     /* Welcome modal */
     .modal-overlay { background: rgba(0,0,0,0.45); backdrop-filter: blur(3px); }
 
-    /* Section nav tabs: larger, clearer active state */
-    .nav-tab { font-size: 0.75rem !important; }
+    /* Section nav tabs: larger, clearer active state — WCAG 2.5.5 min 44px */
+    .nav-tab { font-size: 0.75rem !important; min-height: 44px; padding-top: 12px !important; padding-bottom: 12px !important; }
     .nav-tab.text-purple-600 { background: #faf5ff; }
 
     /* ===== Mobile: keep the whole chart on-screen, no horizontal scroll ===== */
@@ -596,11 +685,11 @@
         z-index: 0;
         pointer-events: none;
       }
-      .chart-box { min-width: 0; max-width: 100%; padding: 6px 8px; min-height: 48px; }
-      .chart-box .cb-num { font-size: 1rem; line-height: 1.1; }
+      .chart-box { min-width: 0; max-width: 100%; padding: 6px 8px; min-height: 52px; }
+      .chart-box .cb-num { font-size: 1.2rem; line-height: 1.1; }
       .chart-box .cb-lbl { font-size: 11px; }
       .period-lbl {
-        font-size: 9px;
+        font-size: 10px;
         padding: 3px 4px;
         line-height: 1.25;
         white-space: normal;
@@ -648,17 +737,29 @@
       border-left: 2px solid #ddd6fe !important;
       background: rgba(255,255,255,0.92) !important;
     }
-    /* 克服数・挑戦数 (マイナス) — グレー寄り、色強調なし */
+    /* 克服数・挑戦数 (マイナス) — 根の色: 落ち着いた土色 */
     .infl-neg {
-      border-left: 2px solid #d1d5db !important;
-      background: rgba(249,250,251,0.92) !important;
+      border-left: 2px solid #b87333 !important;
+      background: rgba(251,247,241,0.92) !important;
+    }
+    /* 根ラベル (克服数・挑戦数セル右下) */
+    .root-label {
+      position: absolute;
+      bottom: 2px;
+      right: 4px;
+      font-size: 10px;
+      font-weight: 700;
+      color: #92580a;
+      letter-spacing: 0.02em;
+      pointer-events: none;
+      opacity: 0.8;
     }
     /* ティアバッジ（影響力ドット） */
     .infl-badge {
       position: absolute;
       top: 4px;
       right: 5px;
-      font-size: 9px;
+      font-size: 10px;
       line-height: 1;
       pointer-events: none;
       user-select: none;
@@ -706,65 +807,93 @@
     }
     @media (max-width: 767px) {
       #infl-legend { max-width: 100%; gap: 4px 8px; padding: 5px 8px; }
-      #infl-legend .lg-item { font-size: 9px; }
+      #infl-legend .lg-item { font-size: 10px; }
     }
 
-    /* ===== ポジション固有色 (6色) — 上品なミュート/ダスティトーン ===== */
-    /* 運命数: ダスティパープル (藤色寄り) */
+    /* ===== 案C: 果実発光 (infl-s / infl-a = 高ティア点灯セル) ===== */
+    /* html2canvas 対応: filter禁止、box-shadow のみ。既存 pos-* 色枠と加算的に共存 */
+    .chart-box.fruit-glow {
+      box-shadow: 0 1px 2px rgba(124,58,237,0.12), 0 0 6px rgba(106,158,130,0.45);
+    }
+    .chart-box.fruit-glow:hover,
+    .chart-box.fruit-glow:focus-visible {
+      box-shadow: 0 3px 10px rgba(168,85,247,0.22), 0 0 8px rgba(106,158,130,0.50);
+    }
+    /* #cell-destiny の ID 高特異度ルールを上書き（誕生数も果実発光） */
+    #cell-destiny.fruit-glow {
+      box-shadow: 0 4px 16px rgba(124,58,237,0.35), 0 0 6px rgba(106,158,130,0.45);
+    }
+    #cell-destiny.fruit-glow:hover,
+    #cell-destiny.fruit-glow:focus-visible {
+      box-shadow: 0 3px 10px rgba(168,85,247,0.22), 0 0 8px rgba(106,158,130,0.50);
+    }
+    /* 地面線: 幹ゾーン(center row)と根ゾーン(克服・挑戦数)の境界 */
+    .chart-ground-line {
+      grid-column: 1 / -1;
+      width: 100%;
+      height: 0;
+      border-top: 1px solid #d8c4a8;
+      opacity: 0.4;
+      pointer-events: none;
+      align-self: center;
+    }
+
+    /* ===== ポジション固有色 (6色) — 明度差を確保した識別トーン ===== */
+    /* 運命数: ダスティパープル (藤色寄り、明度やや高め) */
     .chart-box.pos-lifepath {
-      border-left: 4px solid #9b7ec8 !important;
-      border-top: 1.5px solid #c4aee3 !important;
-      border-right: 1.5px solid #c4aee3 !important;
-      border-bottom: 1.5px solid #c4aee3 !important;
-      background: rgba(242,238,252,0.85) !important;
+      border-left: 4px solid #8b6abf !important;
+      border-top: 1.5px solid #bea8de !important;
+      border-right: 1.5px solid #bea8de !important;
+      border-bottom: 1.5px solid #bea8de !important;
+      background: rgba(240,235,252,0.88) !important;
     }
-    /* 成熟数: くすみゴールド/ベージュゴールド */
+    /* 成熟数: くすみゴールド/アンバー (明度高め・彩度強め) */
     .chart-box.pos-maturity {
-      border-left: 4px solid #b8964a !important;
-      border-top: 1.5px solid #d4b87a !important;
-      border-right: 1.5px solid #d4b87a !important;
-      border-bottom: 1.5px solid #d4b87a !important;
-      background: rgba(252,246,228,0.85) !important;
+      border-left: 4px solid #c4903a !important;
+      border-top: 1.5px solid #dab870 !important;
+      border-right: 1.5px solid #dab870 !important;
+      border-bottom: 1.5px solid #dab870 !important;
+      background: rgba(254,248,224,0.90) !important;
     }
-    /* 成長数: セージグリーン (くすみ緑) */
+    /* 成長数: セージグリーン (明度やや低め・緑の識別強化) */
     .chart-box.pos-spirit {
-      border-left: 4px solid #6a9e82 !important;
-      border-top: 1.5px solid #96bfa8 !important;
-      border-right: 1.5px solid #96bfa8 !important;
-      border-bottom: 1.5px solid #96bfa8 !important;
-      background: rgba(232,244,237,0.85) !important;
+      border-left: 4px solid #4e8c68 !important;
+      border-top: 1.5px solid #82b096 !important;
+      border-right: 1.5px solid #82b096 !important;
+      border-bottom: 1.5px solid #82b096 !important;
+      background: rgba(224,242,232,0.88) !important;
     }
-    /* 誕生数: ダスティブルー (青磁寄り) */
+    /* 誕生数: コバルトブルー (より青の方向・明度上げて誕生と社会を差別化) */
     .chart-box.pos-destiny {
-      border-left: 4px solid #6b8ec4 !important;
-      border-top: 1.5px solid #9db4d9 !important;
-      border-right: 1.5px solid #9db4d9 !important;
-      border-bottom: 1.5px solid #9db4d9 !important;
-      background: rgba(232,240,252,0.85) !important;
+      border-left: 4px solid #4d7fc4 !important;
+      border-top: 1.5px solid #85aad8 !important;
+      border-right: 1.5px solid #85aad8 !important;
+      border-bottom: 1.5px solid #85aad8 !important;
+      background: rgba(224,236,252,0.88) !important;
     }
-    /* 社会数: くすみティール (青緑グレー) */
+    /* 社会数: フォレストグリーン (誕生数=コバルトブルーと明確に差別化した深緑) */
     .chart-box.pos-ground {
-      border-left: 4px solid #5a9a92 !important;
-      border-top: 1.5px solid #88bcb5 !important;
-      border-right: 1.5px solid #88bcb5 !important;
-      border-bottom: 1.5px solid #88bcb5 !important;
-      background: rgba(229,243,242,0.85) !important;
+      border-left: 4px solid #2d7a5a !important;
+      border-top: 1.5px solid #5aaa88 !important;
+      border-right: 1.5px solid #5aaa88 !important;
+      border-bottom: 1.5px solid #5aaa88 !important;
+      background: rgba(210,245,228,0.88) !important;
     }
-    /* 克服数: ダスティローズ (くすみ赤) */
+    /* 克服数: ダスティローズ (くすみ赤、明度中程度) */
     .chart-box.pos-overcome {
-      border-left: 4px solid #b87878 !important;
-      border-top: 1.5px solid #d4a0a0 !important;
-      border-right: 1.5px solid #d4a0a0 !important;
-      border-bottom: 1.5px solid #d4a0a0 !important;
-      background: rgba(252,238,238,0.85) !important;
+      border-left: 4px solid #b86868 !important;
+      border-top: 1.5px solid #d49494 !important;
+      border-right: 1.5px solid #d49494 !important;
+      border-bottom: 1.5px solid #d49494 !important;
+      background: rgba(252,234,234,0.88) !important;
     }
     /* ポジションバッジ色 (★の色) — pos-* クラスに対して上書き */
-    .chart-box.pos-lifepath .infl-badge { color: #7c5aad; }
-    .chart-box.pos-maturity .infl-badge { color: #8a6c28; }
-    .chart-box.pos-spirit   .infl-badge { color: #4a7a5e; }
-    .chart-box.pos-destiny  .infl-badge { color: #4a6ea0; }
-    .chart-box.pos-ground   .infl-badge { color: #3a7870; }
-    .chart-box.pos-overcome .infl-badge { color: #8a4848; }
+    .chart-box.pos-lifepath .infl-badge { color: #6b4a9d; }
+    .chart-box.pos-maturity .infl-badge { color: #8a6018; }
+    .chart-box.pos-spirit   .infl-badge { color: #326a4a; }
+    .chart-box.pos-destiny  .infl-badge { color: #2d5f9c; }
+    .chart-box.pos-ground   .infl-badge { color: #1f5c42; }
+    .chart-box.pos-overcome .infl-badge { color: #8a3838; }
   </style>
 </head>
 <body class="bg-gray-50 min-h-screen">
@@ -849,14 +978,14 @@
         </div>
         <!-- Gemini API Key (hidden by default, toggle to show) -->
         <div>
-          <button type="button" id="toggle-api-key" class="text-[9px] text-gray-300 hover:text-gray-500 transition-colors">
+          <button type="button" id="toggle-api-key" class="text-[10px] text-gray-300 hover:text-gray-500 transition-colors">
             ▶ 上級設定（API Key）
           </button>
           <div id="api-key-section" class="hidden mt-1">
             <label class="block text-xs text-gray-500 mb-1">Gemini API Key <span class="text-gray-400">(任意)</span></label>
             <input type="password" id="geminiApiKey" placeholder="未入力でもAI分析は利用できます"
               class="w-full border border-gray-200 rounded-lg px-3 py-2.5 text-sm focus:ring-2 focus:ring-purple-300 outline-none font-mono">
-            <p class="text-[9px] text-gray-300 mt-0.5">※ 未入力の場合はデフォルトのAI分析を使用します。</p>
+            <p class="text-[10px] text-gray-300 mt-0.5">※ 未入力の場合はデフォルトのAI分析を使用します。</p>
           </div>
         </div>
         <!-- Submit -->
@@ -868,7 +997,7 @@
 
       <footer class="text-center py-6">
         <p class="text-[10px] text-gray-300">&copy; 2026 数秘AIライフコンパス. あなたの輝く人生を心から応援しています。</p>
-        <p class="text-[9px] text-gray-300 mt-0.5">Powered by Gemini.</p>
+        <p class="text-[10px] text-gray-300 mt-0.5">Powered by Gemini.</p>
       </footer>
     </div>
   </div>
@@ -888,6 +1017,23 @@
       <div class="text-center">
         <p class="text-sm font-bold text-gray-700" id="result-name">太郎</p>
         <p class="text-[11px] text-gray-400 mt-0.5">あなたの数秘プロファイル</p>
+        <!-- 主要数サマリー (P1: ファーストビュー主役数) -->
+        <div id="result-primary-nums" class="hidden flex items-center justify-center gap-4 mt-2 flex-wrap">
+          <div class="flex flex-col items-center">
+            <span class="text-[10px] font-semibold text-purple-400 tracking-widest uppercase">運命数</span>
+            <span id="hdr-lifepath" class="font-lora text-2xl font-bold text-purple-700 leading-none mt-0.5">-</span>
+          </div>
+          <div class="w-px h-6 bg-purple-200"></div>
+          <div class="flex flex-col items-center">
+            <span class="text-[10px] font-semibold text-purple-400 tracking-widest uppercase">成熟数</span>
+            <span id="hdr-maturity" class="font-lora text-2xl font-bold text-purple-700 leading-none mt-0.5">-</span>
+          </div>
+          <div class="w-px h-6 bg-purple-200"></div>
+          <div class="flex flex-col items-center">
+            <span class="text-[10px] font-semibold text-purple-400 tracking-widest uppercase">成長数</span>
+            <span id="hdr-spirit" class="font-lora text-2xl font-bold text-purple-600 leading-none mt-0.5">-</span>
+          </div>
+        </div>
       </div>
     </div>
 
@@ -901,15 +1047,21 @@
 
     <!-- Section Navigation Tabs -->
     <div class="sticky top-0 z-30 bg-white/90 backdrop-blur-sm border-b border-gray-100 shadow-sm">
-      <div class="max-w-md mx-auto flex">
-        <button class="nav-tab flex-1 py-2.5 text-[10px] font-medium text-purple-600 border-b-2 border-purple-500" data-target="section-chart">数秘チャート</button>
-        <button class="nav-tab flex-1 py-2.5 text-[10px] font-medium text-gray-400 border-b-2 border-transparent" data-target="section-palm">手相占い</button>
-        <button class="nav-tab flex-1 py-2.5 text-[10px] font-medium text-gray-400 border-b-2 border-transparent" data-target="section-cycles">サイクル</button>
-        <button class="nav-tab flex-1 py-2.5 text-[10px] font-medium text-gray-400 border-b-2 border-transparent" data-target="section-dataset">詳細鑑定</button>
-        <button class="nav-tab flex-1 py-2.5 text-[10px] font-medium text-gray-400 border-b-2 border-transparent" data-target="section-strengths">強み診断</button>
-        <button class="nav-tab flex-1 py-2.5 text-[10px] font-medium text-gray-400 border-b-2 border-transparent" data-target="section-brandkit">ブランド設計</button>
+      <div class="max-w-md mx-auto" style="position:relative;" id="nav-tab-wrap">
+      <div class="flex overflow-x-auto -webkit-overflow-scrolling-touch" style="overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none;" id="nav-tab-container">
+        <button class="nav-tab py-2.5 text-[10px] font-medium text-purple-600 border-b-2 border-purple-500 flex-shrink-0 px-3 white-space-nowrap" style="white-space:nowrap;flex-shrink:0;" data-target="section-chart">数秘チャート</button>
+        <button class="nav-tab py-2.5 text-[10px] font-medium text-gray-400 border-b-2 border-transparent flex-shrink-0 px-3" style="white-space:nowrap;flex-shrink:0;" data-target="section-palm">手相占い</button>
+        <button class="nav-tab py-2.5 text-[10px] font-medium text-gray-400 border-b-2 border-transparent flex-shrink-0 px-3" style="white-space:nowrap;flex-shrink:0;" data-target="section-cycles">サイクル</button>
+        <button class="nav-tab py-2.5 text-[10px] font-medium text-gray-400 border-b-2 border-transparent flex-shrink-0 px-3" style="white-space:nowrap;flex-shrink:0;" data-target="section-dataset">詳細鑑定</button>
+        <button class="nav-tab py-2.5 text-[10px] font-medium text-gray-400 border-b-2 border-transparent flex-shrink-0 px-3" style="white-space:nowrap;flex-shrink:0;" data-target="section-strengths">強み診断</button>
+        <button class="nav-tab py-2.5 text-[10px] font-medium text-gray-400 border-b-2 border-transparent flex-shrink-0 px-3" style="white-space:nowrap;flex-shrink:0;" data-target="section-brandkit">ブランド設計</button>
+        <button class="nav-tab py-2.5 text-[10px] font-medium text-gray-400 border-b-2 border-transparent flex-shrink-0 px-3" style="white-space:nowrap;flex-shrink:0;" data-target="section-course">コース</button>
+      </div>
       </div>
     </div>
+    <style>#nav-tab-container::-webkit-scrollbar{display:none;}
+    #nav-tab-wrap::after{content:'';position:absolute;top:0;right:0;width:28px;height:100%;background:linear-gradient(to right,transparent,rgba(255,255,255,0.95));pointer-events:none;z-index:1;}
+    </style>
 
     <div class="max-w-3xl mx-auto px-4 py-4 space-y-5">
 
@@ -917,8 +1069,9 @@
       <div id="section-chart">
       <!-- Chart Title -->
       <div class="text-center mb-4">
-        <h2 class="text-base font-bold text-purple-700" id="chart-title">太郎さんの数秘チャート</h2>
+        <h2 class="text-base font-bold text-purple-700" id="chart-title">太郎さんの命の木</h2>
         <p class="text-[10px] text-gray-400" id="chart-birthdate">生年月日: 5/15/1990</p>
+        <p class="text-xs text-gray-500 mt-0.5" id="chart-tree-subtitle">根から枝葉へ — あなたの数が語る成長の物語</p>
       </div>
 
       <!-- ===== NUMEROLOGY DIAMOND CHART — wide two-column layout ===== -->
@@ -970,6 +1123,8 @@
             </div>
 
             <!-- ========== CHALLENGES (下半分) — 列アンカー配置 ========== -->
+            <!-- 案C 地面線: 幹ゾーン(center row)と根ゾーン(克服・挑戦数)の境界 -->
+            <div class="chart-ground-line gr-8" style="grid-column:1/7;"></div>
             <div class="period-lbl gr-8 gc-B" id="cp1-label">第1挑戦期間<br><span id="cp1-age"></span></div>
             <div class="period-lbl gr-8 gc-D" id="cp2-label">第2挑戦期間<br><span id="cp2-age"></span></div>
 
@@ -1005,30 +1160,30 @@
       </div><!-- /chart-outer -->
 
       <!-- 影響力ティア凡例 -->
-      <div id="infl-legend" aria-label="チャート色凡例: 枠色は各ポジション、★は影響力の強さを表します">
-        <span class="lg-title">枠色 = 各ポジション／★ = 影響力の強さ</span>
+      <div id="infl-legend" aria-label="チャート色凡例: 枠の色は各数（ポジション種別）、★は影響力の強さを表します">
+        <span class="lg-title">枠の色 = 各数（ポジション種別）／ ★ = 影響力の強さ</span>
         <span class="lg-item">
-          <span class="lg-swatch" style="background:#9b7ec8;border-radius:3px;" aria-hidden="true"></span>
+          <span class="lg-swatch" style="background:#8b6abf;border-radius:3px;" aria-hidden="true"></span>
           <span>運命数</span>
         </span>
         <span class="lg-item">
-          <span class="lg-swatch" style="background:#b8964a;border-radius:3px;" aria-hidden="true"></span>
+          <span class="lg-swatch" style="background:#c4903a;border-radius:3px;" aria-hidden="true"></span>
           <span>成熟数</span>
         </span>
         <span class="lg-item">
-          <span class="lg-swatch" style="background:#6a9e82;border-radius:3px;" aria-hidden="true"></span>
+          <span class="lg-swatch" style="background:#4e8c68;border-radius:3px;" aria-hidden="true"></span>
           <span>成長数</span>
         </span>
         <span class="lg-item">
-          <span class="lg-swatch" style="background:#6b8ec4;border-radius:3px;" aria-hidden="true"></span>
+          <span class="lg-swatch" style="background:#4d7fc4;border-radius:3px;" aria-hidden="true"></span>
           <span>誕生数</span>
         </span>
         <span class="lg-item">
-          <span class="lg-swatch" style="background:#5a9a92;border-radius:3px;" aria-hidden="true"></span>
+          <span class="lg-swatch" style="background:#2d7a5a;border-radius:3px;" aria-hidden="true"></span>
           <span>社会数</span>
         </span>
         <span class="lg-item">
-          <span class="lg-swatch" style="background:#b87878;border-radius:3px;" aria-hidden="true"></span>
+          <span class="lg-swatch" style="background:#b86868;border-radius:3px;" aria-hidden="true"></span>
           <span>克服数</span>
         </span>
         <span class="lg-item" style="width:100%;justify-content:center;margin-top:2px;">
@@ -1037,11 +1192,14 @@
           <span style="color:#a855f7;font-size:10px;">◆</span>&thinsp;<span style="font-size:10px;color:#6b7280;">= 中　</span>
           <span style="color:#c4b5fd;font-size:10px;">·</span>&thinsp;<span style="font-size:10px;color:#6b7280;">= 小</span>
         </span>
+        <span class="lg-item" style="width:100%;justify-content:center;margin-top:4px;border-top:1px solid #e9d5ff;padding-top:4px;">
+          <span style="font-size:10px;color:#7a6048;">下が根（基盤を整える数）・上が枝葉（広がる力）</span>
+        </span>
       </div>
 
       <!-- Note -->
       <p class="text-[11px] text-purple-400 mt-3 leading-relaxed text-center">
-        👆 各数字のボックスをタップすると、その数字が持つ意味や、あなたの人生における役割の詳しい解説が表示されます。
+        各数字のボックスをタップすると、その数字が持つ意味や、あなたの人生における役割の詳しい解説が表示されます。
       </p>
 
       <!-- Numerology Chat UI -->
@@ -1114,7 +1272,7 @@
 
       <!-- Precision Report Trigger -->
       <button id="btn-precision-report"
-        style="background:linear-gradient(135deg,#7c3aed,#db2777)"
+        style="background:linear-gradient(135deg,#7c3aed,#6d28d9)"
         class="w-full text-white rounded-xl py-3 text-sm font-bold hover:opacity-90 transition-all flex items-center justify-center gap-2 shadow-lg mt-2">
         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
         精密レポートを発行
@@ -1150,7 +1308,7 @@
       <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
         <div class="gradient-header p-4 text-center">
           <h3 class="text-base font-bold text-gray-800 flex items-center justify-center gap-2">
-            <span>🖐️</span> 手相占い
+            手相占い
           </h3>
           <p class="text-[10px] text-gray-500 mt-1">あなたの手のひらの線から運勢を読み解きます</p>
         </div>
@@ -1158,9 +1316,9 @@
           <!-- Palm Photo Upload - Two Hands -->
           <div class="grid grid-cols-2 gap-3">
             <!-- Left Hand (先天的な才能 - 左側に表示) -->
-            <div class="bg-indigo-50/60 border border-dashed border-indigo-300 rounded-xl p-3 text-center space-y-2" id="palm-left-zone">
-              <p class="text-[10px] font-bold text-indigo-700">左手（先天的な才能）</p>
-              <p class="text-[9px] text-gray-400">生まれ持った素質</p>
+            <div class="bg-purple-50/60 border border-dashed border-purple-200 rounded-xl p-3 text-center space-y-2" id="palm-left-zone">
+              <p class="text-[10px] font-bold text-purple-700">左手（先天的な才能）</p>
+              <p class="text-[10px] text-gray-400">生まれ持った素質</p>
               <!-- Left preview -->
               <div id="palm-preview-area-left" class="hidden relative">
                 <img id="palm-preview-img-left" class="w-full max-h-32 object-contain rounded-lg" alt="左手画像">
@@ -1168,10 +1326,10 @@
               </div>
               <!-- Left buttons -->
               <div id="palm-upload-prompt-left" class="space-y-1.5">
-                <div class="w-8 h-8 mx-auto bg-indigo-100 rounded-full flex items-center justify-center">
-                  <svg class="w-4 h-4 text-indigo-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                <div class="w-8 h-8 mx-auto bg-purple-100 rounded-full flex items-center justify-center">
+                  <svg class="w-4 h-4 text-purple-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
                 </div>
-                <label class="bg-indigo-500 hover:bg-indigo-600 text-white rounded-full px-3 py-2 text-[10px] font-semibold cursor-pointer transition-all flex items-center justify-center gap-1">
+                <label class="bg-purple-600 hover:bg-purple-700 text-white rounded-full px-3 py-2 text-[10px] font-semibold cursor-pointer transition-all flex items-center justify-center gap-1">
                   <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
                   撮影 / 写真を選択
                   <input type="file" accept="image/*" id="palm-upload-left" class="hidden">
@@ -1180,9 +1338,9 @@
             </div>
 
             <!-- Right Hand (後天的な運勢 - 右側に表示) -->
-            <div class="bg-fuchsia-50/60 border border-dashed border-fuchsia-300 rounded-xl p-3 text-center space-y-2" id="palm-right-zone">
-              <p class="text-[10px] font-bold text-fuchsia-700">右手（後天的な運勢）</p>
-              <p class="text-[9px] text-gray-400">努力で変わる運命</p>
+            <div class="bg-pink-50/60 border border-dashed border-pink-200 rounded-xl p-3 text-center space-y-2" id="palm-right-zone">
+              <p class="text-[10px] font-bold text-pink-700">右手（後天的な運勢）</p>
+              <p class="text-[10px] text-gray-400">努力で変わる運命</p>
               <!-- Right preview -->
               <div id="palm-preview-area-right" class="hidden relative">
                 <img id="palm-preview-img-right" class="w-full max-h-32 object-contain rounded-lg" alt="右手画像">
@@ -1203,7 +1361,7 @@
           </div>
 
           <!-- Camera tip for mobile -->
-          <p class="text-[9px] text-gray-400 text-center">タップするとカメラ撮影または保存済み写真から選べます</p>
+          <p class="text-[10px] text-gray-400 text-center">タップするとカメラ撮影または保存済み写真から選べます</p>
 
           <!-- AI Analysis status -->
           <div id="palm-ai-analysis" class="hidden">
@@ -1821,7 +1979,7 @@
               <h3 class="text-sm font-bold text-gray-800">4領域バランス</h3>
             </div>
             <div class="p-4 flex flex-col items-center gap-4">
-              <svg id="str-radar-svg" width="220" height="220" viewBox="-110 -110 220 220"><polygon points="1.3777276490407724e-15,-22.5 22.5,0 1.3777276490407724e-15,22.5 -22.5,2.7554552980815448e-15" fill="none" stroke="#e5e7eb" stroke-width="0.8"></polygon><polygon points="2.7554552980815448e-15,-45 45,0 2.7554552980815448e-15,45 -45,5.5109105961630896e-15" fill="none" stroke="#e5e7eb" stroke-width="0.8"></polygon><polygon points="4.133182947122317e-15,-67.5 67.5,0 4.133182947122317e-15,67.5 -67.5,8.266365894244634e-15" fill="none" stroke="#e5e7eb" stroke-width="0.8"></polygon><polygon points="5.5109105961630896e-15,-90 90,0 5.5109105961630896e-15,90 -90,1.1021821192326179e-14" fill="none" stroke="#e5e7eb" stroke-width="0.8"></polygon><line x1="0" y1="0" x2="5.5109105961630896e-15" y2="-90" stroke="#e5e7eb" stroke-width="0.8"></line><line x1="0" y1="0" x2="90" y2="0" stroke="#e5e7eb" stroke-width="0.8"></line><line x1="0" y1="0" x2="5.5109105961630896e-15" y2="90" stroke="#e5e7eb" stroke-width="0.8"></line><line x1="0" y1="0" x2="-90" y2="1.1021821192326179e-14" stroke="#e5e7eb" stroke-width="0.8"></line><polygon points="0,0 0,0 0,0 0,0" fill="rgba(124,58,237,0.2)" stroke="#7c3aed" stroke-width="2"></polygon><text x="6.490628035480972e-15" y="-106" text-anchor="middle" dominant-baseline="middle" font-size="8" fill="#7c3aed" font-weight="600">形にする力</text><text x="106" y="0" text-anchor="middle" dominant-baseline="middle" font-size="8" fill="#0f766e" font-weight="600">火をつける力</text><text x="6.490628035480972e-15" y="106" text-anchor="middle" dominant-baseline="middle" font-size="8" fill="#b45309" font-weight="600">つなぐ力</text><text x="-106" y="1.2981256070961945e-14" text-anchor="middle" dominant-baseline="middle" font-size="8" fill="#1d4ed8" font-weight="600">見通す力</text></svg>
+              <svg id="str-radar-svg" width="220" height="220" viewBox="-110 -110 220 220"><polygon points="1.3777276490407724e-15,-22.5 22.5,0 1.3777276490407724e-15,22.5 -22.5,2.7554552980815448e-15" fill="none" stroke="#e5e7eb" stroke-width="0.8"></polygon><polygon points="2.7554552980815448e-15,-45 45,0 2.7554552980815448e-15,45 -45,5.5109105961630896e-15" fill="none" stroke="#e5e7eb" stroke-width="0.8"></polygon><polygon points="4.133182947122317e-15,-67.5 67.5,0 4.133182947122317e-15,67.5 -67.5,8.266365894244634e-15" fill="none" stroke="#e5e7eb" stroke-width="0.8"></polygon><polygon points="5.5109105961630896e-15,-90 90,0 5.5109105961630896e-15,90 -90,1.1021821192326179e-14" fill="none" stroke="#e5e7eb" stroke-width="0.8"></polygon><line x1="0" y1="0" x2="5.5109105961630896e-15" y2="-90" stroke="#e5e7eb" stroke-width="0.8"></line><line x1="0" y1="0" x2="90" y2="0" stroke="#e5e7eb" stroke-width="0.8"></line><line x1="0" y1="0" x2="5.5109105961630896e-15" y2="90" stroke="#e5e7eb" stroke-width="0.8"></line><line x1="0" y1="0" x2="-90" y2="1.1021821192326179e-14" stroke="#e5e7eb" stroke-width="0.8"></line><polygon points="0,0 0,0 0,0 0,0" fill="rgba(124,58,237,0.2)" stroke="#7c3aed" stroke-width="2"></polygon><text x="6.490628035480972e-15" y="-106" text-anchor="middle" dominant-baseline="middle" font-size="10" fill="#7c3aed" font-weight="600">形にする力</text><text x="106" y="0" text-anchor="middle" dominant-baseline="middle" font-size="10" fill="#0f766e" font-weight="600">火をつける力</text><text x="6.490628035480972e-15" y="106" text-anchor="middle" dominant-baseline="middle" font-size="10" fill="#b45309" font-weight="600">つなぐ力</text><text x="-106" y="1.2981256070961945e-14" text-anchor="middle" dominant-baseline="middle" font-size="10" fill="#1d4ed8" font-weight="600">見通す力</text></svg>
               <div id="str-domain-legend" class="grid grid-cols-2 gap-2 w-full text-[10px]"><div class="flex items-center gap-1.5">
             <span class="w-2 h-2 rounded-sm flex-shrink-0" style="background:#7c3aed"></span>
             <span class="text-[10px] text-gray-600">形にする力 <span class="font-bold" style="color:#7c3aed">0%</span></span>
@@ -2160,7 +2318,7 @@
           <!-- Start (生成ボタン) -->
           <div id="bk-start" class="hidden">
             <button id="bk-btn-generate" class="w-full gradient-cta text-white rounded-full py-3 font-semibold text-sm shadow-lg">あなたのブランド素材を生成する</button>
-            <p class="text-[9px] text-gray-400 mt-2 text-center">生成には30秒〜1分ほどかかります。</p>
+            <p class="text-[10px] text-gray-400 mt-2 text-center">生成には30秒〜1分ほどかかります。</p>
           </div>
 
           <!-- Loading -->
@@ -2202,9 +2360,115 @@
       </div>
 
 
+      <!-- ===== Course: 自分ブランド設計コース (name-neutral guided flow) ===== -->
+      <div id="section-course" class="space-y-5">
+        <div class="bg-gradient-to-br from-purple-50 to-white shadow-sm border border-purple-100 rounded-xl p-5 space-y-2.5">
+          <div class="flex items-center justify-between">
+            <h2 class="text-base font-bold text-purple-700">自分ブランド設計コース</h2>
+            <span id="course-progress-badge" class="text-[10px] font-semibold text-purple-500 bg-white border border-purple-200 rounded-full px-2.5 py-1">0 / 4 完了</span>
+          </div>
+          <p class="text-[11px] text-gray-600 leading-relaxed">
+            数秘8と強み24で「自分を読む」ところから、ブランド素材を作り、30日で動かすところまで。4つのステップを、あなた自身のペースで歩いてください。
+          </p>
+          <div class="w-full bg-purple-100 rounded-full h-1.5 overflow-hidden">
+            <div id="course-progress-bar" class="bg-purple-500 h-full transition-all duration-500" style="width:0%"></div>
+          </div>
+        </div>
+
+        <!-- STEP 1 -->
+        <div data-course-step="1" class="bg-white shadow-sm border border-gray-100 rounded-xl p-5 space-y-3">
+          <div class="flex items-start gap-3">
+            <div class="shrink-0 w-8 h-8 rounded-full bg-purple-100 text-purple-700 font-bold text-sm flex items-center justify-center">1</div>
+            <div class="flex-1">
+              <h3 class="text-sm font-bold text-gray-800">自分を読む</h3>
+              <p class="text-[10px] text-purple-400 mt-0.5">数秘8 × 強み24 で自己分析</p>
+            </div>
+            <span data-course-check-icon="1" class="hidden text-green-500 text-lg leading-none">✓</span>
+          </div>
+          <p class="text-[11px] text-gray-600 leading-relaxed">
+            まず、生年月日から導く「数秘8」と、あなたの行動特性「強み24」で自分を読み解きます。ここがすべての土台です。鏡に映った自分の輪郭を、まず受け取ってください。
+          </p>
+          <div class="flex flex-col gap-2">
+            <button data-course-go="section-chart" class="w-full bg-purple-600 text-white rounded-full py-2.5 font-semibold text-sm">数秘チャートを見る</button>
+            <button data-course-go="section-strengths" class="w-full bg-purple-50 text-purple-700 border border-purple-200 rounded-full py-2.5 font-semibold text-sm">強み診断へ進む</button>
+          </div>
+          <label class="flex items-center gap-2 cursor-pointer pt-1">
+            <input type="checkbox" data-course-toggle="1" class="w-4 h-4 accent-purple-600">
+            <span class="text-[11px] text-gray-600">このステップを完了にする</span>
+          </label>
+        </div>
+
+        <!-- STEP 2 -->
+        <div data-course-step="2" class="bg-white shadow-sm border border-gray-100 rounded-xl p-5 space-y-3">
+          <div class="flex items-start gap-3">
+            <div class="shrink-0 w-8 h-8 rounded-full bg-purple-100 text-purple-700 font-bold text-sm flex items-center justify-center">2</div>
+            <div class="flex-1">
+              <h3 class="text-sm font-bold text-gray-800">ブランド素材を作る</h3>
+              <p class="text-[10px] text-purple-400 mt-0.5">4つの資産をAIで生成</p>
+            </div>
+            <span data-course-check-icon="2" class="hidden text-green-500 text-lg leading-none">✓</span>
+          </div>
+          <p class="text-[11px] text-gray-600 leading-relaxed">
+            読み解いた自分を、①ポジショニング ②LP・セールスコピー ③商品設計 ④30日SNSカレンダー の4つの素材に変換します。これは完成品ではなく、あなたが自分の手で磨くための叩き台です。
+          </p>
+          <div class="flex flex-col gap-2">
+            <button data-course-go="section-brandkit" class="w-full bg-purple-600 text-white rounded-full py-2.5 font-semibold text-sm">ブランド設計を開く</button>
+          </div>
+          <label class="flex items-center gap-2 cursor-pointer pt-1">
+            <input type="checkbox" data-course-toggle="2" class="w-4 h-4 accent-purple-600">
+            <span class="text-[11px] text-gray-600">このステップを完了にする</span>
+          </label>
+        </div>
+
+        <!-- STEP 3 -->
+        <div data-course-step="3" class="bg-white shadow-sm border border-gray-100 rounded-xl p-5 space-y-3">
+          <div class="flex items-start gap-3">
+            <div class="shrink-0 w-8 h-8 rounded-full bg-purple-100 text-purple-700 font-bold text-sm flex items-center justify-center">3</div>
+            <div class="flex-1">
+              <h3 class="text-sm font-bold text-gray-800">30日で動かす</h3>
+              <p class="text-[10px] text-purple-400 mt-0.5">30日SNSカレンダーを実装</p>
+            </div>
+            <span data-course-check-icon="3" class="hidden text-green-500 text-lg leading-none">✓</span>
+          </div>
+          <p class="text-[11px] text-gray-600 leading-relaxed">
+            素材は、動かして初めて意味を持ちます。生成された30日SNSカレンダーを1日ずつ実行し、世界に向けて自分の言葉を出していきましょう。最初の30日が、あなたのブランドの輪郭になります。
+          </p>
+          <div class="flex flex-col gap-2">
+            <button data-course-go="section-brandkit" class="w-full bg-purple-600 text-white rounded-full py-2.5 font-semibold text-sm">30日カレンダーを見る</button>
+          </div>
+          <label class="flex items-center gap-2 cursor-pointer pt-1">
+            <input type="checkbox" data-course-toggle="3" class="w-4 h-4 accent-purple-600">
+            <span class="text-[11px] text-gray-600">このステップを完了にする</span>
+          </label>
+        </div>
+
+        <!-- STEP 4 -->
+        <div data-course-step="4" class="bg-white shadow-sm border border-gray-100 rounded-xl p-5 space-y-3">
+          <div class="flex items-start gap-3">
+            <div class="shrink-0 w-8 h-8 rounded-full bg-purple-100 text-purple-700 font-bold text-sm flex items-center justify-center">4</div>
+            <div class="flex-1">
+              <h3 class="text-sm font-bold text-gray-800">覚悟の門</h3>
+              <p class="text-[10px] text-purple-400 mt-0.5">一人で守り続けなくていい場所へ</p>
+            </div>
+            <span data-course-check-icon="4" class="hidden text-green-500 text-lg leading-none">✓</span>
+          </div>
+          <p class="text-[11px] text-gray-600 leading-relaxed">
+            ここまでは、あなた一人でも歩けるように作られています。それで十分です。もし「一人で守り続けるのではなく、覚悟を分かち合える誰かと進みたい」と本気で思ったときだけ、その先の扉があります。迎えに行くことはしません。扉を開くのは、あなたの覚悟だけです。
+          </p>
+          <div class="flex flex-col gap-2">
+            <button data-course-go="section-brandkit" class="w-full bg-purple-50 text-purple-700 border border-purple-200 rounded-full py-2.5 font-semibold text-sm">覚悟の門を見る</button>
+          </div>
+          <label class="flex items-center gap-2 cursor-pointer pt-1">
+            <input type="checkbox" data-course-toggle="4" class="w-4 h-4 accent-purple-600">
+            <span class="text-[11px] text-gray-600">このステップを完了にする</span>
+          </label>
+        </div>
+      </div>
+
+
       <footer class="text-center py-4">
         <p class="text-[10px] text-gray-300">&copy; 2026 数秘AIライフコンパス. あなたの輝く人生を心から応援しています。</p>
-        <p class="text-[9px] text-gray-300 mt-0.5">Powered by Gemini.</p>
+        <p class="text-[10px] text-gray-300 mt-0.5">Powered by Gemini.</p>
       </footer>
     </div>
 
@@ -2530,9 +2794,20 @@
 
       // Update header
       document.getElementById('result-name').textContent = firstName;
-      document.getElementById('chart-title').textContent = firstName + 'さんの数秘チャート';
+      document.getElementById('chart-title').textContent = firstName + 'さんの命の木';
       document.getElementById('chart-birthdate').textContent = '生年月日: ' + month + '/' + day + '/' + year;
       document.getElementById('modal-greeting').textContent = firstName + 'さん、ようこそ！';
+      // 主要数サマリー (P1: ファーストビュー主役数)
+      const _hdrLP = document.getElementById('hdr-lifepath');
+      const _hdrMat = document.getElementById('hdr-maturity');
+      const _hdrSp = document.getElementById('hdr-spirit');
+      const _hdrBlock = document.getElementById('result-primary-nums');
+      if (_hdrLP && _hdrMat && _hdrSp && _hdrBlock) {
+        _hdrLP.textContent = r.lifePath;
+        _hdrMat.textContent = r.maturity;
+        _hdrSp.textContent = r.spirit;
+        _hdrBlock.classList.remove('hidden');
+      }
 
       // Update chart boxes
       const boxMap = {
@@ -2585,6 +2860,19 @@
           // aria-label に影響力情報を追記
           el.setAttribute('aria-label',
             `${lbl ? lbl.textContent : ''} ${val}。${tier.label}。タップで詳しい解説を表示`);
+          // B: 根ラベル（克服数・挑戦数のみ）
+          let rootLbl = el.querySelector('.root-label');
+          if (tier.cls === 'infl-neg') {
+            if (!rootLbl) {
+              rootLbl = document.createElement('span');
+              rootLbl.className = 'root-label';
+              rootLbl.setAttribute('aria-hidden', 'true');
+              el.appendChild(rootLbl);
+            }
+            rootLbl.textContent = '根';
+          } else if (rootLbl) {
+            rootLbl.remove();
+          }
         } else {
           el.setAttribute('aria-label', `${lbl ? lbl.textContent : ''} ${val}。タップで詳しい解説を表示`);
         }
@@ -2606,6 +2894,16 @@
         if (!el) continue;
         el.classList.remove(...ALL_POS_CLS);
         el.classList.add(posCls);
+      }
+
+      // 案C 果実発光: 影響力高ティア(★★/★ = infl-s/infl-a)に緑グロー付与
+      for (const id of Object.keys(boxMap)) {
+        const el = document.getElementById(id);
+        if (!el) continue;
+        el.classList.remove('fruit-glow');
+        if (el.classList.contains('infl-s') || el.classList.contains('infl-a')) {
+          el.classList.add('fruit-glow');
+        }
       }
 
       // Update right-column info cells
@@ -2742,6 +3040,7 @@
         if (target) target.scrollIntoView({ behavior: 'smooth', block: 'start' });
         if (tab.dataset.target === 'section-strengths') { window.__refreshStrengthsNumCross && window.__refreshStrengthsNumCross(); }
         if (tab.dataset.target === 'section-brandkit') { window.__refreshBrandKitGate && window.__refreshBrandKitGate(); }
+        if (tab.dataset.target === 'section-course') { window.__refreshCourse && window.__refreshCourse(); }
       });
     });
 
@@ -2753,7 +3052,7 @@
       const show = (el) => { if (el) el.classList.remove('hidden'); };
       const hide = (el) => { if (el) el.classList.add('hidden'); };
       // 立会の窓口（中立・名義非表示）。差し替えはこの2定数のみ。
-      const CONTACT_EMAIL = 'kodawarimaxjp@gmail.com';
+      const CONTACT_EMAIL = 'kodawarimaxjp+compass@gmail.com';
       const CONTACT_SUBJECT = '数秘AIライフコンパス｜お問い合わせ';
 
       function refreshBrandKitGate() {
@@ -2813,11 +3112,11 @@
             <div class="text-gray-600">${esc(d.post)}</div></td></tr>`).join('');
         const snsBody = `<div class="overflow-x-auto"><table class="w-full text-left">
           <thead><tr class="border-b border-purple-100">
-            <th class="py-1 pr-2 text-[9px] text-purple-400 font-medium">日</th>
-            <th class="py-1 pr-2 text-[9px] text-purple-400 font-medium">形式</th>
-            <th class="py-1 text-[9px] text-purple-400 font-medium">テーマ・フック・投稿</th>
+            <th class="py-1 pr-2 text-[10px] text-purple-400 font-medium">日</th>
+            <th class="py-1 pr-2 text-[10px] text-purple-400 font-medium">形式</th>
+            <th class="py-1 text-[10px] text-purple-400 font-medium">テーマ・フック・投稿</th>
           </tr></thead><tbody>${snsRows}</tbody></table></div>
-          <p class="text-[9px] text-gray-400 mt-2">全${sns.length}日分。</p>`;
+          <p class="text-[10px] text-gray-400 mt-2">全${sns.length}日分。</p>`;
 
         const html = artifactCard('① ポジショニング', 'あなたが何者で、誰に何を約束するか', posBody)
           + artifactCard('② LP・セールスコピー', 'そのまま下書きに使える構成案', lpBody)
@@ -2863,7 +3162,7 @@
             <p class="text-[11px] text-gray-700 leading-relaxed">
               あなたが本気で覚悟を決めたなら、その先には「一人で守り続けなくていい」場所があります。
               ただし、こちらから売り込むことはありません。連絡するかどうかは、あなた自身が決めてください。</p>
-            <a data-bk-witness-link href="#" class="block text-center text-[11px] text-purple-600 underline">（立会の窓口リンクは未設定）</a>
+            <a data-bk-witness-link href="mailto:${CONTACT_EMAIL}?subject=${encodeURIComponent(CONTACT_SUBJECT)}" class="block text-center text-[11px] text-purple-600 underline">お問い合わせ（メール）</a>
           </div>`;
           show(rv);
           hide(gate);
@@ -2871,6 +3170,59 @@
         refreshBrandKitGate();
       }
 
+      if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', wire);
+      else wire();
+    })();
+
+
+    // -- Course: guided learning flow (name-neutral; localStorage progress only, no tracking) --
+    (function () {
+      const KEY = 'course_progress_v1';
+      const STEPS = [1, 2, 3, 4];
+      function load() {
+        try { return JSON.parse(localStorage.getItem(KEY)) || {}; } catch (e) { return {}; }
+      }
+      function save(state) {
+        try { localStorage.setItem(KEY, JSON.stringify(state)); } catch (e) {}
+      }
+      function render() {
+        const state = load();
+        let done = 0;
+        STEPS.forEach((n) => {
+          const on = !!state['s' + n];
+          if (on) done++;
+          const cb = document.querySelector('[data-course-toggle="' + n + '"]');
+          if (cb) cb.checked = on;
+          const icon = document.querySelector('[data-course-check-icon="' + n + '"]');
+          if (icon) icon.classList.toggle('hidden', !on);
+          const card = document.querySelector('[data-course-step="' + n + '"]');
+          if (card) card.classList.toggle('border-green-200', on);
+        });
+        const badge = document.getElementById('course-progress-badge');
+        if (badge) badge.textContent = done + ' / 4 完了';
+        const bar = document.getElementById('course-progress-bar');
+        if (bar) bar.style.width = (done / 4 * 100) + '%';
+      }
+      function wire() {
+        document.querySelectorAll('[data-course-toggle]').forEach((cb) => {
+          cb.addEventListener('change', () => {
+            const n = cb.getAttribute('data-course-toggle');
+            const state = load();
+            state['s' + n] = cb.checked;
+            save(state);
+            render();
+          });
+        });
+        document.querySelectorAll('[data-course-go]').forEach((btn) => {
+          btn.addEventListener('click', () => {
+            const targetId = btn.getAttribute('data-course-go');
+            const navTab = document.querySelector('.nav-tab[data-target="' + targetId + '"]');
+            if (navTab) navTab.click();
+          });
+        });
+        render();
+      }
+      window.__refreshCourse = render;
       if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', wire);
       else wire();
     })();
@@ -3014,7 +3366,7 @@
           // NOTE: aiBadge is a fixed developer-controlled literal. It must NOT include
           // any dataset string without esc() — it is concatenated raw into innerHTML below.
           const aiBadge = dsCell._ai_generated
-            ? '<span class="inline-block bg-amber-100 text-amber-700 text-[9px] font-semibold rounded-full px-2 py-0.5 ml-2">AI補完</span>'
+            ? '<span class="inline-block bg-amber-100 text-amber-700 text-[10px] font-semibold rounded-full px-2 py-0.5 ml-2">AI補完</span>'
             : '';
           const titleLine = dsCell.title
             ? `<p class="text-sm font-bold text-purple-800 mb-2">${esc(dsCell.title)}${aiBadge}</p>`
@@ -3618,7 +3970,7 @@ JSONのみ返してください（\`\`\`不要）:
         if (analysis.confidence === 'low') {
           confidenceTipHtml = `
             <div class="bg-blue-50 border border-blue-200 rounded-lg p-2 mt-1 mb-1">
-              <p class="text-[10px] text-blue-600">💡 写真が不鮮明な可能性があります。明るい場所で手のひら全体を撮り直すと、より正確な結果が得られます。</p>
+              <p class="text-[10px] text-blue-600">◇ 写真が不鮮明な可能性があります。明るい場所で手のひら全体を撮り直すと、より正確な結果が得られます。</p>
             </div>`;
         }
 
@@ -3632,7 +3984,7 @@ JSONのみ返してください（\`\`\`不要）:
             Gemini Vision AI 分析完了（${handLabel}${confidenceLabel ? '・確信度：' + confidenceLabel : ''}）
           </p>
           <p class="text-[10px] text-gray-500 leading-relaxed mt-1">${findingsText}</p>
-          <p class="text-[9px] text-gray-300 mt-2">結果を確認し、必要に応じて手動で修正してください</p>`;
+          <p class="text-[10px] text-gray-300 mt-2">結果を確認し、必要に応じて手動で修正してください</p>`;
         palmAnalysisPending = false;
 
       } catch(e) {
@@ -3655,7 +4007,7 @@ JSONのみ返してください（\`\`\`不要）:
           </p>
           <p class="text-[10px] text-gray-400">${errText}</p>
           <button onclick="palmAnalysisPending=false;analyzePalmWithAI()" class="mt-1 text-[10px] text-purple-600 underline hover:text-purple-800">再試行する</button>
-          <p class="text-[9px] text-gray-300 mt-1">または手動で選択してください</p>`;
+          <p class="text-[10px] text-gray-300 mt-1">または手動で選択してください</p>`;
       }
     }
 
@@ -3796,7 +4148,7 @@ JSONのみ返してください（\`\`\`不要）:
                                       '課題はありますが、手相は変わります。前向きに取り組みましょう。';
 
       html = `
-        <div class="bg-gradient-to-r from-purple-600 via-pink-600 to-rose-500 rounded-xl p-4 text-white text-center">
+        <div class="bg-gradient-to-r from-purple-600 via-violet-600 to-purple-800 rounded-xl p-4 text-white text-center">
           <p class="text-xs opacity-80 mb-1">総合鑑定スコア</p>
           <p class="text-2xl font-bold font-lora">${avg} / 5.0</p>
           <p class="text-sm mt-1">${overallStars}</p>
@@ -3837,7 +4189,7 @@ JSONのみ返してください（\`\`\`不要）:
           html += `<div class="mb-3 last:mb-0">
             <div class="flex items-center justify-between mb-0.5">
               <span class="text-[11px] font-semibold text-gray-800">${sp.name}</span>
-              <span class="text-[9px] text-amber-500 bg-amber-100 rounded-full px-2 py-0.5">${sp.rarity}</span>
+              <span class="text-[10px] text-amber-500 bg-amber-100 rounded-full px-2 py-0.5">${sp.rarity}</span>
             </div>
             <p class="text-xs text-gray-500 leading-relaxed">${sp.reading}</p>
           </div>`;
@@ -4369,19 +4721,29 @@ ${numContext}
     // r からスコアマップを生成
     // 戻り値: { 1: { scoreSum, items:[{label,weight},...] }, ... }
     function buildOwnershipMap(r) {
+      // ウェイトモデル = 一本の木。
+      //   根 (roots / 負): 克服数=最も深い根(-4)、各期の挑戦数=根(-1)。
+      //     根をしっかり意識し整えるほど人生の基盤が安定する。
+      //   幹・枝葉 (branches / 正・5段階 = 5・4・3.5・3・1):
+      //     人格数・目標数・社会数・誕生数・成長数・運命数・成熟数。
+      //     整った根の上に広がっていく力。目標数は 5段階の最小ウェイト1。
+      //   ※並び順はスコア合算に影響しない（読みやすさのため根/枝葉でグループ化）。
       const sources = [
+        // ── 幹・枝葉 (branches) ──
         { label: '運命数',  key: 'lifePath', weight:  5   },
         { label: '成熟数',  key: 'maturity', weight:  5   },
         { label: '成長数',  key: 'spirit',   weight:  4   },
         { label: '誕生数',  key: 'destiny',  weight:  3.5 },
         { label: '社会数',  key: 'ground',   weight:  3   },
         { label: '人格数',  key: 'persona',  weight:  1   },
-        { label: '第2目標', key: 'target2',  weight:  1   },
-        { label: '第3目標', key: 'target3',  weight:  1   },
-        { label: '克服数',  key: 'ch1',      weight: -4   },
-        { label: '第2挑戦', key: 'ch2',      weight: -1   },
-        { label: '第3挑戦', key: 'ch3',      weight: -1   },
-        { label: '第4挑戦', key: 'ch4',      weight: -1   },
+        { label: '第1目標', key: 'spirit',   weight:  1   },  // 成長数=第1目標兼任, spirit累計=4+1=5
+        { label: '第2目標', key: 'target2',  weight:  1   },  // 目標数 = 5段階の1
+        { label: '第3目標', key: 'target3',  weight:  1   },  // 目標数 = 5段階の1
+        // ── 根 (roots) ──
+        { label: '克服数',  key: 'ch1',      weight: -4   },  // 最も深い根
+        { label: '第2挑戦', key: 'ch2',      weight: -1   },  // 挑戦数 = -1
+        { label: '第3挑戦', key: 'ch3',      weight: -1   },  // 挑戦数 = -1
+        { label: '第4挑戦', key: 'ch4',      weight: -1   },  // 挑戦数 = -1
       ];
       const map = {};
       for (let i = 1; i <= 9; i++) map[i] = { scoreSum: 0, items: [] };
@@ -4511,7 +4873,7 @@ ${numContext}
             const bsum = cellBonusSum[n] ?? 0;
             const hasSpecial = myLines.some(l => l.isSpecial);
             const lineDesc = myLines.map(l => `${l.name}+${l.bonusValue}`).join('・');
-            bonusNote = `<span style="color:${hasSpecial ? '#92400e' : '#b45309'};font-weight:600;"> ＋揃いボーナス +${bsum}（${lineDesc}）${hasSpecial ? ' ✨特別' : ''}</span>`;
+            bonusNote = `<span style="color:${hasSpecial ? '#92400e' : '#b45309'};font-weight:600;"> ＋揃いボーナス +${bsum}（${lineDesc}）${hasSpecial ? ' ◇特別' : ''}</span>`;
           }
           innerHtml = `<p style="font-size:11px;color:#6b7280;margin-top:6px;">影響度 ${esc(starsHtml)}（base${cellData.scoreSum >= 0 ? '+' : ''}${cellData.scoreSum}${bonusNote}、final${fs >= 0 ? '+' : ''}${fs}）</p><p style="font-size:11px;color:#6b7280;margin-top:2px;">内訳: ${lines}</p>`;
         } else {
@@ -4554,7 +4916,7 @@ ${numContext}
         if (isLit) {
           const detail = items.map(it => `${it.label}${it.weight >= 0 ? '+' : ''}${it.weight}`).join('、');
           const bonusPart = bc > 0
-            ? `、揃いボーナス+${bsum}（${myLines.map(l => `${l.name}+${l.bonusValue}`).join('/')}）${isSpecialCell ? '✨特別' : ''}`
+            ? `、揃いボーナス+${bsum}（${myLines.map(l => `${l.name}+${l.bonusValue}`).join('/')}）${isSpecialCell ? '◇特別' : ''}`
             : '';
           ariaLabel = `${num} ${MANDALA_CHARS[num]}、影響度★${rating}（${detail}${bonusPart}）`;
         } else if (items.length > 0) {
@@ -4621,7 +4983,7 @@ ${numContext}
           const badge = document.createElement('span');
           badge.className = 'mc-bonus-badge';
           badge.setAttribute('aria-hidden', 'true');
-          badge.textContent = isSpecialCell ? `✨+${bsum}` : `⚡+${bsum}`;
+          badge.textContent = isSpecialCell ? `◇+${bsum}` : `+${bsum}`;
           cell.appendChild(badge);
         }
 
@@ -4646,7 +5008,7 @@ ${numContext}
         const rh = document.createElement('div');
         rh.className = `mandala-row-header ${rowDef.cls}` + (hideOnMobile ? ' mandala-hide-mobile' : '');
         const [eng, jpn] = rowDef.rowLabel.split('\n');
-        rh.innerHTML = `<span class="mrh-tri">▲</span><span class="mrh-label" style="font-weight:700">${esc(eng)}</span><span class="mrh-label" style="font-size:9px">${esc(jpn)}</span><span class="mrh-nums">${rowNums.join('·')}</span><span class="mrh-mean" style="font-size:9px;opacity:0.75;display:block;margin-top:1px;">${esc(rowDef.mean)}</span>`;
+        rh.innerHTML = `<span class="mrh-tri">▲</span><span class="mrh-label" style="font-weight:700">${esc(eng)}</span><span class="mrh-label" style="font-size:10px">${esc(jpn)}</span><span class="mrh-nums">${rowNums.join('·')}</span><span class="mrh-mean" style="font-size:10px;opacity:0.75;display:block;margin-top:1px;">${esc(rowDef.mean)}</span>`;
         return rh;
       }
 
@@ -4699,7 +5061,7 @@ ${numContext}
           const spItem = document.createElement('div');
           spItem.className = 'rounded-lg px-3 py-2 border';
           spItem.style.cssText = 'background:rgba(245,158,11,0.15);border-color:#f59e0b;margin-bottom:4px;';
-          spItem.innerHTML = `<p style="font-size:11px;color:#78350f;line-height:1.55;font-weight:700;">✨ 特別ボーナス: ${specialLines.map(l => `${esc(l.name)}（コア${l.coreCount}種・+15）`).join('・')}</p><p style="font-size:10px;color:#92400e;margin-top:2px;">${specialLines.map(l => `${esc(l.name)} +15/マス`).join(' / ')}</p>`;
+          spItem.innerHTML = `<p style="font-size:11px;color:#78350f;line-height:1.55;font-weight:700;">◇ 特別ボーナス: ${specialLines.map(l => `${esc(l.name)}（コア${l.coreCount}種・+15）`).join('・')}</p><p style="font-size:10px;color:#92400e;margin-top:2px;">${specialLines.map(l => `${esc(l.name)} +15/マス`).join(' / ')}</p>`;
           linesListEl.appendChild(spItem);
         }
 
@@ -4708,7 +5070,7 @@ ${numContext}
           const norItem = document.createElement('div');
           norItem.className = 'rounded-lg px-3 py-2 border';
           norItem.style.cssText = 'background:rgba(250,204,21,0.12);border-color:#fde68a;margin-bottom:4px;';
-          norItem.innerHTML = `<p style="font-size:11px;color:#92400e;line-height:1.55;font-weight:600;">🎉 揃いボーナス: ${normalLines.map(l => esc(l.name)).join('・')}（+10/マス）</p><p style="font-size:10px;color:#b45309;margin-top:2px;">${normalLines.map(l => `${esc(l.name)} +10`).join(' / ')}</p>`;
+          norItem.innerHTML = `<p style="font-size:11px;color:#92400e;line-height:1.55;font-weight:600;">★ 揃いボーナス: ${normalLines.map(l => esc(l.name)).join('・')}（+10/マス）</p><p style="font-size:10px;color:#b45309;margin-top:2px;">${normalLines.map(l => `${esc(l.name)} +10`).join(' / ')}</p>`;
           linesListEl.appendChild(norItem);
         }
 
@@ -4726,7 +5088,7 @@ ${numContext}
           item.className = 'bg-purple-50 rounded-lg px-3 py-2 border border-purple-100';
           const matchedLine = completedLines.find(cl => cl.key === ld.key);
           const bonusTag = matchedLine
-            ? ` <span style="color:${matchedLine.isSpecial ? '#78350f' : '#b45309'};font-weight:700;font-size:10px;">${matchedLine.isSpecial ? '✨特別+15' : '⚡揃い+10'}</span>`
+            ? ` <span style="color:${matchedLine.isSpecial ? '#78350f' : '#b45309'};font-weight:700;font-size:10px;">${matchedLine.isSpecial ? '◇特別+15' : '★揃い+10'}</span>`
             : '';
           item.innerHTML = `<p style="font-size:11px;color:#4b5563;line-height:1.55;">${esc(meaning)}${bonusTag}</p>`;
           linesListEl.appendChild(item);
@@ -4922,7 +5284,7 @@ ${numContext}
             <p style="font-size:12px" class="text-gray-600 leading-relaxed">${esc(desc)}</p>
           </div>` : ''}
           <div class="bg-white/70 rounded-lg px-3 py-2 border border-gray-100">
-            <p style="font-size:11px" class="font-semibold text-purple-600 mb-0.5">💡 一言アドバイス</p>
+            <p style="font-size:11px" class="font-semibold text-purple-600 mb-0.5">◆ 一言アドバイス</p>
             <p style="font-size:11px" class="text-gray-700 leading-snug">${esc(advice)}</p>
           </div>
         </div>`;
@@ -5910,14 +6272,19 @@ ${numContext}
     };
 
     // Build sorted positive positions by influence weight
+    // 幹・枝葉(branches): 整った根の上に広がる正のポジション。5段階ウェイト 5・4・3.5・3・1。
+    // 目標数(target2/target3)も 5段階の最小ウェイト1の枝葉として読みに含める。
+    // 降順なので top2 (= prBuildRelationshipSection の最強二数) は運命数/成熟数のまま不変。
     function prGetSortedPositions(r) {
       const positions = [
-        { key: 'lifePath',  label: '運命数',  weight: 5 },
-        { key: 'maturity',  label: '成熟数',  weight: 5 },
-        { key: 'spirit',    label: '成長数',  weight: 4 },
-        { key: 'destiny',   label: '誕生数',  weight: 3.5 },
-        { key: 'ground',    label: '社会数',  weight: 3 },
-        { key: 'persona',   label: '人格数',  weight: 1 },
+        { key: 'lifePath',  label: '運命数',   weight: 5 },
+        { key: 'maturity',  label: '成熟数',   weight: 5 },
+        { key: 'spirit',    label: '成長数',   weight: 4 },
+        { key: 'destiny',   label: '誕生数',   weight: 3.5 },
+        { key: 'ground',    label: '社会数',   weight: 3 },
+        { key: 'persona',   label: '人格数',   weight: 1 },
+        { key: 'target2',   label: '第2目標数', weight: 1 },
+        { key: 'target3',   label: '第3目標数', weight: 1 },
       ];
       return positions;
     }
@@ -6022,6 +6389,35 @@ ${numContext}
         </div>
       </div>`;
 
+      // ── 核心3行サマリー（結論を先に / P1: RIOルーブリック）
+      const _coreTpl = prGetTemplate(r.lifePath);
+      const _coreKeyword = (_coreTpl.core || '').split('。')[0] || '';
+      const _vocationCore = _coreTpl.vocation ? (_coreTpl.vocation[0] || '') : '';
+      html += `<div class="pr-core-summary">
+        <div class="pr-core-summary__label">核心サマリー — ${prEsc(name)}さんの3行プロファイル</div>
+        <div class="pr-core-summary__line"><strong>運命数 ${prEsc(String(r.lifePath))}</strong> が主役：${prEsc(_coreKeyword)}</div>
+        <div class="pr-core-summary__line"><strong>最強の軸</strong>：運命数${prEsc(String(r.lifePath))} ＋ 成熟数${prEsc(String(r.maturity))} — 人生の目的と後半の統合が共鳴</div>
+        <div class="pr-core-summary__line"><strong>天職コア</strong>：${prEsc(_vocationCore || '固有の才能が社会と交差する場所を歩む')}</div>
+      </div>`;
+
+      // ── 章目次（全体像と現在地 / P1: RIOルーブリック / D4: アンカーリンク化）
+      html += `<div class="pr-toc">
+        <div class="pr-toc__label">目次 — 全 11 章 ＋ 図</div>
+        <ul class="pr-toc__list">
+          <li class="pr-toc__item"><a href="#pr-ch-intro" class="pr-toc__link"><span class="pr-toc__num">01</span>序章 — ${prEsc(name)}さんという存在</a></li>
+          <li class="pr-toc__item"><a href="#pr-ch-numbers" class="pr-toc__link"><span class="pr-toc__num">02</span>各数が語るあなたの姿（6ポジション）</a></li>
+          <li class="pr-toc__item"><a href="#pr-ch-dynamics" class="pr-toc__link"><span class="pr-toc__num">03</span>内なる力学 — 数同士の関係と葛藤</a></li>
+          <li class="pr-toc__item"><a href="#pr-ch-mandala" class="pr-toc__link"><span class="pr-toc__num">04</span>数秘マンダラ — 9マスの羅針盤</a></li>
+          <li class="pr-toc__item"><a href="#pr-ch-axes" class="pr-toc__link"><span class="pr-toc__num">05</span>3つの軸 — エネルギーの向き方（図付き）</a></li>
+          <li class="pr-toc__item"><a href="#pr-ch-career" class="pr-toc__link"><span class="pr-toc__num">06</span>天職 — あなたが輝く場所</a></li>
+          <li class="pr-toc__item"><a href="#pr-ch-compat" class="pr-toc__link"><span class="pr-toc__num">07</span>相性 — 関係性の読み方（図付き）</a></li>
+          <li class="pr-toc__item"><a href="#pr-ch-pyear" class="pr-toc__link"><span class="pr-toc__num">08</span>今の流れ — 個人年のテーマ（図付き）</a></li>
+          <li class="pr-toc__item"><a href="#pr-ch-integration" class="pr-toc__link"><span class="pr-toc__num">09</span>統合章 — ${prEsc(name)}さんという物語</a></li>
+          <li class="pr-toc__item"><a href="#pr-ch-direction" class="pr-toc__link"><span class="pr-toc__num">10</span>方向性 — これから歩む道</a></li>
+          <li class="pr-toc__item"><a href="#pr-ch-closing" class="pr-toc__link"><span class="pr-toc__num">11</span>結び</a></li>
+        </ul>
+      </div>`;
+
       // Helper: 章番号カウンター
       let chapterNum = 0;
       function nextChNum() { chapterNum++; return String(chapterNum).padStart(2,'0'); }
@@ -6042,7 +6438,7 @@ ${numContext}
       html += `<div class="pr-chapter" id="pr-ch-numbers">
         <span class="pr-chapter-num">${nextChNum()}</span>
         <h2>各数が語るあなたの姿</h2>
-        <p>あなたのチャートを構成する6つのポジションを、影響力の強い順に読んでいきます。それぞれの数は独立したキャラクターであり、あなたという物語の中でそれぞれの役割を担っています。</p>`;
+        <p>あなたのチャートを構成する${positions.length}つのポジションを、影響力の強い順に読んでいきます。それぞれの数は独立したキャラクターであり、あなたという物語の中でそれぞれの役割を担っています。</p>`;
 
       for (const pos of positions) {
         const val = r[pos.key];
@@ -6085,12 +6481,16 @@ ${numContext}
         <span class="pr-chapter-num">${nextChNum()}</span>
         <h2>内なる力学 — 数同士の関係と葛藤を読む</h2>
         <p>${prEsc(name)}さんのチャートを構成する数は、それぞれ独立して存在するのではなく、互いに影響し合い、複雑な内なるドラマを生み出しています。ここでは、特に重要な数の組み合わせが生む「共鳴と葛藤」を読んでいきます。この立体的な読みこそが、あなたの行動パターンや繰り返しの葛藤の根本を理解する鍵です。</p>
+        <div class="pr-action-block" style="background:linear-gradient(135deg,#fdf6ee,#fff8f1);border-left-color:#b87333;margin-bottom:14px;">
+          <div class="pr-action-block-label" style="color:#92580a;">根 → 幹・枝葉の思想</div>
+          <p>数秘チャートを一本の木として見てみましょう。<strong>克服数・挑戦数は「根」</strong>——地中に張り巡らされ、目には見えにくいけれど、木の生命力を支える基盤です。根をしっかり意識し整えることで人生の土台が安定し、その上に広がる<strong>「幹・枝葉」</strong>——人格数・目標数・社会数・誕生数・成長数・運命数・成熟数——が豊かに広がっていきます。克服数や挑戦数は「弱点」ではなく、あなたの木をより高く、より広く育てるための根。この視点で向き合うとき、葛藤は成長の力に変わります。</p>
+        </div>
         ${relSection}
         <p style="margin-top:12px;">これらの葛藤は「どちらが正しいか」という問題ではありません。どちらのエネルギーもあなたの一部であり、どちらかを否定することで問題は解決しません。それぞれの数のエネルギーに、適切な表現の場を与えることが、内なる平和への道です。</p>
         <div class="pr-action-block" style="margin-top:12px;">
           <div class="pr-action-block-label">行動提言</div>
           <p><strong>今週試してほしいこと：</strong>最も大きな葛藤だと感じる数の組み合わせを一つ選び、その葛藤が最近いつ、どんな場面で現れたかを書き出してみましょう。パターンが見えてきます。</p>
-          <p><strong>自分への問い：</strong>「この葛藤は私の弱さではなく、成長のための対話なのかもしれない。それぞれのエネルギーが求めているものは何か？」</p>
+          <p><strong>自分への問い：</strong>「克服数・挑戦数という根がしっかりすることで、私の幹・枝葉はどう広がるだろうか？」</p>
         </div>
       </div>`;
 
@@ -6107,7 +6507,7 @@ ${numContext}
       } else {
         html += `<p>現在のチャートでは、特定のラインが強く揃うというよりも、様々な方向に力が分散しています。これは多様性と柔軟性の象徴でもあり、特定の型にはまらないあなたの個性を表しています。単一の才能に特化するよりも、複数の視点や分野を横断することで真価を発揮するタイプです。</p>`;
       }
-      html += `<p style="margin-top:10px;">最も影響力の強い数は<strong>${prEsc(String(r.lifePath))}（運命数）</strong>と<strong>${prEsc(String(r.maturity))}（成熟数）</strong>。この二つの数があなたの人生の基調音として響き続けます。</p>
+      html += `<p style="margin-top:10px;">最も影響力の強い数は<strong>${prEsc(String(r.lifePath))}（運命数）</strong>と<strong>${prEsc(String(r.maturity))}（成熟数）</strong>。この二つの数があなたの人生の基調音として響き続けます。マンダラの「根（克服数 ${prEsc(String(r.ch1))} / 挑戦数）」が整うほど、これらの枝葉のエネルギーはより豊かに花開いていきます。</p>
         <div class="pr-action-block" style="margin-top:12px;">
           <div class="pr-action-block-label">行動提言</div>
           <p><strong>今週試してほしいこと：</strong>あなたのマンダラのラインを一つ意識して、そのエネルギーを意図的に使う機会を一つ作ってみましょう。自然に動けると感じた瞬間を記録してみてください。</p>
@@ -6154,7 +6554,7 @@ ${numContext}
             const gPts = axisPts.map(function(p) { return ptAt(p.angle, gr); });
             gridSvg += '<polygon points="' + gPts.map(function(p) { return p.x.toFixed(1)+','+p.y.toFixed(1); }).join(' ') + '" fill="none" stroke="#e9d5ff" stroke-width="'+(step===3?1:0.7)+'"/>';
             const glp = ptAt(axisPts[0].angle, gr);
-            gridSvg += '<text x="'+(glp.x+4).toFixed(1)+'" y="'+glp.y.toFixed(1)+'" font-size="7" fill="#c4b5fd" text-anchor="start" dominant-baseline="middle">'+gv+'</text>';
+            gridSvg += '<text x="'+(glp.x+4).toFixed(1)+'" y="'+glp.y.toFixed(1)+'" font-size="10" fill="#c4b5fd" text-anchor="start" dominant-baseline="middle">'+gv+'</text>';
           });
           // 軸線
           let axisLines = '';
@@ -6175,8 +6575,8 @@ ${numContext}
             const vp = ptAt(p.angle, valR);
             const ly = i === 0 ? lp.y - 10 : lp.y + 12;
             const vy = i === 0 ? vp.y + 0  : vp.y + 12;
-            labelsStr += '<text x="'+lp.x.toFixed(1)+'" y="'+ly.toFixed(1)+'" text-anchor="'+anchors[i]+'" font-family="sans-serif" font-size="9" fill="#7e22ce" font-weight="700">'+p.label+'</text>';
-            labelsStr += '<text x="'+vp.x.toFixed(1)+'" y="'+vy.toFixed(1)+'" text-anchor="'+anchors[i]+'" font-family="Lora,serif" font-size="11" fill="#6b21a8" font-weight="700">'+p.disp+'</text>';
+            labelsStr += '<text x="'+lp.x.toFixed(1)+'" y="'+ly.toFixed(1)+'" text-anchor="'+anchors[i]+'" font-family="sans-serif" font-size="12" fill="#7e22ce" font-weight="700">'+p.label+'</text>';
+            labelsStr += '<text x="'+vp.x.toFixed(1)+'" y="'+vy.toFixed(1)+'" text-anchor="'+anchors[i]+'" font-family="Lora,serif" font-size="13" fill="#6b21a8" font-weight="700">'+p.disp+'</text>';
           });
           // データ点
           let dotStr = '';
@@ -6184,9 +6584,9 @@ ${numContext}
             dotStr += '<circle cx="'+p.x.toFixed(1)+'" cy="'+p.y.toFixed(1)+'" r="4" fill="#7e22ce" opacity="0.9"/>';
           });
           return '<figure class="pr-compat-figure" style="margin:14px 0 10px;">'
-            + '<svg viewBox="0 0 240 220" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="3軸レーダーチャート" style="width:min(300px,100%);height:auto;overflow:visible;display:block;margin:0 auto;">'
-            + '<rect width="240" height="220" fill="#faf5ff" rx="12"/>'
-            + '<text x="120" y="15" text-anchor="middle" font-family="serif" font-size="10" fill="#9333ea" font-weight="700">3軸エネルギーバランス（個数）</text>'
+            + '<svg viewBox="0 0 260 240" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="3軸レーダーチャート" style="width:min(300px,100%);height:auto;overflow:visible;display:block;margin:0 auto;">'
+            + '<rect width="260" height="240" fill="#faf5ff" rx="12"/>'
+            + '<text x="130" y="15" text-anchor="middle" font-family="serif" font-size="12" fill="#9333ea" font-weight="700">3軸エネルギーバランス（個数）</text>'
             + gridSvg + axisLines
             + '<polygon points="'+polyStr+'" fill="rgba(126,34,206,0.18)" stroke="#7e22ce" stroke-width="1.8" stroke-linejoin="round"/>'
             + dotStr + labelsStr
@@ -6302,40 +6702,40 @@ ${numContext}
         <p>${prEsc(partnerT.core.substring(0, 120))}——そのような本質を持つ相手と、あなたの${prEsc(String(r.lifePath))}のエネルギーが出会うとき、固有の化学反応が生まれます。</p>
         ${compatRel ? `<p><strong>二人の共鳴：</strong>${prEsc(compatRel.harmony)}</p><p><strong>二人の葛藤：</strong>${prEsc(compatRel.tension)}</p>` : ''}
         <div class="pr-compat-figure">
-          <svg id="${compatSvgId}" viewBox="0 0 320 240" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="相性対比図">
+          <svg id="${compatSvgId}" viewBox="0 0 320 250" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="相性対比図">
             <!-- 背景 -->
-            <rect width="320" height="240" fill="#faf5ff" rx="12"/>
+            <rect width="320" height="250" fill="#faf5ff" rx="12"/>
             <!-- タイトル -->
-            <text x="160" y="22" text-anchor="middle" font-family="serif" font-size="11" fill="#9333ea" font-weight="700">数秘相性対比チャート</text>
+            <text x="160" y="22" text-anchor="middle" font-family="serif" font-size="12" fill="#9333ea" font-weight="700">数秘相性対比チャート</text>
             <!-- 中央ライン -->
-            <line x1="160" y1="32" x2="160" y2="185" stroke="#d8b4fe" stroke-width="1.5" stroke-dasharray="4,3"/>
+            <line x1="160" y1="32" x2="160" y2="190" stroke="#d8b4fe" stroke-width="1.5" stroke-dasharray="4,3"/>
             <!-- ラベル: 自分 / 相手 -->
-            <text x="80" y="42" text-anchor="middle" font-family="sans-serif" font-size="10" fill="#7e22ce" font-weight="700">あなた</text>
-            <text x="240" y="42" text-anchor="middle" font-family="sans-serif" font-size="10" fill="#be185d" font-weight="700">相手</text>
+            <text x="80" y="44" text-anchor="middle" font-family="sans-serif" font-size="12" fill="#7e22ce" font-weight="700">あなた</text>
+            <text x="240" y="44" text-anchor="middle" font-family="sans-serif" font-size="12" fill="#be185d" font-weight="700">相手</text>
             <!-- 運命数バー -->
-            <text x="155" y="65" text-anchor="end" font-family="sans-serif" font-size="9" fill="#6b7280">運命数</text>
-            <rect x="${160 - bw(myLP)}" y="70" width="${bw(myLP)}" height="14" rx="4" fill="#7e22ce" opacity="0.8"/>
-            <text x="${160 - bw(myLP) - 4}" y="81" text-anchor="end" font-family="serif" font-size="10" fill="#7e22ce" font-weight="700">${myLP}</text>
-            <rect x="160" y="70" width="${bw(thLP)}" height="14" rx="4" fill="#be185d" opacity="0.8"/>
-            <text x="${160 + bw(thLP) + 4}" y="81" text-anchor="start" font-family="serif" font-size="10" fill="#be185d" font-weight="700">${thLP}</text>
+            <text x="155" y="68" text-anchor="end" font-family="sans-serif" font-size="11" fill="#6b7280">運命数</text>
+            <rect x="${160 - bw(myLP)}" y="73" width="${bw(myLP)}" height="14" rx="4" fill="#7e22ce" opacity="0.8"/>
+            <text x="${160 - bw(myLP) - 4}" y="84" text-anchor="end" font-family="serif" font-size="12" fill="#7e22ce" font-weight="700">${myLP}</text>
+            <rect x="160" y="73" width="${bw(thLP)}" height="14" rx="4" fill="#be185d" opacity="0.8"/>
+            <text x="${160 + bw(thLP) + 4}" y="84" text-anchor="start" font-family="serif" font-size="12" fill="#be185d" font-weight="700">${thLP}</text>
             <!-- 成熟数バー -->
-            <text x="155" y="103" text-anchor="end" font-family="sans-serif" font-size="9" fill="#6b7280">成熟数</text>
-            <rect x="${160 - bw(myMat)}" y="108" width="${bw(myMat)}" height="14" rx="4" fill="#7e22ce" opacity="0.65"/>
-            <text x="${160 - bw(myMat) - 4}" y="119" text-anchor="end" font-family="serif" font-size="10" fill="#7e22ce" font-weight="700">${myMat}</text>
-            <rect x="160" y="108" width="${bw(thMat)}" height="14" rx="4" fill="#be185d" opacity="0.65"/>
-            <text x="${160 + bw(thMat) + 4}" y="119" text-anchor="start" font-family="serif" font-size="10" fill="#be185d" font-weight="700">${thMat}</text>
+            <text x="155" y="108" text-anchor="end" font-family="sans-serif" font-size="11" fill="#6b7280">成熟数</text>
+            <rect x="${160 - bw(myMat)}" y="113" width="${bw(myMat)}" height="14" rx="4" fill="#7e22ce" opacity="0.65"/>
+            <text x="${160 - bw(myMat) - 4}" y="124" text-anchor="end" font-family="serif" font-size="12" fill="#7e22ce" font-weight="700">${myMat}</text>
+            <rect x="160" y="113" width="${bw(thMat)}" height="14" rx="4" fill="#be185d" opacity="0.65"/>
+            <text x="${160 + bw(thMat) + 4}" y="124" text-anchor="start" font-family="serif" font-size="12" fill="#be185d" font-weight="700">${thMat}</text>
             <!-- 成長数バー -->
-            <text x="155" y="141" text-anchor="end" font-family="sans-serif" font-size="9" fill="#6b7280">成長数</text>
-            <rect x="${160 - bw(mySp)}" y="146" width="${bw(mySp)}" height="14" rx="4" fill="#7e22ce" opacity="0.5"/>
-            <text x="${160 - bw(mySp) - 4}" y="157" text-anchor="end" font-family="serif" font-size="10" fill="#7e22ce" font-weight="700">${mySp}</text>
-            <rect x="160" y="146" width="${bw(thSp)}" height="14" rx="4" fill="#be185d" opacity="0.5"/>
-            <text x="${160 + bw(thSp) + 4}" y="157" text-anchor="start" font-family="serif" font-size="10" fill="#be185d" font-weight="700">${thSp}</text>
+            <text x="155" y="148" text-anchor="end" font-family="sans-serif" font-size="11" fill="#6b7280">成長数</text>
+            <rect x="${160 - bw(mySp)}" y="153" width="${bw(mySp)}" height="14" rx="4" fill="#7e22ce" opacity="0.5"/>
+            <text x="${160 - bw(mySp) - 4}" y="164" text-anchor="end" font-family="serif" font-size="12" fill="#7e22ce" font-weight="700">${mySp}</text>
+            <rect x="160" y="153" width="${bw(thSp)}" height="14" rx="4" fill="#be185d" opacity="0.5"/>
+            <text x="${160 + bw(thSp) + 4}" y="164" text-anchor="start" font-family="serif" font-size="12" fill="#be185d" font-weight="700">${thSp}</text>
             <!-- 共鳴スコアゲージ -->
-            <text x="160" y="180" text-anchor="middle" font-family="sans-serif" font-size="9" fill="#6b7280">共鳴スコア</text>
-            <rect x="55" y="186" width="210" height="12" rx="6" fill="#e9d5ff"/>
-            <rect x="55" y="186" width="${Math.round(210 * resonanceScore / 100)}" height="12" rx="6" fill="url(#compatGrad${compatSvgId})"/>
-            <text x="160" y="197" text-anchor="middle" font-family="serif" font-size="11" fill="#6b21a8" font-weight="700">${resonanceScore}点/100</text>
-            <text x="160" y="212" text-anchor="middle" font-family="sans-serif" font-size="10" fill="#7e22ce" font-weight="700">${prEsc(resonanceType)}</text>
+            <text x="160" y="186" text-anchor="middle" font-family="sans-serif" font-size="11" fill="#6b7280">共鳴スコア</text>
+            <rect x="55" y="192" width="210" height="12" rx="6" fill="#e9d5ff"/>
+            <rect x="55" y="192" width="${Math.round(210 * resonanceScore / 100)}" height="12" rx="6" fill="url(#compatGrad${compatSvgId})"/>
+            <text x="160" y="203" text-anchor="middle" font-family="serif" font-size="12" fill="#6b21a8" font-weight="700">${resonanceScore}点/100</text>
+            <text x="160" y="220" text-anchor="middle" font-family="sans-serif" font-size="12" fill="#7e22ce" font-weight="700">${prEsc(resonanceType)}</text>
             <defs>
               <linearGradient id="compatGrad${compatSvgId}" x1="0" y1="0" x2="1" y2="0">
                 <stop offset="0%" stop-color="#7e22ce"/>
@@ -6398,17 +6798,17 @@ ${numContext}
             const textCol = isCur ? '#fff' : '#7c3aed';
             const fw = isCur ? '700' : '500';
             dots += '<circle cx="'+dx.toFixed(1)+'" cy="'+dy.toFixed(1)+'" r="'+cr+'" fill="'+fill+'" stroke="'+stroke+'" stroke-width="'+sw+'"/>';
-            dots += '<text x="'+dx.toFixed(1)+'" y="'+dy.toFixed(1)+'" text-anchor="middle" dominant-baseline="central" font-family="Lora,serif" font-size="'+(isCur?13:11)+'" fill="'+textCol+'" font-weight="'+fw+'">'+i+'</text>';
+            dots += '<text x="'+dx.toFixed(1)+'" y="'+dy.toFixed(1)+'" text-anchor="middle" dominant-baseline="central" font-family="Lora,serif" font-size="'+(isCur?14:12)+'" fill="'+textCol+'" font-weight="'+fw+'">'+i+'</text>';
           }
           // 循環矢印: 点線の外円
           const arcR = svgR + dotR + 5;
-          const centerLabel = '<text x="'+svgCx+'" y="'+(svgCy-10)+'" text-anchor="middle" font-family="Lora,serif" font-size="20" fill="#d97706" font-weight="700">'+curPy+'</text>'
-            + '<text x="'+svgCx+'" y="'+(svgCy+8)+'" text-anchor="middle" font-family="sans-serif" font-size="8" fill="#9333ea" font-weight="700">個人年</text>'
-            + (pyTheme ? '<text x="'+svgCx+'" y="'+(svgCy+22)+'" text-anchor="middle" font-family="sans-serif" font-size="7.5" fill="#6b21a8">'+pyTheme.substring(0,6)+'</text>' : '');
+          const centerLabel = '<text x="'+svgCx+'" y="'+(svgCy-10)+'" text-anchor="middle" font-family="Lora,serif" font-size="22" fill="#d97706" font-weight="700">'+curPy+'</text>'
+            + '<text x="'+svgCx+'" y="'+(svgCy+10)+'" text-anchor="middle" font-family="sans-serif" font-size="12" fill="#9333ea" font-weight="700">個人年</text>'
+            + (pyTheme ? '<text x="'+svgCx+'" y="'+(svgCy+26)+'" text-anchor="middle" font-family="sans-serif" font-size="11" fill="#6b21a8">'+pyTheme.substring(0,6)+'</text>' : '');
           return '<figure class="pr-compat-figure" style="margin:14px 0 10px;">'
-            + '<svg viewBox="0 0 240 230" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="個人年サイクル円図" style="width:min(280px,100%);height:auto;overflow:visible;display:block;margin:0 auto;">'
-            + '<rect width="240" height="230" fill="#faf5ff" rx="12"/>'
-            + '<text x="120" y="15" text-anchor="middle" font-family="serif" font-size="10" fill="#9333ea" font-weight="700">個人年サイクル（9年の巡り）</text>'
+            + '<svg viewBox="0 0 240 240" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="個人年サイクル円図" style="width:min(280px,100%);height:auto;overflow:visible;display:block;margin:0 auto;">'
+            + '<rect width="240" height="240" fill="#faf5ff" rx="12"/>'
+            + '<text x="120" y="15" text-anchor="middle" font-family="serif" font-size="12" fill="#9333ea" font-weight="700">個人年サイクル（9年の巡り）</text>'
             + '<circle cx="'+svgCx+'" cy="'+svgCy+'" r="'+arcR+'" fill="none" stroke="#e9d5ff" stroke-width="1" stroke-dasharray="4,4"/>'
             + '<circle cx="'+svgCx+'" cy="'+svgCy+'" r="42" fill="#f5f3ff" stroke="#ddd6fe" stroke-width="0.8"/>'
             + centerLabel
@@ -6614,7 +7014,19 @@ ${completedLines.length > 0 ? `- 揃いライン: ${completedLines.map(l => l.na
 
     // ------- MAIN REPORT ORCHESTRATOR -------
     async function generatePrecisionReport() {
-      if (!lastResults) return;
+      if (!lastResults) {
+        // D7: no-results fallback — show a user-friendly message
+        const section = document.getElementById('section-precision-report');
+        const content = document.getElementById('precision-report-content');
+        const loading = document.getElementById('precision-report-loading');
+        if (section) section.classList.remove('hidden');
+        if (loading) loading.classList.add('hidden');
+        if (content) {
+          content.innerHTML = `<div class="pr-chapter"><p style="color:#6b21a8;">まず上のフォームから生年月日を入力して「鑑定を開始する」を押してください。</p></div>`;
+          content.classList.remove('hidden');
+        }
+        return;
+      }
       const r = lastResults;
       const name = document.getElementById('result-name').textContent || 'あなた';
       const apiKey = ((document.getElementById('geminiApiKey') || {}).value || '').trim();
@@ -6633,20 +7045,34 @@ ${completedLines.length > 0 ? `- 揃いライン: ${completedLines.map(l => l.na
       // Scroll into view
       section.scrollIntoView({ behavior: 'smooth', block: 'start' });
 
+      // C: Step visualization helper
+      function setStep(msg) {
+        if (loadingMsg) loadingMsg.textContent = msg;
+      }
+
       let reportHtml = '';
       let isAI = false;
 
       if (apiKey) {
         try {
-          loadingMsg.textContent = 'Gemini AIがあなたの物語を紡いでいます...';
+          setStep('① 数を読み解いています...');
+          await new Promise(res => setTimeout(res, 200));
+          setStep('② Gemini AI が内なる力学を分析中...');
           reportHtml = await buildAIReport(r, name, apiKey);
           isAI = true;
+          setStep('③ チャート図を描いています...');
         } catch(e) {
           console.warn('AI report generation failed, falling back to template:', e.message);
-          loadingMsg.textContent = 'テンプレートで生成中...';
+          setStep('テンプレート版で生成中...');
           reportHtml = buildTemplateReport(r, name);
+          setStep('③ チャート図を描いています...');
         }
       } else {
+        setStep('① 数を読み解いています...');
+        await new Promise(res => setTimeout(res, 150));
+        setStep('② 内なる力学を分析中...');
+        await new Promise(res => setTimeout(res, 150));
+        setStep('③ チャート図を描いています...');
         reportHtml = buildTemplateReport(r, name);
       }
 
@@ -6659,7 +7085,10 @@ ${completedLines.length > 0 ? `- 揃いライン: ${completedLines.map(l => l.na
       content.innerHTML = reportHtml;
 
       // ── 図の埋め込み（非同期・失敗してもテキストレポートは維持）
+      setStep('④ マンダラ図・相性図を描いています...');
       await injectChartAndMandalaImages(content);
+      setStep('⑤ 物語を仕上げています...');
+      await new Promise(res => setTimeout(res, 100));
 
       loading.classList.add('hidden');
       content.classList.remove('hidden');
@@ -7136,7 +7565,7 @@ ${completedLines.length > 0 ? `- 揃いライン: ${completedLines.map(l => l.na
               });
               if (pCount > 0) {
                 const pAvg = (pTotal / pCount).toFixed(1);
-                palmHtml += '<div style="background:linear-gradient(135deg,#7c3aed,#ec4899);border-radius:10px;padding:20px;text-align:center;color:#fff;margin-bottom:24px;">' +
+                palmHtml += '<div style="background:linear-gradient(135deg,#7c3aed,#6d28d9);border-radius:10px;padding:20px;text-align:center;color:#fff;margin-bottom:24px;">' +
                   '<div style="font-size:11px;opacity:0.85;margin-bottom:4px;">総合スコア</div>' +
                   '<div style="font-family:Lora,serif;font-size:36px;font-weight:700;line-height:1;">' + pAvg + ' / 5.0</div>' +
                   '<div style="font-size:10px;opacity:0.7;margin-top:4px;">基本6線の平均</div></div>';
@@ -7168,7 +7597,7 @@ ${completedLines.length > 0 ? `- 揃いライン: ${completedLines.map(l => l.na
                 palmHtml += '<div data-pdf-break-candidate style="background:#fffbeb;border:1px solid #fde68a;border-radius:8px;padding:12px 14px;margin-bottom:8px;">' +
                   '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;">' +
                   '<span style="font-size:13px;font-weight:700;color:#92400e;">' + sp.name + '</span>' +
-                  '<span style="font-size:9px;color:#d97706;background:#fef3c7;border-radius:10px;padding:2px 8px;">' + sp.rarity + '</span></div>' +
+                  '<span style="font-size:10px;color:#d97706;background:#fef3c7;border-radius:10px;padding:2px 8px;">' + sp.rarity + '</span></div>' +
                   '<div style="font-size:11px;color:#6b7280;line-height:1.7;">' + sp.reading + '</div></div>';
               });
             }
@@ -7802,7 +8231,7 @@ ${palmAnalysisResult?.findings ? '- AI画像分析所見: ' + palmAnalysisResult
           const lx = cx + (R + 16) * Math.cos(a);
           const ly = cy + (R + 16) * Math.sin(a);
           const dom = DOMAINS[domains[i]];
-          html += `<text x="${lx}" y="${ly}" text-anchor="middle" dominant-baseline="middle" font-size="8" fill="${dom.color}" font-weight="600">${esc(dom.label)}</text>`;
+          html += `<text x="${lx}" y="${ly}" text-anchor="middle" dominant-baseline="middle" font-size="10" fill="${dom.color}" font-weight="600">${esc(dom.label)}</text>`;
         });
         svg.innerHTML = html;
       }
