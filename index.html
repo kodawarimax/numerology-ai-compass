@@ -23,10 +23,14 @@
     .gradient-cta:hover { background: linear-gradient(to right, #db2777, #e11d48); }
 
     /* ===== Precision Report ===== */
-    .pr-chapter { background: #fff; border-radius: 16px; border: 1px solid #e9d5ff; padding: 20px 18px; margin-bottom: 12px; box-shadow: 0 1px 4px rgba(124,58,237,0.06); }
-    .pr-chapter h2 { font-family: 'Lora', serif; font-size: 1.05rem; font-weight: 700; color: #6b21a8; margin: 0 0 10px; border-left: 3px solid #a855f7; padding-left: 10px; line-height: 1.4; }
+    /* Phase 1: タイポグラフィ改善 */
+    .pr-chapter { background: #fff; border-radius: 16px; border: 1px solid #e9d5ff; padding: 20px 18px; margin-bottom: 24px; box-shadow: 0 1px 4px rgba(124,58,237,0.06); }
+    .pr-chapter h2 { font-family: 'Lora', serif; font-size: 17px; font-weight: 700; color: #6b21a8; margin: 0 0 10px; border-left: 3px solid #a855f7; padding-left: 10px; line-height: 1.4; }
+    @media (min-width: 640px) { .pr-chapter h2 { font-size: 19px; } }
+    @media (min-width: 768px) { .pr-chapter h2 { font-size: 20px; } }
     .pr-chapter h3 { font-family: 'Lora', serif; font-size: 0.92rem; font-weight: 600; color: #7c3aed; margin: 14px 0 6px; }
-    .pr-chapter p { font-size: 0.84rem; line-height: 1.9; color: #374151; margin-bottom: 8px; }
+    .pr-chapter p { font-size: 15px; line-height: 1.78; color: #374151; margin-bottom: 8px; }
+    @media (min-width: 640px) { .pr-chapter p { font-size: 16px; line-height: 1.8; } }
     .pr-chapter p:last-child { margin-bottom: 0; }
     .pr-num-badge { display: inline-flex; align-items: center; justify-content: center; font-family: 'Lora', serif; font-size: 1.3rem; font-weight: 700; color: #7c3aed; background: #f3e8ff; border-radius: 50%; width: 2.2rem; height: 2.2rem; flex-shrink: 0; }
     .pr-num-header { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
@@ -38,11 +42,52 @@
     .pr-tag-shadow { background: #fef2f2; color: #991b1b; }
     .pr-tag-action { background: #eff6ff; color: #1e40af; }
     .pr-divider { border: none; border-top: 1px solid #f3e8ff; margin: 14px 0; }
+    /* Phase 1: .pr-highlight を .pr-action-block にリネーム + スタイル改善（後方互換で両クラス維持） */
     .pr-highlight { background: linear-gradient(135deg, #fdf4ff, #fce7f3); border-radius: 12px; padding: 14px 16px; border: 1px solid #f0abfc; margin-top: 10px; }
     .pr-highlight p { color: #6b21a8; font-weight: 500; }
+    .pr-action-block { border-left: 3px solid #c084fc; border-radius: 0 12px 12px 0; padding: 14px 16px; background: linear-gradient(135deg, #fdf4ff, #fce7f3); margin-top: 10px; }
+    .pr-action-block p { color: #6b21a8; font-weight: 500; font-size: 15px; line-height: 1.78; }
+    @media (min-width: 640px) { .pr-action-block p { font-size: 16px; line-height: 1.8; } }
+    .pr-action-block-label { font-family: 'Lora', serif; font-size: 13px; letter-spacing: 0.08em; color: #7e22ce; font-weight: 700; margin-bottom: 6px; text-transform: uppercase; }
     .pr-mode-badge { display: inline-block; font-size: 0.65rem; font-weight: 600; border-radius: 99px; padding: 2px 8px; margin-left: 6px; vertical-align: middle; }
     .pr-mode-ai { background: #fef3c7; color: #92400e; }
     .pr-mode-template { background: #f0f9ff; color: #0369a1; }
+    /* Phase 2: 章番号装飾 */
+    .pr-chapter-num { display: block; font-size: 11px; font-weight: 700; color: #a8a29e; letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 4px; }
+    /* Phase 2: 重点章カード */
+    .pr-chapter--featured { background: linear-gradient(135deg, #faf5ff, #fdf4ff); border: 1.5px solid #d8b4fe; box-shadow: 0 4px 12px rgba(124,58,237,0.10); margin-bottom: 32px; }
+    /* Phase 2: 結びカード */
+    .pr-chapter--closing { background: linear-gradient(135deg, #6b21a8, #9333ea); border-color: #7c3aed; }
+    .pr-chapter--closing h2 { color: #fff; border-left-color: rgba(255,255,255,0.5); }
+    .pr-chapter--closing p { color: rgba(255,255,255,0.92); font-weight: 400; }
+    .pr-chapter--closing p strong { color: #fde68a; }
+    /* Phase 2: 引用ブロック */
+    .pr-quote { font-family: 'Lora', serif; font-style: italic; font-size: 17px; color: #6b21a8; text-align: center; border-top: 1.5px solid #d8b4fe; border-bottom: 1.5px solid #d8b4fe; padding: 14px 12px; margin: 16px 0; line-height: 1.7; }
+    /* Phase 1: figure ラップ */
+    .pr-figure { text-align: center; margin: 12px 0 16px; }
+    .pr-figure img { width: min(420px, 100%); border-radius: 12px; box-shadow: 0 3px 12px rgba(124,58,237,0.12); display: block; margin: 0 auto 6px; height: auto; }
+    .pr-figure figcaption { font-size: 12px; color: #9ca3af; margin-top: 4px; }
+    /* Phase 2: 表紙 */
+    #pr-cover { background: linear-gradient(160deg, #4a1d96, #7e22ce 60%, #9d174d); border-radius: 16px; padding: 36px 24px 32px; margin-bottom: 24px; text-align: center; position: relative; overflow: hidden; color: #fff; }
+    #pr-cover::before { content: ''; position: absolute; width: 220px; height: 220px; border-radius: 50%; background: rgba(255,255,255,0.04); top: -60px; right: -60px; pointer-events: none; }
+    #pr-cover .pr-cover-emblem { font-family: 'Lora', serif; font-size: 48px; color: rgba(255,255,255,0.12); position: absolute; top: 12px; left: 16px; line-height: 1; pointer-events: none; }
+    #pr-cover .pr-cover-title { font-family: 'Lora', serif; font-size: 20px; font-weight: 700; color: #fff; margin-bottom: 6px; line-height: 1.4; }
+    @media (min-width: 640px) { #pr-cover .pr-cover-title { font-size: 22px; } }
+    #pr-cover .pr-cover-subtitle { font-size: 13px; color: rgba(255,255,255,0.7); margin-bottom: 20px; }
+    #pr-cover .pr-cover-nums { display: flex; justify-content: center; gap: 20px; flex-wrap: wrap; margin: 16px 0 0; }
+    #pr-cover .pr-cover-num-item { text-align: center; }
+    #pr-cover .pr-cover-num-label { font-size: 10px; color: rgba(255,255,255,0.6); letter-spacing: 0.08em; text-transform: uppercase; display: block; margin-bottom: 2px; }
+    #pr-cover .pr-cover-num-val { font-family: 'Lora', serif; font-size: 36px; font-weight: 700; color: #fde68a; line-height: 1; }
+    /* Phase 3: 相性図 */
+    .pr-compat-figure { text-align: center; margin: 14px 0 10px; overflow: hidden; max-width: 100%; }
+    .pr-compat-figure svg { max-width: 100%; width: min(340px, 100%); height: auto; overflow: visible; }
+    .pr-compat-tagline { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; justify-content: center; margin: 10px 0; }
+    .pr-compat-type-badge { font-family: 'Lora', serif; font-size: 13px; font-weight: 700; background: linear-gradient(135deg, #7e22ce, #be185d); color: #fff; border-radius: 99px; padding: 3px 12px; display: inline-block; }
+    .pr-compat-tagline-text { font-size: 14px; color: #6b21a8; font-weight: 500; }
+    .pr-compat-shared { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; justify-content: center; margin: 10px 0; }
+    .pr-compat-shared-label { font-size: 12px; color: #9ca3af; }
+    .pr-compat-num { display: inline-flex; align-items: center; justify-content: center; font-family: 'Lora', serif; font-size: 15px; font-weight: 700; width: 30px; height: 30px; border-radius: 50%; background: #f3e8ff; color: #7c3aed; border: 1.5px solid #d8b4fe; }
+    .pr-compat-num--shared { background: linear-gradient(135deg, #7e22ce, #be185d); color: #fff; border-color: transparent; box-shadow: 0 2px 6px rgba(124,58,237,0.3); }
 
     /* ===== Numerology Chart ===== */
 
@@ -5321,6 +5366,7 @@ ${numContext}
     }
 
     // Get compat info for partner if available
+    // Extended: also computes partner maturity, spirit for Phase 3 shared-number display
     function prGetCompatInfo() {
       const py = (document.getElementById('compat-year') || {}).value || '';
       const pm = (document.getElementById('compat-month') || {}).value || '';
@@ -5329,7 +5375,15 @@ ${numContext}
       const partnerDate = new Date(parseInt(py), parseInt(pm)-1, parseInt(pd));
       if (isNaN(partnerDate.getTime())) return null;
       const partnerLP = Numerology.lifePath(partnerDate);
-      return { year: py, month: pm, day: pd, lifePath: partnerLP, date: partnerDate };
+      const partnerMaturity = Numerology.maturity(partnerDate);
+      const partnerSpirit = Numerology.spirit(partnerDate);
+      return {
+        year: py, month: pm, day: pd,
+        lifePath: partnerLP,
+        maturity: partnerMaturity,
+        spirit: partnerSpirit,
+        date: partnerDate
+      };
     }
 
     // ------- TEMPLATE-BASED REPORT BUILDER -------
@@ -5359,8 +5413,40 @@ ${numContext}
 
       let html = '';
 
-      // ── 序章
-      html += `<div class="pr-chapter" id="pr-ch-intro">
+      // ── Phase 2: 表紙
+      const todayStr = new Date().toLocaleDateString('ja-JP', { year:'numeric', month:'long', day:'numeric' });
+      // birthYear/Month not in lastResults — read from form inputs as fallback
+      const _by = r.birthYear || (document.getElementById('birthYear') || {}).value || '';
+      const _bm = r.birthMonth || (document.getElementById('birthMonth') || {}).value || '';
+      const _bd = r.birthDay || (document.getElementById('birthDay') || {}).value || '';
+      const birthStr = `${prEsc(String(_by))}年${prEsc(String(_bm))}月${prEsc(String(_bd))}日`;
+      html += `<div id="pr-cover">
+        <span class="pr-cover-emblem">数</span>
+        <div class="pr-cover-title">${prEsc(name)}さんのための精密数秘レポート</div>
+        <div class="pr-cover-subtitle">生年月日 ${birthStr} &nbsp;|&nbsp; 発行日 ${prEsc(todayStr)}</div>
+        <div class="pr-cover-nums">
+          <div class="pr-cover-num-item">
+            <span class="pr-cover-num-label">運命数</span>
+            <span class="pr-cover-num-val">${prEsc(String(r.lifePath))}</span>
+          </div>
+          <div class="pr-cover-num-item">
+            <span class="pr-cover-num-label">成熟数</span>
+            <span class="pr-cover-num-val">${prEsc(String(r.maturity))}</span>
+          </div>
+          <div class="pr-cover-num-item">
+            <span class="pr-cover-num-label">成長数</span>
+            <span class="pr-cover-num-val">${prEsc(String(r.spirit))}</span>
+          </div>
+        </div>
+      </div>`;
+
+      // Helper: 章番号カウンター
+      let chapterNum = 0;
+      function nextChNum() { chapterNum++; return String(chapterNum).padStart(2,'0'); }
+
+      // ── 序章 (Phase 2: --featured クラス + 章番号)
+      html += `<div class="pr-chapter pr-chapter--featured" id="pr-ch-intro">
+        <span class="pr-chapter-num">${nextChNum()}</span>
         <h2>序章 — ${prEsc(name)}さんという存在</h2>
         <p>${prEsc(name)}さん。あなたは ${prEsc(String(r.lifePath))} という運命数を軸に、${prEsc(String(r.destiny))} の誕生数、${prEsc(String(r.maturity))} の成熟数、そして ${prEsc(String(r.spirit))} の成長数が絡み合う、固有の星座の中に生きています。これらの数は、単なる数字ではありません。それぞれがあなたという存在の一面を映し出す鏡であり、組み合わさることで初めて見えてくる「あなただけの力学」があります。</p>
         <p>この精密レポートは、チャートに刻まれたすべての数を一つずつ丁寧に読み解き、さらに「数同士の関係と葛藤」を立体的に読むことで、あなたの内なる構造を明らかにしようとするものです。各章には、洞察だけでなく、明日から実際に試せる行動の提案も添えました。読み進めるにつれ、あなた自身への理解が深まり、これからの歩みが少し、より鮮明に見えてくることを願っています。</p>
@@ -5370,8 +5456,9 @@ ${numContext}
         </div>
       </div>`;
 
-      // ── 各数を一つずつ語る
+      // ── 各数を一つずつ語る (Phase 1: action block, Phase 2: 章番号)
       html += `<div class="pr-chapter" id="pr-ch-numbers">
+        <span class="pr-chapter-num">${nextChNum()}</span>
         <h2>各数が語るあなたの姿</h2>
         <p>あなたのチャートを構成する6つのポジションを、影響力の強い順に読んでいきます。それぞれの数は独立したキャラクターであり、あなたという物語の中でそれぞれの役割を担っています。</p>`;
 
@@ -5401,68 +5488,253 @@ ${numContext}
           <h3>影として出る面（課題）</h3>
           <p>${prEsc(t.shadow)}</p>
           <h3>日常での活かし方・具体的な行動提言</h3>
-          <p>${prEsc(t.action)}</p>
+          <div class="pr-action-block">
+            <div class="pr-action-block-label">行動提言</div>
+            <p>${prEsc(t.action)}</p>
+          </div>
           <hr class="pr-divider">
         </div>`;
       }
       html += `</div>`;
 
-      // ── 強みの構造（マンダラ）
+      // ── 内なる力学（RIO推奨: 各数の直後に移動。Phase 2: 章番号）
+      const relSection = prBuildRelationshipSection(r);
+      html += `<div class="pr-chapter" id="pr-ch-dynamics" style="background:linear-gradient(135deg,#fefce8,#fff7ed);border-color:#fde68a;">
+        <span class="pr-chapter-num">${nextChNum()}</span>
+        <h2>内なる力学 — 数同士の関係と葛藤を読む</h2>
+        <p>${prEsc(name)}さんのチャートを構成する数は、それぞれ独立して存在するのではなく、互いに影響し合い、複雑な内なるドラマを生み出しています。ここでは、特に重要な数の組み合わせが生む「共鳴と葛藤」を読んでいきます。この立体的な読みこそが、あなたの行動パターンや繰り返しの葛藤の根本を理解する鍵です。</p>
+        ${relSection}
+        <p style="margin-top:12px;">これらの葛藤は「どちらが正しいか」という問題ではありません。どちらのエネルギーもあなたの一部であり、どちらかを否定することで問題は解決しません。それぞれの数のエネルギーに、適切な表現の場を与えることが、内なる平和への道です。</p>
+        <div class="pr-action-block" style="margin-top:12px;">
+          <div class="pr-action-block-label">行動提言</div>
+          <p><strong>今週試してほしいこと：</strong>最も大きな葛藤だと感じる数の組み合わせを一つ選び、その葛藤が最近いつ、どんな場面で現れたかを書き出してみましょう。パターンが見えてきます。</p>
+          <p><strong>自分への問い：</strong>「この葛藤は私の弱さではなく、成長のための対話なのかもしれない。それぞれのエネルギーが求めているものは何か？」</p>
+        </div>
+      </div>`;
+
+      // ── 強みの構造（マンダラ）(Phase 2: 章番号)
       html += `<div class="pr-chapter" id="pr-ch-mandala">
+        <span class="pr-chapter-num">${nextChNum()}</span>
         <h2>強みの構造 — あなたのマンダラが語るもの</h2>
         <p>数秘マンダラは、1から9までの数があなたの中でどのように分布しているかを示す地図です。特定の「ライン（横・縦・斜め）」が揃うとき、その軸を構成する複数の数が強く共鳴し、自然に発揮できる才能の型が浮かび上がります。</p>`;
       if (completedLines.length > 0) {
         html += `<p>あなたの数秘マンダラでは、<strong>${prEsc(String(completedLines.length))}本のライン</strong>が揃っています。これは、複数の数が連携してあなたの中で強く共鳴していることを意味します。単独の数よりも、このライン全体を「才能の型」として理解することが大切です。</p>`;
         completedLines.forEach(ld => {
-          html += `<div class="pr-highlight"><p><strong>${prEsc(ld.name)}</strong>が揃っています。このラインが示すエネルギーは、あなたの中で特に力強く働いており、意識しなくても自然と発揮できる才能の型を形成しています。このラインに乗っているとき、あなたは「頑張っている」という感覚よりも「自然に動いている」という感覚を得やすいはずです。</p></div>`;
+          html += `<div class="pr-action-block"><p><strong>${prEsc(ld.name)}</strong>が揃っています。このラインが示すエネルギーは、あなたの中で特に力強く働いており、意識しなくても自然と発揮できる才能の型を形成しています。このラインに乗っているとき、あなたは「頑張っている」という感覚よりも「自然に動いている」という感覚を得やすいはずです。</p></div>`;
         });
       } else {
         html += `<p>現在のチャートでは、特定のラインが強く揃うというよりも、様々な方向に力が分散しています。これは多様性と柔軟性の象徴でもあり、特定の型にはまらないあなたの個性を表しています。単一の才能に特化するよりも、複数の視点や分野を横断することで真価を発揮するタイプです。</p>`;
       }
       html += `<p style="margin-top:10px;">最も影響力の強い数は<strong>${prEsc(String(r.lifePath))}（運命数）</strong>と<strong>${prEsc(String(r.maturity))}（成熟数）</strong>。この二つの数があなたの人生の基調音として響き続けます。</p>
-        <div class="pr-highlight" style="margin-top:12px;">
+        <div class="pr-action-block" style="margin-top:12px;">
+          <div class="pr-action-block-label">行動提言</div>
           <p><strong>今週試してほしいこと：</strong>あなたのマンダラのラインを一つ意識して、そのエネルギーを意図的に使う機会を一つ作ってみましょう。自然に動けると感じた瞬間を記録してみてください。</p>
           <p><strong>自分への問い：</strong>「私が最も楽に、自然に力を発揮できる場面はどんなときか？」</p>
         </div>
       </div>`;
 
-      // ── 3つの軸
+      // ── 3つの軸 (Phase 2: 章番号)
+      // ── 3軸レーダーチャート SVG生成 (buildAxesSvg ヘルパー)
+      const axesSvgHtml = (function buildAxesSvg() {
+        try {
+          // 正規化: マスター数 11→2, 22→4, 33→6。その他>9は%9||9
+          function normNum(n) {
+            if (!n || isNaN(n)) return 1;
+            if (n === 11) return 2;
+            if (n === 22) return 4;
+            if (n === 33) return 6;
+            if (n > 9) return (n % 9) || 9;
+            return Math.max(1, Math.min(9, n));
+          }
+          const snSelf = [r.destiny, r.lifePath].map(normNum);
+          const snOther = [r.persona, r.ground].map(normNum);
+          const rawGuide = [r.spirit, r.target2||0, r.target3||0, r.maturity].filter(v=>v>0);
+          const snGuide = rawGuide.map(normNum);
+          const saRaw = snSelf.reduce((a,b)=>a+b,0)/snSelf.length;
+          const oaRaw = snOther.reduce((a,b)=>a+b,0)/snOther.length;
+          const gaRaw = snGuide.length ? snGuide.reduce((a,b)=>a+b,0)/snGuide.length : 1;
+          const saDisp = Math.round(saRaw * 10) / 10;
+          const oaDisp = Math.round(oaRaw * 10) / 10;
+          const gaDisp = Math.round(gaRaw * 10) / 10;
+
+          const svgCx = 120, svgCy = 110, maxR = 78;
+          const axisPts = [
+            { angle: -Math.PI/2,                        label: '自分軸', val: saRaw, disp: saDisp },
+            { angle: -Math.PI/2 + 2*Math.PI/3,         label: '他人軸', val: oaRaw, disp: oaDisp },
+            { angle: -Math.PI/2 + 4*Math.PI/3,         label: '導き軸', val: gaRaw, disp: gaDisp },
+          ];
+          function ptAt(angle, r2) {
+            return { x: svgCx + Math.cos(angle)*r2, y: svgCy + Math.sin(angle)*r2 };
+          }
+          // 背景グリッド三角(3,6,9)
+          let gridSvg = '';
+          [3,6,9].forEach(function(gv) {
+            const gr = (gv/9)*maxR;
+            const gPts = axisPts.map(function(p) { return ptAt(p.angle, gr); });
+            gridSvg += '<polygon points="' + gPts.map(function(p) { return p.x.toFixed(1)+','+p.y.toFixed(1); }).join(' ') + '" fill="none" stroke="#e9d5ff" stroke-width="'+(gv===9?1:0.7)+'"/>';
+            const glp = ptAt(axisPts[0].angle, gr);
+            gridSvg += '<text x="'+(glp.x+4).toFixed(1)+'" y="'+glp.y.toFixed(1)+'" font-size="7" fill="#c4b5fd" text-anchor="start" dominant-baseline="middle">'+gv+'</text>';
+          });
+          // 軸線
+          let axisLines = '';
+          axisPts.forEach(function(p) {
+            const ep = ptAt(p.angle, maxR);
+            axisLines += '<line x1="'+svgCx+'" y1="'+svgCy+'" x2="'+ep.x.toFixed(1)+'" y2="'+ep.y.toFixed(1)+'" stroke="#ddd6fe" stroke-width="0.8"/>';
+          });
+          // データポリゴン
+          const dataPts = axisPts.map(function(p) { return ptAt(p.angle, (Math.min(p.val,9)/9)*maxR); });
+          const polyStr = dataPts.map(function(p) { return p.x.toFixed(1)+','+p.y.toFixed(1); }).join(' ');
+          // ラベルと数値
+          let labelsStr = '';
+          const anchors = ['middle', 'end', 'start'];
+          const labelR = maxR + 22;
+          const valR = maxR + 12;
+          axisPts.forEach(function(p, i) {
+            const lp = ptAt(p.angle, labelR);
+            const vp = ptAt(p.angle, valR);
+            // ラベル y オフセット: 上頂点は上へ、下2頂点は下へ
+            const ly = i === 0 ? lp.y - 10 : lp.y + 12;
+            const vy = i === 0 ? vp.y + 0 : vp.y + 12;
+            labelsStr += '<text x="'+lp.x.toFixed(1)+'" y="'+ly.toFixed(1)+'" text-anchor="'+anchors[i]+'" font-family="sans-serif" font-size="9" fill="#7e22ce" font-weight="700">'+p.label+'</text>';
+            labelsStr += '<text x="'+vp.x.toFixed(1)+'" y="'+vy.toFixed(1)+'" text-anchor="'+anchors[i]+'" font-family="Lora,serif" font-size="11" fill="#6b21a8" font-weight="700">'+p.disp+'</text>';
+          });
+          // データ点
+          let dotStr = '';
+          dataPts.forEach(function(p) {
+            dotStr += '<circle cx="'+p.x.toFixed(1)+'" cy="'+p.y.toFixed(1)+'" r="4" fill="#7e22ce" opacity="0.9"/>';
+          });
+          return '<figure class="pr-compat-figure" style="margin:14px 0 10px;">'
+            + '<svg viewBox="0 0 240 220" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="3軸レーダーチャート" style="width:min(300px,100%);height:auto;overflow:visible;display:block;margin:0 auto;">'
+            + '<rect width="240" height="220" fill="#faf5ff" rx="12"/>'
+            + '<text x="120" y="15" text-anchor="middle" font-family="serif" font-size="10" fill="#9333ea" font-weight="700">3軸エネルギーバランス</text>'
+            + gridSvg + axisLines
+            + '<polygon points="'+polyStr+'" fill="rgba(126,34,206,0.18)" stroke="#7e22ce" stroke-width="1.8" stroke-linejoin="round"/>'
+            + dotStr + labelsStr
+            + '</svg>'
+            + '<figcaption style="font-size:12px;color:#9ca3af;margin-top:4px;">自分軸・他人軸・導き軸のバランス</figcaption>'
+            + '</figure>';
+        } catch(e) { return ''; }
+      })();
+
       html += `<div class="pr-chapter" id="pr-ch-axes">
+        <span class="pr-chapter-num">${nextChNum()}</span>
         <h2>3つの軸 — エネルギーの向き方</h2>
+        ${axesSvgHtml}
         <p>あなたの数秘チャートを「自分軸・他人軸・導き軸」の三方向から見ると、<strong>${prEsc(dominantAxis)}</strong>のエネルギーが相対的に強く現れています。これは、あなたのエネルギーが自然に向かう方向を示しています。強い軸がある一方で、他の軸は意識的に育てていく領域です。</p>
         <p><strong>自分軸（誕生数${prEsc(String(r.destiny))} × 運命数${prEsc(String(r.lifePath))}）：</strong> あなたの内側から湧き出る衝動（誕生数${prEsc(String(r.destiny))}）と、人生を通じて体現するテーマ（運命数${prEsc(String(r.lifePath))}）が重なる場所です。ここにあなたの「本来の自分」が宿っています。自分軸が強いほど、内側から動く力が自然に発揮されます。</p>
         <p><strong>他人軸（人格数${prEsc(String(r.persona))} × 社会数${prEsc(String(r.ground))}）：</strong> 外から見たあなたの印象（人格数${prEsc(String(r.persona))}）と、社会や時代との接点（社会数${prEsc(String(r.ground))}）が交わる場所です。他人軸が育つにつれ、あなたの影響力が外の世界に広がっていきます。</p>
         <p><strong>導き軸（成長数${prEsc(String(r.spirit))} × 成熟数${prEsc(String(r.maturity))}）：</strong> 幼少期から自然に育まれてきた資質（成長数${prEsc(String(r.spirit))}）と、人生後半で統合されていくテーマ（成熟数${prEsc(String(r.maturity))}）が流れる場所です。導き軸は、あなたの人生に方向性と意味をもたらす軸です。</p>
-        <div class="pr-highlight" style="margin-top:12px;">
+        <div class="pr-action-block" style="margin-top:12px;">
+          <div class="pr-action-block-label">行動提言</div>
           <p><strong>今週試してほしいこと：</strong>最も弱いと感じる軸のエネルギーを、一つの小さな行動で意識的に使ってみましょう。</p>
           <p><strong>自分への問い：</strong>「私は今、自分のためだけに動いているか、それとも誰かとの繋がりの中で動いているか？」</p>
         </div>
       </div>`;
 
-      // ── 職業適性
+      // ── 職業適性 (Phase 2: 章番号)
       html += `<div class="pr-chapter" id="pr-ch-career">
+        <span class="pr-chapter-num">${nextChNum()}</span>
         <h2>才能の発揮先 — 職業適性の可能性</h2>
         <p>あなたの運命数${prEsc(String(r.lifePath))}と誕生数${prEsc(String(r.destiny))}の組み合わせが示す才能の方向性を、決めつけではなく可能性として受け取ってください。職業名よりも「どんな状況で、どんな役割のときに最も自分らしく動けるか」を探ることが大切です。</p>
         <p>${prEsc(prGetTemplate(r.lifePath).direction)}</p>
         <p>成長数${prEsc(String(r.spirit))}が示す資質は、幼少期から自然と磨かれてきた能力です。それを活かせる場に身を置くとき、あなたは「頑張っている」というよりも「自然にできる」という感覚を得られます。「これは簡単すぎて価値がないと思っていたこと」の中に、実はあなたの才能が隠れていることが多いのです。</p>
         <p>成熟数${prEsc(String(r.maturity))}は、人生の後半に向かってあなたが統合していくテーマです。今はまだその全貌が見えなくても、日々の積み重ねの中で少しずつ形になっていきます。焦らず、しかし意識的に、そのエネルギーを育てていきましょう。</p>
-        <div class="pr-highlight" style="margin-top:12px;">
+        <div class="pr-action-block" style="margin-top:12px;">
+          <div class="pr-action-block-label">行動提言</div>
           <p><strong>今週試してほしいこと：</strong>「これが得意」と感じることを一つ書き出し、それを誰かの役に立てる場面を意識的に作ってみましょう。</p>
           <p><strong>自分への問い：</strong>「私が当然だと思っていることの中に、実は誰もが羨む才能が隠れていないか？」</p>
         </div>
       </div>`;
 
-      // ── 相性
+      // ── 相性 (Phase 2: 章番号 / Phase 3: 相性図)
       html += `<div class="pr-chapter" id="pr-ch-compat">
+        <span class="pr-chapter-num">${nextChNum()}</span>
         <h2>縁と関係性 — 相性が語るもの</h2>`;
       if (compatInfo) {
         const partnerT = prGetTemplate(compatInfo.lifePath);
         const compatRel = prGetRelationshipReading(r.lifePath, compatInfo.lifePath, '運命数', '相手の運命数');
+
+        // Phase 3: 共有数・共鳴スコア計算
+        const myNums = new Set([r.lifePath, r.maturity, r.spirit]);
+        const theirNums = new Set([compatInfo.lifePath, compatInfo.maturity, compatInfo.spirit]);
+        const sharedNums = [...myNums].filter(n => theirNums.has(n));
+        // 共鳴スコア: 共有数×15 + 数差スコア×30 + ベース40、0-100クランプ
+        // 数差合計 = |myLP - theirLP| + |myMat - theirMat| + |mySp - theirSp| (小さいほど近い)
+        const numDiffSum = Math.abs(r.lifePath - compatInfo.lifePath) + Math.abs(r.maturity - compatInfo.maturity) + Math.abs(r.spirit - compatInfo.spirit);
+        const rawScore = sharedNums.length * 15 + (1 / (1 + numDiffSum)) * 30 + 40;
+        const resonanceScore = Math.max(0, Math.min(100, Math.round(rawScore)));
+
+        // 共鳴タイプ名とタグライン(簡易)
+        const resonanceType = resonanceScore >= 80 ? '深共鳴型' : resonanceScore >= 65 ? '調和共鳴型' : resonanceScore >= 50 ? '補完成長型' : '対極成長型';
+        const resonanceTagline = resonanceScore >= 80 ? '引き合う魂が持つ深い共鳴' : resonanceScore >= 65 ? '互いの光を引き出し合う縁' : resonanceScore >= 50 ? '違いが成長を呼ぶ組み合わせ' : '対極から学び合う対話の縁';
+
+        // Phase 3: 相性SVG対比図
+        const myLP = r.lifePath, myMat = r.maturity, mySp = r.spirit;
+        const thLP = compatInfo.lifePath, thMat = compatInfo.maturity, thSp = compatInfo.spirit;
+        // バー幅: 数/9×110px (最大110px)
+        const bw = (n) => Math.round((Math.min(n,9)/9)*110);
+        const compatSvgId = 'pr-compat-svg-' + Date.now();
         html += `<p>相手の生年月日（${prEsc(compatInfo.year)}年${prEsc(compatInfo.month)}月${prEsc(compatInfo.day)}日）から導かれる運命数は<strong>${prEsc(String(compatInfo.lifePath))}</strong>です。</p>
         <p>${prEsc(partnerT.core.substring(0, 120))}——そのような本質を持つ相手と、あなたの${prEsc(String(r.lifePath))}のエネルギーが出会うとき、固有の化学反応が生まれます。</p>
         ${compatRel ? `<p><strong>二人の共鳴：</strong>${prEsc(compatRel.harmony)}</p><p><strong>二人の葛藤：</strong>${prEsc(compatRel.tension)}</p>` : ''}
+        <div class="pr-compat-figure">
+          <svg id="${compatSvgId}" viewBox="0 0 320 240" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="相性対比図">
+            <!-- 背景 -->
+            <rect width="320" height="240" fill="#faf5ff" rx="12"/>
+            <!-- タイトル -->
+            <text x="160" y="22" text-anchor="middle" font-family="serif" font-size="11" fill="#9333ea" font-weight="700">数秘相性対比チャート</text>
+            <!-- 中央ライン -->
+            <line x1="160" y1="32" x2="160" y2="185" stroke="#d8b4fe" stroke-width="1.5" stroke-dasharray="4,3"/>
+            <!-- ラベル: 自分 / 相手 -->
+            <text x="80" y="42" text-anchor="middle" font-family="sans-serif" font-size="10" fill="#7e22ce" font-weight="700">あなた</text>
+            <text x="240" y="42" text-anchor="middle" font-family="sans-serif" font-size="10" fill="#be185d" font-weight="700">相手</text>
+            <!-- 運命数バー -->
+            <text x="155" y="65" text-anchor="end" font-family="sans-serif" font-size="9" fill="#6b7280">運命数</text>
+            <rect x="${160 - bw(myLP)}" y="70" width="${bw(myLP)}" height="14" rx="4" fill="#7e22ce" opacity="0.8"/>
+            <text x="${160 - bw(myLP) - 4}" y="81" text-anchor="end" font-family="serif" font-size="10" fill="#7e22ce" font-weight="700">${myLP}</text>
+            <rect x="160" y="70" width="${bw(thLP)}" height="14" rx="4" fill="#be185d" opacity="0.8"/>
+            <text x="${160 + bw(thLP) + 4}" y="81" text-anchor="start" font-family="serif" font-size="10" fill="#be185d" font-weight="700">${thLP}</text>
+            <!-- 成熟数バー -->
+            <text x="155" y="103" text-anchor="end" font-family="sans-serif" font-size="9" fill="#6b7280">成熟数</text>
+            <rect x="${160 - bw(myMat)}" y="108" width="${bw(myMat)}" height="14" rx="4" fill="#7e22ce" opacity="0.65"/>
+            <text x="${160 - bw(myMat) - 4}" y="119" text-anchor="end" font-family="serif" font-size="10" fill="#7e22ce" font-weight="700">${myMat}</text>
+            <rect x="160" y="108" width="${bw(thMat)}" height="14" rx="4" fill="#be185d" opacity="0.65"/>
+            <text x="${160 + bw(thMat) + 4}" y="119" text-anchor="start" font-family="serif" font-size="10" fill="#be185d" font-weight="700">${thMat}</text>
+            <!-- 成長数バー -->
+            <text x="155" y="141" text-anchor="end" font-family="sans-serif" font-size="9" fill="#6b7280">成長数</text>
+            <rect x="${160 - bw(mySp)}" y="146" width="${bw(mySp)}" height="14" rx="4" fill="#7e22ce" opacity="0.5"/>
+            <text x="${160 - bw(mySp) - 4}" y="157" text-anchor="end" font-family="serif" font-size="10" fill="#7e22ce" font-weight="700">${mySp}</text>
+            <rect x="160" y="146" width="${bw(thSp)}" height="14" rx="4" fill="#be185d" opacity="0.5"/>
+            <text x="${160 + bw(thSp) + 4}" y="157" text-anchor="start" font-family="serif" font-size="10" fill="#be185d" font-weight="700">${thSp}</text>
+            <!-- 共鳴スコアゲージ -->
+            <text x="160" y="180" text-anchor="middle" font-family="sans-serif" font-size="9" fill="#6b7280">共鳴スコア</text>
+            <rect x="55" y="186" width="210" height="12" rx="6" fill="#e9d5ff"/>
+            <rect x="55" y="186" width="${Math.round(210 * resonanceScore / 100)}" height="12" rx="6" fill="url(#compatGrad${compatSvgId})"/>
+            <text x="160" y="197" text-anchor="middle" font-family="serif" font-size="11" fill="#6b21a8" font-weight="700">${resonanceScore}点/100</text>
+            <text x="160" y="212" text-anchor="middle" font-family="sans-serif" font-size="10" fill="#7e22ce" font-weight="700">${prEsc(resonanceType)}</text>
+            <defs>
+              <linearGradient id="compatGrad${compatSvgId}" x1="0" y1="0" x2="1" y2="0">
+                <stop offset="0%" stop-color="#7e22ce"/>
+                <stop offset="100%" stop-color="#be185d"/>
+              </linearGradient>
+            </defs>
+          </svg>
+        </div>
+        <div class="pr-compat-tagline">
+          <span class="pr-compat-type-badge">${prEsc(resonanceType)}</span>
+          <span class="pr-compat-tagline-text">${prEsc(resonanceTagline)}</span>
+        </div>
+        <div class="pr-compat-shared">
+          <span class="pr-compat-shared-label">共有する数：</span>
+          ${[1,2,3,4,5,6,7,8,9].filter(n => myNums.has(n) || theirNums.has(n)).map(n => {
+            const isShared = sharedNums.includes(n);
+            return `<span class="pr-compat-num${isShared ? ' pr-compat-num--shared' : ''}">${n}</span>`;
+          }).join('')}
+          ${sharedNums.length === 0 ? '<span class="pr-compat-shared-label">（共有なし）</span>' : ''}
+        </div>
         <p>どんな相性であっても、それは優劣ではなく「組み合わせ」の問題。あなたが相手のどこに惹かれ、どこに摩擦を感じるかを知ることが、関係を深める第一歩です。摩擦は「合わない」サインではなく、互いが成長するための摩石です。</p>
-        <div class="pr-highlight" style="margin-top:12px;">
+        <div class="pr-action-block" style="margin-top:12px;">
+          <div class="pr-action-block-label">行動提言</div>
           <p><strong>今週試してほしいこと：</strong>相手のどんな面に感謝を感じているか、一つ言葉にして伝えてみましょう。</p>
           <p><strong>自分への問い：</strong>「この関係の中で、私が最も成長している部分はどこか？」</p>
         </div>`;
@@ -5470,63 +5742,104 @@ ${numContext}
         html += `<p>相手の生年月日を「相性診断」欄に入力すると、二人の数字の組み合わせが示す関係性の可能性をこのレポートに統合してお届けできます。どの数同士にも、固有の共鳴と葛藤のパターンがあります。</p>
         <p>人との縁は、数秘の視点から見ると「偶然の出会い」ではなく、何かを学び合うために引き寄せられた必然のように映ります。あなたのチャートには、あなたがどんな人から学びやすく、どんな相手と補い合えるかのヒントが刻まれています。</p>
         <p>どんな関係においても、まず「自分の数のエネルギーを理解する」ことが、深い縁を育てる出発点になります。あなたが自分自身を深く知るほど、他者への理解も自然に深まっていきます。</p>
-        <div class="pr-highlight" style="margin-top:12px;">
+        <div class="pr-action-block" style="margin-top:12px;">
+          <div class="pr-action-block-label">行動提言</div>
           <p><strong>今週試してほしいこと：</strong>今の人間関係で「この人と一緒にいると自分らしくいられる」と感じる場面を一つ思い出し、その理由を言葉にしてみましょう。</p>
           <p><strong>自分への問い：</strong>「私は今の関係の中で、自分の最も良い面を出せているか？」</p>
         </div>`;
       }
       html += `</div>`;
 
-      // ── 個人年予報（id を pr-ch-pyear も付与）
+      // ── 個人年サイクル円図 SVG生成 (buildPyearSvg ヘルパー)
+      const pyearSvgHtml = (function buildPyearSvg() {
+        try {
+          const svgR = 76;       // 円全体の半径
+          const dotR = 13;       // 各年の小円半径
+          const svgCx = 120, svgCy = 115;
+          // 現在地: pyBase (1-9)
+          const curPy = pyBase;
+          const pyTheme = (PERSONAL_YEAR_DB[curPy] || {}).theme || '';
+          // 1〜9を12時位置から時計回りに配置
+          let dots = '';
+          for (let i = 1; i <= 9; i++) {
+            const angle = -Math.PI/2 + (i-1)*(2*Math.PI/9);
+            const dx = svgCx + Math.cos(angle)*svgR;
+            const dy = svgCy + Math.sin(angle)*svgR;
+            const isCur = (i === curPy);
+            // 現在地は金色・大きく
+            const cr = isCur ? dotR + 3 : dotR;
+            const fill = isCur ? '#d97706' : '#e9d5ff';
+            const stroke = isCur ? '#b45309' : '#c4b5fd';
+            const sw = isCur ? '2' : '1';
+            const textCol = isCur ? '#fff' : '#7c3aed';
+            const fw = isCur ? '700' : '500';
+            dots += '<circle cx="'+dx.toFixed(1)+'" cy="'+dy.toFixed(1)+'" r="'+cr+'" fill="'+fill+'" stroke="'+stroke+'" stroke-width="'+sw+'"/>';
+            dots += '<text x="'+dx.toFixed(1)+'" y="'+dy.toFixed(1)+'" text-anchor="middle" dominant-baseline="central" font-family="Lora,serif" font-size="'+(isCur?13:11)+'" fill="'+textCol+'" font-weight="'+fw+'">'+i+'</text>';
+          }
+          // 循環矢印: 点線の外円
+          const arcR = svgR + dotR + 5;
+          const centerLabel = '<text x="'+svgCx+'" y="'+(svgCy-10)+'" text-anchor="middle" font-family="Lora,serif" font-size="20" fill="#d97706" font-weight="700">'+curPy+'</text>'
+            + '<text x="'+svgCx+'" y="'+(svgCy+8)+'" text-anchor="middle" font-family="sans-serif" font-size="8" fill="#9333ea" font-weight="700">個人年</text>'
+            + (pyTheme ? '<text x="'+svgCx+'" y="'+(svgCy+22)+'" text-anchor="middle" font-family="sans-serif" font-size="7.5" fill="#6b21a8">'+pyTheme.substring(0,6)+'</text>' : '');
+          return '<figure class="pr-compat-figure" style="margin:14px 0 10px;">'
+            + '<svg viewBox="0 0 240 230" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="個人年サイクル円図" style="width:min(280px,100%);height:auto;overflow:visible;display:block;margin:0 auto;">'
+            + '<rect width="240" height="230" fill="#faf5ff" rx="12"/>'
+            + '<text x="120" y="15" text-anchor="middle" font-family="serif" font-size="10" fill="#9333ea" font-weight="700">個人年サイクル（9年の巡り）</text>'
+            + '<circle cx="'+svgCx+'" cy="'+svgCy+'" r="'+arcR+'" fill="none" stroke="#e9d5ff" stroke-width="1" stroke-dasharray="4,4"/>'
+            + '<circle cx="'+svgCx+'" cy="'+svgCy+'" r="42" fill="#f5f3ff" stroke="#ddd6fe" stroke-width="0.8"/>'
+            + centerLabel
+            + dots
+            + '</svg>'
+            + '<figcaption style="font-size:12px;color:#9ca3af;margin-top:4px;">個人年サイクル（現在地をハイライト）</figcaption>'
+            + '</figure>';
+        } catch(e) { return ''; }
+      })();
+
+      // ── 個人年予報（id を pr-ch-pyear も付与）(Phase 2: 章番号)
       html += `<div class="pr-chapter" id="pr-ch-pyear" data-alias="pr-ch-forecast">
+        <span class="pr-chapter-num">${nextChNum()}</span>
         <h2>今の流れ — 個人年${prEsc(String(r.pYear))}が語るテーマ</h2>
+        ${pyearSvgHtml}
         <p>数秘の時間軸では、9年を一サイクルとする「個人年」の流れが存在します。今年はあなたにとって<strong>個人年${prEsc(String(r.pYear))}「${prEsc(pyDB.theme)}」</strong>の年です。この数が示すエネルギーは、今年のあなたに自然に流れ込んでいるテーマであり、逆らうよりも活かすことで、より少ない力で大きな成果が生まれます。</p>
         <p><strong>流れに乗った行動：</strong>${prEsc(pyDB.recommend.join('、'))}といったことが、このサイクルであなたのエネルギーと共鳴します。これらはあなたが「正しい方向に動いている」と感じるための試金石です。</p>
         <p><strong>避けるべき傾向：</strong>一方で${prEsc(pyDB.avoid.join('、'))}は、今年のエネルギーに逆らう動き方です。今年に限って苦手なことが増えていると感じるなら、それはエネルギーのズレのサインかもしれません。</p>
         <p>個人月${prEsc(String(r.pMonth))}・個人日${prEsc(String(r.pDay))}という細かい流れも、大きなテーマの中での「今日のタイミング」を教えてくれます。流れに逆らうより、流れを読んで動くことが、この時期を豊かにします。</p>
-        <div class="pr-highlight" style="margin-top:12px;">
+        <div class="pr-action-block" style="margin-top:12px;">
+          <div class="pr-action-block-label">行動提言</div>
           <p><strong>今すぐできること：</strong>個人年${prEsc(String(r.pYear))}のテーマ「${prEsc(pyDB.theme)}」に関連した行動を一つ書き出し、今週中に実行してみましょう。</p>
           <p><strong>自分への問い：</strong>「今年、私が流れに乗れていると感じる瞬間は、どんなときか？」</p>
         </div>
       </div>`;
 
-      // ── 数同士の関係・葛藤を読む
-      const relSection = prBuildRelationshipSection(r);
-      html += `<div class="pr-chapter" id="pr-ch-dynamics" style="background:linear-gradient(135deg,#fefce8,#fff7ed);border-color:#fde68a;">
-        <h2>内なる力学 — 数同士の関係と葛藤を読む</h2>
-        <p>${prEsc(name)}さんのチャートを構成する数は、それぞれ独立して存在するのではなく、互いに影響し合い、複雑な内なるドラマを生み出しています。ここでは、特に重要な数の組み合わせが生む「共鳴と葛藤」を読んでいきます。この立体的な読みこそが、あなたの行動パターンや繰り返しの葛藤の根本を理解する鍵です。</p>
-        ${relSection}
-        <p style="margin-top:12px;">これらの葛藤は「どちらが正しいか」という問題ではありません。どちらのエネルギーもあなたの一部であり、どちらかを否定することで問題は解決しません。それぞれの数のエネルギーに、適切な表現の場を与えることが、内なる平和への道です。</p>
-        <div class="pr-highlight" style="margin-top:12px;">
-          <p><strong>今週試してほしいこと：</strong>最も大きな葛藤だと感じる数の組み合わせを一つ選び、その葛藤が最近いつ、どんな場面で現れたかを書き出してみましょう。パターンが見えてきます。</p>
-          <p><strong>自分への問い：</strong>「この葛藤は私の弱さではなく、成長のための対話なのかもしれない。それぞれのエネルギーが求めているものは何か？」</p>
-        </div>
-      </div>`;
-
-      // ── 統合章
-      html += `<div class="pr-chapter" id="pr-ch-integration" style="background:linear-gradient(135deg,#fdf4ff,#fce7f3);border-color:#f0abfc;">
+      // ── 統合章 (Phase 2: --featured + 章番号 + .pr-quote)
+      html += `<div class="pr-chapter pr-chapter--featured" id="pr-ch-integration" style="background:linear-gradient(135deg,#fdf4ff,#fce7f3);border:1.5px solid #d8b4fe;">
+        <span class="pr-chapter-num">${nextChNum()}</span>
         <h2>統合章 — ${prEsc(name)}さんという物語</h2>
+        <div class="pr-quote">数は、あなたを分解するためではなく、あなたという全体をより深く見るための光です。</div>
         <p>ここまで一つずつ数字を紐解き、さらにその関係性と葛藤を見てきました。今度はそれらをバラバラにせず、一つの物語として束ねましょう。あなたという人間は、これらのすべてが混ざり合った、唯一無二の存在です。</p>
         <p>あなたの核心には、運命数<strong>${prEsc(String(r.lifePath))}</strong>が流れています。${prEsc(prGetTemplate(r.lifePath).core.split('。')[0])}——これがあなたの魂が最も深く共鳴するテーマです。そこに誕生数<strong>${prEsc(String(r.destiny))}</strong>の内なる衝動が加わり、人格数<strong>${prEsc(String(r.persona))}</strong>として外の世界に表現されていきます。</p>
         <p>成長数<strong>${prEsc(String(r.spirit))}</strong>が幼少期から育んできた土台の上に、社会数<strong>${prEsc(String(r.ground))}</strong>が時代や社会との接点を作ります。そしてこれらすべてが、成熟数<strong>${prEsc(String(r.maturity))}</strong>という人生後半の統合テーマへ向かって流れていきます。</p>
         ${r.ch1 && r.ch1 !== 0 ? `<p>克服数<strong>${prEsc(String(r.ch1))}</strong>は、あなたが最初に向き合う関門です。しかしこれは「弱点」ではなく、「磨かれ続ける砥石」——運命数${prEsc(String(r.lifePath))}を最高の形で発揮するために必要な試練として、あなたの旅に用意されたものです。この数のエネルギーと上手に付き合うことが、あなたの成長の大きな軸になります。</p>` : ''}
         <p>矛盾に見える数同士も、実はあなたの中で必然の役割を担っています。全ての数があなたという存在を作るピースであり、どれ一つ余分なものはありません。複雑に見えるほど、それはあなたが多次元的な人間であることの証です。</p>
         <p>あなたという物語には、まだたくさんの章が残っています。そして次の章を書くのは、他の誰でもなく、あなた自身です。</p>
-        <div class="pr-highlight" style="margin-top:12px;">
+        <div class="pr-action-block" style="margin-top:12px;">
+          <div class="pr-action-block-label">行動提言</div>
           <p><strong>今週試してほしいこと：</strong>このレポートを読んで最も「これは私のことだ」と感じた言葉を一つ書き留め、なぜそう感じたかを三行で書いてみましょう。</p>
           <p><strong>自分への問い：</strong>「私の数のすべてが、私という物語を豊かにするために存在しているとしたら、今日の出来事をどう読み直せるか？」</p>
         </div>
       </div>`;
 
-      // ── 方向性
-      html += `<div class="pr-chapter" id="pr-ch-direction">
+      // ── 方向性 (Phase 2: --featured + 章番号 + .pr-quote)
+      html += `<div class="pr-chapter pr-chapter--featured" id="pr-ch-direction">
+        <span class="pr-chapter-num">${nextChNum()}</span>
         <h2>方向性 — これから歩む道</h2>
         <p>今、あなたは${prEsc(String(r.age))}歳。${prEsc(stageLabel)}の中にいます。このステージが持つ固有のエネルギーと、あなたの数秘が持つ方向性が重なると、今取り組むべきテーマがより鮮明に見えてきます。</p>
         <p>${prEsc(prGetTemplate(r.lifePath).direction)}</p>
         <p>個人年${prEsc(String(r.pYear))}のテーマ「${prEsc(pyDB.theme)}」が示す流れの中で、運命数${prEsc(String(r.lifePath))}のエネルギーを体現するとき、あなたは「正しい方向に歩んでいる」という感覚を持てるはずです。逆に、その感覚が薄いなら、一度立ち止まって方向を確認してみてください。</p>
         <p>次の一歩は大きくなくていいのです。「今日、自分の数のエネルギーを一つの行動で表現してみる」——その小さな積み重ねが、あなたという物語の次の章を書いていきます。完璧な準備を待つ必要はありません。今の理解で、今できることから始める勇気が、あなたを動かします。</p>
-        <div class="pr-highlight" style="margin-top:12px;">
-          <p><strong>明日からできる3つの行動：</strong></p>
+        <div class="pr-quote">一年後のあなたが今日を振り返るとき、今この瞬間の選択が起点になっている。</div>
+        <div class="pr-action-block" style="margin-top:12px;">
+          <div class="pr-action-block-label">明日からできる3つの行動</div>
           <p>1. 運命数${prEsc(String(r.lifePath))}のエネルギー（${prEsc(prGetTemplate(r.lifePath).direction.split('。')[0])}）を、明日一つの具体的な場面で意識的に表現してみましょう。</p>
           <p>2. 成熟数${prEsc(String(r.maturity))}に向かうテーマについて、今の自分がすでに持っている種を一つ書き出してみましょう。</p>
           <p>3. 今年の個人年のテーマ「${prEsc(pyDB.theme)}」に沿った行動を、今週の予定に一つ意図的に入れてみましょう。</p>
@@ -5534,12 +5847,13 @@ ${numContext}
         </div>
       </div>`;
 
-      // ── 結び
-      html += `<div class="pr-chapter" id="pr-ch-closing" style="text-align:center;background:linear-gradient(135deg,#f3e8ff,#fce7f3,#e0e7ff);">
+      // ── 結び (Phase 2: --closing クラス + 章番号 + .pr-quote)
+      html += `<div class="pr-chapter pr-chapter--closing" id="pr-ch-closing">
+        <span class="pr-chapter-num" style="color:rgba(255,255,255,0.5);">${nextChNum()}</span>
         <h2 style="text-align:center;border-left:none;padding-left:0;">結び</h2>
-        <p style="text-align:center;">数は、あなたを縛るものではありません。<br>あなた自身をより深く知るための、光の地図です。</p>
+        <div class="pr-quote" style="border-color:rgba(255,255,255,0.3);color:#fde68a;">数は、あなたを縛るものではありません。<br>あなた自身をより深く知るための、光の地図です。</div>
         <p style="text-align:center;">この地図を手に、あなたが歩む道は<br>今日より少し、明るく見えることを願っています。</p>
-        <p style="text-align:center;font-weight:600;color:#7c3aed;">${prEsc(name)}さんの旅が、これからも豊かであることを願っています。</p>
+        <p style="text-align:center;font-weight:600;color:#fde68a;">${prEsc(name)}さんの旅が、これからも豊かであることを願っています。</p>
       </div>`;
 
       return html;
@@ -5757,7 +6071,7 @@ ${completedLines.length > 0 ? `- 揃いライン: ${completedLines.map(l => l.na
         }
       }
 
-      // ── 1. 数秘チャート図 を序章の直後に挿入
+      // ── 1. 数秘チャート図 を序章の直後に挿入 (Phase 1: figure+figcaption)
       try {
         const chartSrc = document.getElementById('chart-area-inner');
         if (chartSrc) {
@@ -5771,8 +6085,10 @@ ${completedLines.length > 0 ? `- 揃いライン: ${completedLines.map(l => l.na
               figWrap.style.cssText = 'text-align:center;';
               figWrap.innerHTML = `
                 <h2>あなたの数秘チャート</h2>
-                <img src="${dataUrl}" alt="数秘チャート図" style="max-width:100%;height:auto;border-radius:8px;margin:8px auto 6px;display:block;" />
-                <p style="font-size:0.75rem;color:#9ca3af;margin-top:4px;">▲ 6ポジション・影響力強度・接続線を含む数秘チャート</p>`;
+                <figure class="pr-figure">
+                  <img src="${dataUrl}" alt="数秘チャート図" />
+                  <figcaption>各ポジションの数と影響力の強さ（★）を示しています</figcaption>
+                </figure>`;
               introChapter.insertAdjacentElement('afterend', figWrap);
             }
           }
@@ -5781,7 +6097,7 @@ ${completedLines.length > 0 ? `- 揃いライン: ${completedLines.map(l => l.na
         console.warn('[PR] チャート図の埋め込みに失敗しました（テキストレポートは維持）:', e.message);
       }
 
-      // ── 2. マンダラ図 を「強みの構造」章の冒頭に挿入
+      // ── 2. マンダラ図 を「強みの構造」章の冒頭に挿入 (Phase 1: figure+figcaption)
       try {
         const mandalaSrc = document.getElementById('mandala-grid-wrap');
         if (mandalaSrc) {
@@ -5790,11 +6106,11 @@ ${completedLines.length > 0 ? `- 揃いライン: ${completedLines.map(l => l.na
             const mandalaChapter = contentEl.querySelector('#pr-ch-mandala');
             if (mandalaChapter) {
               const firstH2 = mandalaChapter.querySelector('h2');
-              const figWrap = document.createElement('div');
-              figWrap.style.cssText = 'text-align:center;margin:10px 0 14px;';
+              const figWrap = document.createElement('figure');
+              figWrap.className = 'pr-figure';
               figWrap.innerHTML = `
-                <img src="${dataUrl}" alt="数秘マンダラ図" style="max-width:100%;height:auto;border-radius:8px;display:block;margin:0 auto 4px;" />
-                <p style="font-size:0.75rem;color:#9ca3af;margin:0;">▲ 数秘マンダラ — 影響力の集中と揃い（1〜9の分布）</p>`;
+                <img src="${dataUrl}" alt="数秘マンダラ図" />
+                <figcaption>3×3マンダラ — 強みのパターンと中心軸</figcaption>`;
               if (firstH2) {
                 firstH2.insertAdjacentElement('afterend', figWrap);
               } else {
@@ -5805,6 +6121,20 @@ ${completedLines.length > 0 ? `- 揃いライン: ${completedLines.map(l => l.na
         }
       } catch(e) {
         console.warn('[PR] マンダラ図の埋め込みに失敗しました（テキストレポートは維持）:', e.message);
+      }
+
+      // ── 3. Phase 3: 相性SVG図 をhtml2canvasで画像化してPDFに対応 (SVGはそのまま表示)
+      try {
+        const compatFigEl = contentEl.querySelector('.pr-compat-figure svg');
+        if (compatFigEl) {
+          // SVGは表示上そのまま。PDF用にscreenshot化してimg差し込み済み構造を作る。
+          // html2canvas は既存の captureElement で SVGを含む親ごとキャプチャするので
+          // savePrecisionReportPdfがquerySelectorAll('.pr-chapter')でピックアップする際
+          // SVGがcanvas化されてPDFに乗る。追加処理不要。
+          // (SVG text のズレはhtmlCanvasで吸収される)
+        }
+      } catch(e) {
+        console.warn('[PR] 相性図のPDF対応処理でエラー（表示は維持）:', e.message);
       }
     }
 
