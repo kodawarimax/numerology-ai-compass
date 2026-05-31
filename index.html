@@ -374,6 +374,54 @@
     .mandala-cell.lit-self   .mc-dot { background: #dc2626; }
     .mandala-cell.lit-share  .mc-dot { background: #2563eb; }
     .mandala-cell.lit-spirit .mc-dot { background: #d97706; }
+    /* 揃いボーナス — 金グロー枠（通常+10） */
+    .mandala-cell.bonus-glow {
+      box-shadow: 0 0 0 2px #facc15, 0 0 10px rgba(250,204,21,0.55);
+    }
+    .mandala-cell.bonus-glow:hover,
+    .mandala-cell.bonus-glow:focus-visible {
+      box-shadow: 0 0 0 2px #facc15, 0 0 14px rgba(250,204,21,0.75),
+                  0 3px 12px rgba(124,58,237,0.22);
+    }
+    /* 特別ボーナス — 濃い金グロー（+15、コア3種以上） */
+    .mandala-cell.bonus-glow-special {
+      box-shadow: 0 0 0 3px #f59e0b, 0 0 16px rgba(245,158,11,0.75),
+                  0 0 4px rgba(251,191,36,0.9);
+    }
+    .mandala-cell.bonus-glow-special:hover,
+    .mandala-cell.bonus-glow-special:focus-visible {
+      box-shadow: 0 0 0 3px #f59e0b, 0 0 22px rgba(245,158,11,0.90),
+                  0 3px 12px rgba(124,58,237,0.22);
+    }
+    /* ボーナスバッジ（右上⚡） */
+    .mc-bonus-badge {
+      position: absolute;
+      top: 2px;
+      left: 2px;
+      font-size: 9px;
+      line-height: 1;
+      background: #facc15;
+      color: #78350f;
+      border-radius: 3px;
+      padding: 1px 3px;
+      font-weight: 700;
+    }
+    /* ★レーティング */
+    .mc-stars {
+      display: flex;
+      gap: 1px;
+      justify-content: center;
+      margin-top: 3px;
+      line-height: 1;
+    }
+    .mc-star {
+      font-size: 10px;
+      line-height: 1;
+    }
+    .mandala-cell.lit-self   .mc-star.filled { color: #dc2626; }
+    .mandala-cell.lit-share  .mc-star.filled { color: #2563eb; }
+    .mandala-cell.lit-spirit .mc-star.filled { color: #d97706; }
+    .mc-star.empty { color: #d1d5db; }
 
     /* モバイル: 下辺・右辺・四隅非表示 + 左辺を▲色のみ + セル最低48px */
     @media (max-width: 480px) {
@@ -492,6 +540,88 @@
         margin-top: 14px !important;
       }
       .chart-info-col .info-row { font-size: 11px; padding: 4px 8px; white-space: nowrap; }
+    }
+
+    /* ===== 影響力ティア強調 (infl-s/a/b/c) ===== */
+    /* Tier S: weight>=5 (運命数・成熟数) */
+    .infl-s {
+      border-left: 4px solid #7c3aed !important;
+      background: rgba(237,228,255,0.82) !important;
+    }
+    /* Tier A: weight 3.5-4 (成長数・誕生数) */
+    .infl-a {
+      border-left: 4px solid #a855f7 !important;
+      background: rgba(245,240,255,0.82) !important;
+    }
+    /* Tier B: weight=3 (社会数) */
+    .infl-b {
+      border-left: 3px solid #c084fc !important;
+      background: rgba(250,245,255,0.75) !important;
+    }
+    /* Tier C: weight=1 (人格数・目標数) — 控えめ */
+    .infl-c {
+      border-left: 2px solid #ddd6fe !important;
+      background: rgba(255,255,255,0.92) !important;
+    }
+    /* 克服数・挑戦数 (マイナス) — グレー寄り、色強調なし */
+    .infl-neg {
+      border-left: 2px solid #d1d5db !important;
+      background: rgba(249,250,251,0.92) !important;
+    }
+    /* ティアバッジ（影響力ドット） */
+    .infl-badge {
+      position: absolute;
+      top: 4px;
+      right: 5px;
+      font-size: 9px;
+      line-height: 1;
+      pointer-events: none;
+      user-select: none;
+    }
+    .infl-s .infl-badge { color: #6d28d9; }
+    .infl-a .infl-badge { color: #9333ea; }
+    .infl-b .infl-badge { color: #a855f7; }
+    .infl-c .infl-badge { color: #c4b5fd; }
+    .infl-neg .infl-badge { color: #9ca3af; }
+
+    /* 凡例コンテナ */
+    #infl-legend {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: center;
+      gap: 6px 10px;
+      padding: 6px 10px;
+      margin: 8px auto 0;
+      max-width: 380px;
+      background: rgba(250,245,255,0.8);
+      border: 1px solid #e9d5ff;
+      border-radius: 8px;
+    }
+    #infl-legend .lg-title {
+      width: 100%;
+      text-align: center;
+      font-size: 10px;
+      font-weight: 600;
+      color: #6d28d9;
+      margin-bottom: 2px;
+    }
+    #infl-legend .lg-item {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 10px;
+      color: #4b5563;
+    }
+    #infl-legend .lg-swatch {
+      width: 10px;
+      height: 10px;
+      border-radius: 2px;
+      flex-shrink: 0;
+    }
+    @media (max-width: 767px) {
+      #infl-legend { max-width: 100%; gap: 4px 8px; padding: 5px 8px; }
+      #infl-legend .lg-item { font-size: 9px; }
     }
   </style>
 </head>
@@ -729,6 +859,31 @@
         </div><!-- /chart-info-col -->
 
       </div><!-- /chart-outer -->
+
+      <!-- 影響力ティア凡例 -->
+      <div id="infl-legend" aria-label="チャート色凡例: 枠の色は各ポジションの影響力の強さを表します">
+        <span class="lg-title">色 = 影響力の強さ</span>
+        <span class="lg-item">
+          <span class="lg-swatch" style="background:#7c3aed;" aria-hidden="true"></span>
+          <span>最強 (運命数・成熟数)</span>
+        </span>
+        <span class="lg-item">
+          <span class="lg-swatch" style="background:#a855f7;" aria-hidden="true"></span>
+          <span>強 (成長数・誕生数)</span>
+        </span>
+        <span class="lg-item">
+          <span class="lg-swatch" style="background:#c084fc;" aria-hidden="true"></span>
+          <span>中 (社会数)</span>
+        </span>
+        <span class="lg-item">
+          <span class="lg-swatch" style="background:#ddd6fe;" aria-hidden="true"></span>
+          <span>小 (人格数・目標数)</span>
+        </span>
+        <span class="lg-item">
+          <span class="lg-swatch" style="background:#d1d5db;" aria-hidden="true"></span>
+          <span>克服・挑戦数</span>
+        </span>
+      </div>
 
       <!-- Note -->
       <p class="text-[11px] text-purple-400 mt-3 leading-relaxed text-center">
@@ -1627,12 +1782,51 @@
         'cell-ch1': r.ch1, 'cell-ch2': r.ch2,
         'cell-ch3': r.ch3, 'cell-ch4': r.ch4,
       };
+
+      // 影響力ティア定義 — buildOwnershipMap の sources と同一ウェイトを参照 (Single Source of Truth)
+      const INFL_WEIGHT = {
+        'cell-lifepath': 5,  'cell-maturity': 5,
+        'cell-spirit':   4,  'cell-destiny':  3.5,
+        'cell-ground':   3,
+        'cell-persona':  1,  'cell-target2':  1,  'cell-target3': 1,
+        'cell-ch1':      -4, 'cell-ch2':     -1,  'cell-ch3':    -1, 'cell-ch4': -1,
+      };
+      const INFL_CLS = ['infl-s', 'infl-a', 'infl-b', 'infl-c', 'infl-neg'];
+      function inflTier(w) {
+        if (w >= 5)   return { cls: 'infl-s', badge: '★★', label: '影響力: 最強' };
+        if (w >= 3.5) return { cls: 'infl-a', badge: '★',  label: '影響力: 強' };
+        if (w >= 3)   return { cls: 'infl-b', badge: '◆',  label: '影響力: 中' };
+        if (w > 0)    return { cls: 'infl-c', badge: '·',  label: '影響力: 小' };
+        return            { cls: 'infl-neg', badge: '',  label: '克服・挑戦数' };
+      }
+
       for (const [id, val] of Object.entries(boxMap)) {
         const el = document.getElementById(id);
         if (!el) continue;
         el.querySelector('.cb-num').textContent = val;
         const lbl = el.querySelector('.cb-lbl');
-        el.setAttribute('aria-label', `${lbl ? lbl.textContent : ''} ${val}。タップで詳しい解説を表示`);
+
+        // 影響力ティアクラス付与
+        el.classList.remove(...INFL_CLS);
+        const w = INFL_WEIGHT[id];
+        if (w !== undefined) {
+          const tier = inflTier(w);
+          el.classList.add(tier.cls);
+          // バッジ（既存があれば更新、なければ新規作成）
+          let badge = el.querySelector('.infl-badge');
+          if (!badge) {
+            badge = document.createElement('span');
+            badge.className = 'infl-badge';
+            badge.setAttribute('aria-hidden', 'true');
+            el.appendChild(badge);
+          }
+          badge.textContent = tier.badge;
+          // aria-label に影響力情報を追記
+          el.setAttribute('aria-label',
+            `${lbl ? lbl.textContent : ''} ${val}。${tier.label}。タップで詳しい解説を表示`);
+        } else {
+          el.setAttribute('aria-label', `${lbl ? lbl.textContent : ''} ${val}。タップで詳しい解説を表示`);
+        }
       }
 
       // Update right-column info cells
@@ -3222,29 +3416,34 @@ ${numContext}
       return n;
     }
 
-    // r から保有数マップ { 1: [{label,key},...], 2: [...], ... } を生成
+    // r からスコアマップを生成
+    // 戻り値: { 1: { scoreSum, items:[{label,weight},...] }, ... }
     function buildOwnershipMap(r) {
       const sources = [
-        { label: '運命数', key: 'lifePath' },
-        { label: '誕生数', key: 'destiny' },
-        { label: '成熟数', key: 'maturity' },
-        { label: '成長数', key: 'spirit' },
-        { label: '人格数', key: 'persona' },
-        { label: '社会数', key: 'ground' },
-        { label: '第2目標', key: 'target2' },
-        { label: '第3目標', key: 'target3' },
-        { label: '克服数', key: 'ch1' },
-        { label: '第2挑戦', key: 'ch2' },
-        { label: '第3挑戦', key: 'ch3' },
-        { label: '第4挑戦', key: 'ch4' },
+        { label: '運命数',  key: 'lifePath', weight:  5   },
+        { label: '成熟数',  key: 'maturity', weight:  5   },
+        { label: '成長数',  key: 'spirit',   weight:  4   },
+        { label: '誕生数',  key: 'destiny',  weight:  3.5 },
+        { label: '社会数',  key: 'ground',   weight:  3   },
+        { label: '人格数',  key: 'persona',  weight:  1   },
+        { label: '第2目標', key: 'target2',  weight:  1   },
+        { label: '第3目標', key: 'target3',  weight:  1   },
+        { label: '克服数',  key: 'ch1',      weight: -4   },
+        { label: '第2挑戦', key: 'ch2',      weight: -1   },
+        { label: '第3挑戦', key: 'ch3',      weight: -1   },
+        { label: '第4挑戦', key: 'ch4',      weight: -1   },
       ];
       const map = {};
-      for (let i = 1; i <= 9; i++) map[i] = [];
+      for (let i = 1; i <= 9; i++) map[i] = { scoreSum: 0, items: [] };
       sources.forEach(s => {
         const raw = r[s.key];
         if (raw == null) return;
         const n = normalizeTo9(raw);
-        if (n >= 1 && n <= 9) map[n].push(s.label);
+        if (n >= 1 && n <= 9) {
+          map[n].scoreSum += s.weight;
+          // posKey: コア4判定用にポジションキーも保持
+          map[n].items.push({ label: s.label, weight: s.weight, posKey: s.key });
+        }
       });
       return map;
     }
@@ -3264,13 +3463,110 @@ ${numContext}
         'lit-spirit': { base: '217,119,6',  border: '#f59e0b' },
       };
 
-      // 詳細モーダル表示
+      // ==== ライン揃いボーナス計算 ====
+      // 8ライン定義（転置後盤面に合わせた縦3・横3・斜め2）
+      const LINE_DEFS = [
+        { key: 'COL_SELF',          name: '自分軸',   nums: [1,4,7] },
+        { key: 'COL_SHARE',         name: '他人軸',   nums: [2,5,8] },
+        { key: 'COL_SPIRIT',        name: '導き軸',   nums: [3,6,9] },
+        { key: 'ROW_PLAN',          name: 'PLAN',     nums: [1,2,3] },
+        { key: 'ROW_ARRANGE',       name: 'ARRANGE',  nums: [4,5,6] },
+        { key: 'ROW_DEVELOP',       name: 'DEVELOP',  nums: [7,8,9] },
+        { key: 'DIAG_ACHIEVER',     name: '達成',     nums: [1,5,9] },
+        { key: 'DIAG_PHILOSOPHER',  name: '哲学',     nums: [3,5,7] },
+      ];
+
+      // 揃い判定: 3マス全て baseScore > 0
+      const completedLines = LINE_DEFS.filter(ld =>
+        ld.nums.every(n => (ownerMap[n]?.scoreSum ?? 0) > 0)
+      );
+
+      // コア4ポジション（特別ボーナス判定用）
+      const CORE_KEYS = new Set(['spirit', 'destiny', 'maturity', 'lifePath']);
+
+      // 各揃いラインについてボーナス値（+10 or +15）を決定
+      // +15条件: そのライン3マスに乗っているコア4種のうち3種以上が存在
+      completedLines.forEach(ld => {
+        // ライン上の全アイテムのposKeyを収集しコア種類数を数える
+        const coreKinds = new Set();
+        ld.nums.forEach(n => {
+          (ownerMap[n]?.items ?? []).forEach(it => {
+            if (CORE_KEYS.has(it.posKey)) coreKinds.add(it.posKey);
+          });
+        });
+        ld.coreCount  = coreKinds.size;          // コア種類数（0〜4）
+        ld.bonusValue = coreKinds.size >= 3 ? 15 : 10;  // 判定
+        ld.isSpecial  = ld.bonusValue === 15;
+      });
+
+      // 各セルの finalScore: baseScore + Σ(乗っている各揃いラインのbonusValue)
+      const finalScores = {};
+      // セルごとのボーナス加算合計と特別ライン乗り有無を保持
+      const cellBonusSum = {};   // { num: 合計ボーナス加算値 }
+      const cellIsSpecial = {};  // { num: true/false }
+      for (let i = 1; i <= 9; i++) {
+        cellBonusSum[i]  = 0;
+        cellIsSpecial[i] = false;
+      }
+      completedLines.forEach(ld => {
+        ld.nums.forEach(n => {
+          cellBonusSum[n]  += ld.bonusValue;
+          if (ld.isSpecial) cellIsSpecial[n] = true;
+        });
+      });
+      for (let i = 1; i <= 9; i++) {
+        finalScores[i] = (ownerMap[i]?.scoreSum ?? 0) + cellBonusSum[i];
+      }
+
+      // 後方互換: bonusCount は「乗っているライン本数」として維持（バッジ表示等で使用）
+      const bonusCount = {};
+      for (let i = 1; i <= 9; i++) bonusCount[i] = 0;
+      completedLines.forEach(ld => ld.nums.forEach(n => bonusCount[n]++));
+
+      // ★相対スケールは finalScore で再計算
+      const maxFinal = Math.max(0, ...Object.values(finalScores));
+
+      function calcRating(num) {
+        const fs = finalScores[num] ?? 0;
+        const base = ownerMap[num]?.scoreSum ?? 0;
+        if (base <= 0 || maxFinal <= 0) return 0;   // 点灯判定は baseScore>0
+        return Math.max(1, Math.round(fs / maxFinal * 5));
+      }
+
+      // rating→alpha（濃淡5段階）
+      const RATING_ALPHA = { 1: 0.10, 2: 0.18, 3: 0.28, 4: 0.40, 5: 0.55 };
+      // bonusTotal: 全揃いラインの bonusValue × 3マス の合計
+      const bonusTotal = completedLines.reduce((s, ld) => s + ld.bonusValue * 3, 0);
+
+      // 詳細モーダル表示（★＋内訳＋ボーナス付き）
       function showMandalaDetail(n) {
         const nd = numDB[n] || numDB[Math.min(n, 9)];
         const charName = MANDALA_CHARS[n] || '';
-        const ownersStr = ownerMap[n]?.length
-          ? `<p style="font-size:11px;color:#6b7280;margin-top:6px;">あなたの保有数: <strong>${esc(ownerMap[n].join('・'))}</strong></p>`
-          : '<p style="font-size:11px;color:#9ca3af;margin-top:6px;">この数はあなたのチャートに含まれていません</p>';
+        const cellData = ownerMap[n] || { scoreSum: 0, items: [] };
+        const rating = calcRating(n);
+        const fs = finalScores[n] ?? 0;
+        const bc = bonusCount[n] ?? 0;
+        const starsHtml = rating > 0
+          ? `${'★'.repeat(rating)}${'☆'.repeat(5 - rating)}`
+          : '☆☆☆☆☆';
+        let innerHtml = '';
+        if (cellData.items.length > 0) {
+          const lines = cellData.items.map(it => {
+            const sign = it.weight >= 0 ? '+' : '';
+            return `${esc(it.label)} ${sign}${it.weight}`;
+          }).join('、');
+          const myLines = completedLines.filter(l => l.nums.includes(n));
+          let bonusNote = '';
+          if (myLines.length > 0) {
+            const bsum = cellBonusSum[n] ?? 0;
+            const hasSpecial = myLines.some(l => l.isSpecial);
+            const lineDesc = myLines.map(l => `${l.name}+${l.bonusValue}`).join('・');
+            bonusNote = `<span style="color:${hasSpecial ? '#92400e' : '#b45309'};font-weight:600;"> ＋揃いボーナス +${bsum}（${lineDesc}）${hasSpecial ? ' ✨特別' : ''}</span>`;
+          }
+          innerHtml = `<p style="font-size:11px;color:#6b7280;margin-top:6px;">影響度 ${esc(starsHtml)}（base${cellData.scoreSum >= 0 ? '+' : ''}${cellData.scoreSum}${bonusNote}、final${fs >= 0 ? '+' : ''}${fs}）</p><p style="font-size:11px;color:#6b7280;margin-top:2px;">内訳: ${lines}</p>`;
+        } else {
+          innerHtml = '<p style="font-size:11px;color:#9ca3af;margin-top:6px;">影響度なし（このチャートに含まれません）</p>';
+        }
         const content = document.getElementById('detail-content');
         if (!content) return;
         content.innerHTML = `
@@ -3282,7 +3578,7 @@ ${numContext}
             </div>
           </div>
           <p style="font-size:13px;color:#374151;line-height:1.65;">${nd ? esc(nd.core) : ''}</p>
-          ${ownersStr}
+          ${innerHtml}
           ${nd ? `<div style="margin-top:10px;background:#faf5ff;border-radius:10px;padding:10px;"><p style="font-size:11px;font-weight:600;color:#6d28d9;margin-bottom:4px;">特性</p><p style="font-size:12px;color:#4b5563;line-height:1.55;white-space:pre-line;">${esc(nd.traits)}</p></div>` : ''}
           <button onclick="document.getElementById('detail-modal').classList.add('hidden');document.body.style.overflow='';" style="margin-top:14px;width:100%;background:#7c3aed;color:#fff;border:none;border-radius:9999px;padding:10px;font-size:13px;font-weight:600;cursor:pointer;">閉じる</button>
         `;
@@ -3290,29 +3586,56 @@ ${numContext}
         document.body.style.overflow = 'hidden';
       }
 
-      // セル作成ヘルパー（転置後: litClsは数字が属する列=SELF/SHARE/SPIRITで決まる）
+      // セル作成ヘルパー（★レーティング＋ボーナスグロー＋スコア濃淡）
       function makeCell(num) {
-        const owners = ownerMap[num] || [];
-        const count = owners.length;
+        const cellData = ownerMap[num] || { scoreSum: 0, items: [] };
+        const { scoreSum, items } = cellData;
+        const rating = calcRating(num);
+        const isLit = scoreSum > 0;
+        const bc = bonusCount[num] ?? 0;
         const litCls = NUM_LIT_CLS[num] || 'lit-self';
+
+        const myLines = completedLines.filter(l => l.nums.includes(num));
+        const isSpecialCell = cellIsSpecial[num] ?? false;
+        const bsum = cellBonusSum[num] ?? 0;
+
+        // aria-label: 内訳＋★＋ボーナス(+10/+15)を含む
+        let ariaLabel;
+        if (isLit) {
+          const detail = items.map(it => `${it.label}${it.weight >= 0 ? '+' : ''}${it.weight}`).join('、');
+          const bonusPart = bc > 0
+            ? `、揃いボーナス+${bsum}（${myLines.map(l => `${l.name}+${l.bonusValue}`).join('/')}）${isSpecialCell ? '✨特別' : ''}`
+            : '';
+          ariaLabel = `${num} ${MANDALA_CHARS[num]}、影響度★${rating}（${detail}${bonusPart}）`;
+        } else if (items.length > 0) {
+          const detail = items.map(it => `${it.label}${it.weight >= 0 ? '+' : ''}${it.weight}`).join('、');
+          ariaLabel = `${num} ${MANDALA_CHARS[num]}、影響度なし（${detail}）`;
+        } else {
+          ariaLabel = `${num} ${MANDALA_CHARS[num]}、該当なし`;
+        }
+
+        // グロークラス: 特別(+15)は bonus-glow-special、通常(+10)は bonus-glow
+        const glowCls = bc > 0
+          ? (isSpecialCell ? ' bonus-glow-special' : ' bonus-glow')
+          : '';
         const cell = document.createElement('div');
-        cell.className = 'mandala-cell';
+        cell.className = 'mandala-cell' + glowCls;
         cell.setAttribute('role', 'button');
         cell.setAttribute('tabindex', '0');
-        cell.setAttribute('aria-label', count > 0
-          ? `${num} ${MANDALA_CHARS[num]}、${owners.join('と')}が該当`
-          : `${num} ${MANDALA_CHARS[num]}、該当なし`);
+        cell.setAttribute('aria-label', ariaLabel);
         cell.dataset.num = num;
+        cell.dataset.rating = rating;
+        cell.dataset.score = scoreSum;
+        cell.dataset.final = finalScores[num] ?? 0;
+        cell.dataset.bonus = bc;
 
-        if (count > 0) {
+        if (isLit) {
           cell.classList.add(litCls);
           const ac = axisColors[litCls];
-          const alpha = count >= 3 ? 0.60 : count >= 2 ? 0.35 : 0.15;
+          const alpha = RATING_ALPHA[rating] || 0.10;
           cell.style.background  = `rgba(${ac.base}, ${alpha})`;
           cell.style.borderColor = ac.border;
           cell.style.opacity     = '1';
-          if (count >= 3) cell.classList.add('lit-3');
-          else if (count >= 2) cell.classList.add('lit-2');
         } else {
           cell.style.background  = '#f3f4f6';
           cell.style.borderColor = '#e5e7eb';
@@ -3329,17 +3652,27 @@ ${numContext}
         charEl.textContent = MANDALA_CHARS[num] || '';
         cell.appendChild(charEl);
 
-        if (count > 0) {
-          const dotsWrap = document.createElement('div');
-          dotsWrap.className = 'mc-dots';
-          const showDots = Math.min(count, 4);
-          for (let d = 0; d < showDots; d++) {
-            const dot = document.createElement('span');
-            dot.className = 'mc-dot';
-            dot.title = owners[d] || '';
-            dotsWrap.appendChild(dot);
+        // ★表示（点灯セルのみ）
+        if (isLit) {
+          const starsWrap = document.createElement('div');
+          starsWrap.className = 'mc-stars';
+          starsWrap.setAttribute('aria-hidden', 'true');
+          for (let s = 1; s <= 5; s++) {
+            const star = document.createElement('span');
+            star.className = 'mc-star ' + (s <= rating ? 'filled' : 'empty');
+            star.textContent = s <= rating ? '★' : '☆';
+            starsWrap.appendChild(star);
           }
-          cell.appendChild(dotsWrap);
+          cell.appendChild(starsWrap);
+        }
+
+        // ボーナスバッジ（揃いライン乗りセルのみ）— +10/+15 の別を表示
+        if (bc > 0) {
+          const badge = document.createElement('span');
+          badge.className = 'mc-bonus-badge';
+          badge.setAttribute('aria-hidden', 'true');
+          badge.textContent = isSpecialCell ? `✨+${bsum}` : `⚡+${bsum}`;
+          cell.appendChild(badge);
         }
 
         cell.addEventListener('click', () => showMandalaDetail(num));
@@ -3395,39 +3728,61 @@ ${numContext}
       COL_AXES.forEach(col => wrap.appendChild(makeColHeader(col, true)));
       wrap.appendChild(makeCorner('1·5·9', '達成数', 'diag-achiever', true));
 
-      // -- 強調ライン判定 --
+      // -- 強調ライン判定 (LINE_DEFS を流用、hitLines = 2マス以上プラスのライン) --
       const lineSummaryEl = document.getElementById('mandala-lines-summary');
       const linesListEl = document.getElementById('mandala-lines-list');
       if (!lineSummaryEl || !linesListEl) { card.classList.remove('hidden'); return; }
       linesListEl.innerHTML = '';
 
-      // 転置後: 行=PLAN[1,2,3]/ARRANGE[4,5,6]/DEVELOP[7,8,9]、列=SELF[1,4,7]/SHARE[2,5,8]/SPIRIT[3,6,9]
-      const lineChecks = [
-        // rows（転置後）
-        { key: 'ROW_PLAN',    nums: [1,2,3] },
-        { key: 'ROW_ARRANGE', nums: [4,5,6] },
-        { key: 'ROW_DEVELOP', nums: [7,8,9] },
-        // cols（転置後）
-        { key: 'COL_SELF',   nums: [1,4,7] },
-        { key: 'COL_SHARE',  nums: [2,5,8] },
-        { key: 'COL_SPIRIT', nums: [3,6,9] },
-        // diagonals（不変）
-        { key: 'DIAG_ACHIEVER',    nums: [1,5,9] },
-        { key: 'DIAG_PHILOSOPHER', nums: [3,5,7] },
-      ];
-
-      const hitLines = lineChecks.filter(lc =>
-        lc.nums.filter(n => (ownerMap[n] || []).length > 0).length >= 2
+      // hitLines: 2マス以上プラス（通常強調ライン）
+      const hitLines = LINE_DEFS.filter(ld =>
+        ld.nums.filter(n => (ownerMap[n]?.scoreSum ?? 0) > 0).length >= 2
       );
 
+      // ボーナス要約を最上部に表示（+10/+15 を区別）
+      if (completedLines.length > 0) {
+        const specialLines  = completedLines.filter(l => l.isSpecial);
+        const normalLines   = completedLines.filter(l => !l.isSpecial);
+
+        // 特別ボーナス行（+15）
+        if (specialLines.length > 0) {
+          const spItem = document.createElement('div');
+          spItem.className = 'rounded-lg px-3 py-2 border';
+          spItem.style.cssText = 'background:rgba(245,158,11,0.15);border-color:#f59e0b;margin-bottom:4px;';
+          spItem.innerHTML = `<p style="font-size:11px;color:#78350f;line-height:1.55;font-weight:700;">✨ 特別ボーナス: ${specialLines.map(l => `${esc(l.name)}（コア${l.coreCount}種・+15）`).join('・')}</p><p style="font-size:10px;color:#92400e;margin-top:2px;">${specialLines.map(l => `${esc(l.name)} +15/マス`).join(' / ')}</p>`;
+          linesListEl.appendChild(spItem);
+        }
+
+        // 通常ボーナス行（+10）
+        if (normalLines.length > 0) {
+          const norItem = document.createElement('div');
+          norItem.className = 'rounded-lg px-3 py-2 border';
+          norItem.style.cssText = 'background:rgba(250,204,21,0.12);border-color:#fde68a;margin-bottom:4px;';
+          norItem.innerHTML = `<p style="font-size:11px;color:#92400e;line-height:1.55;font-weight:600;">🎉 揃いボーナス: ${normalLines.map(l => esc(l.name)).join('・')}（+10/マス）</p><p style="font-size:10px;color:#b45309;margin-top:2px;">${normalLines.map(l => `${esc(l.name)} +10`).join(' / ')}</p>`;
+          linesListEl.appendChild(norItem);
+        }
+
+        // 合計表示
+        const totalItem = document.createElement('div');
+        totalItem.style.cssText = 'font-size:10px;color:#6b7280;text-align:right;margin-bottom:4px;';
+        totalItem.textContent = `合計ボーナス加算: +${bonusTotal}点（${completedLines.length}ライン）`;
+        linesListEl.appendChild(totalItem);
+      }
+
       if (hitLines.length > 0) {
-        hitLines.forEach(lc => {
-          const meaning = LINE_MEANINGS[lc.key] || lc.key;
+        hitLines.forEach(ld => {
+          const meaning = LINE_MEANINGS[ld.key] || ld.key;
           const item = document.createElement('div');
           item.className = 'bg-purple-50 rounded-lg px-3 py-2 border border-purple-100';
-          item.innerHTML = `<p style="font-size:11px;color:#4b5563;line-height:1.55;">${esc(meaning)}</p>`;
+          const matchedLine = completedLines.find(cl => cl.key === ld.key);
+          const bonusTag = matchedLine
+            ? ` <span style="color:${matchedLine.isSpecial ? '#78350f' : '#b45309'};font-weight:700;font-size:10px;">${matchedLine.isSpecial ? '✨特別+15' : '⚡揃い+10'}</span>`
+            : '';
+          item.innerHTML = `<p style="font-size:11px;color:#4b5563;line-height:1.55;">${esc(meaning)}${bonusTag}</p>`;
           linesListEl.appendChild(item);
         });
+        lineSummaryEl.classList.remove('hidden');
+      } else if (completedLines.length > 0) {
         lineSummaryEl.classList.remove('hidden');
       } else {
         lineSummaryEl.classList.add('hidden');
