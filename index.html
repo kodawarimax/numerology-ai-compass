@@ -61,6 +61,24 @@
     .pr-chapter--closing h2 { color: #fff; border-left-color: rgba(255,255,255,0.5); }
     .pr-chapter--closing p { color: rgba(255,255,255,0.92); font-weight: 400; }
     .pr-chapter--closing p strong { color: #fde68a; }
+    /* 天職カード — 3軸・相性カードと統一トーン */
+    .voc-section { background: #fff; border-radius: 16px; border: 1px solid #e9d5ff; padding: 16px 16px 14px; margin-bottom: 10px; box-shadow: 0 1px 4px rgba(124,58,237,0.06); }
+    .voc-section--core { background: linear-gradient(135deg,#faf5ff,#fce7f3); border: 1.5px solid #d8b4fe; box-shadow: 0 3px 10px rgba(124,58,237,0.10); }
+    .voc-section--a { background: linear-gradient(135deg,#eef2ff,#f5f3ff); border: 1px solid #c7d2fe; }
+    .voc-section--b { background: linear-gradient(135deg,#f5f3ff,#fdf4ff); border: 1px solid #ddd6fe; }
+    .voc-section__title { font-family: 'Lora', serif; font-size: 13px; font-weight: 700; color: #6b21a8; border-left: 3px solid #a855f7; padding-left: 8px; margin-bottom: 6px; line-height: 1.4; }
+    .voc-section--a .voc-section__title { color: #3730a3; border-left-color: #6366f1; }
+    .voc-section--b .voc-section__title { color: #5b21b6; border-left-color: #8b5cf6; }
+    .voc-section__sub { font-size: 11px; color: #7c3aed; margin-bottom: 4px; line-height: 1.5; }
+    .voc-section--a .voc-section__sub { color: #4338ca; }
+    .voc-section--b .voc-section__sub { color: #6d28d9; }
+    .voc-section__desc { font-size: 12px; line-height: 1.7; color: #374151; background: rgba(255,255,255,0.6); border-radius: 8px; padding: 8px 10px; margin-bottom: 8px; border-left: 2px solid #c4b5fd; }
+    .voc-section--a .voc-section__desc { border-left-color: #a5b4fc; }
+    .voc-section__chips { display: flex; flex-wrap: wrap; gap: 4px; }
+    .voc-chip { font-size: 11px; padding: 3px 10px; min-height: 24px; line-height: 1.4; display: inline-flex; align-items: center; border-radius: 99px; font-weight: 500; }
+    .voc-chip--core { background: linear-gradient(135deg,#7c3aed,#db2777); color: #fff; font-weight: 700; font-size: 12px; padding: 4px 12px; min-height: 26px; }
+    .voc-chip--a { background: #e0e7ff; color: #3730a3; }
+    .voc-chip--b { background: #ede9fe; color: #5b21b6; }
     /* Phase 2: 引用ブロック */
     .pr-quote { font-family: 'Lora', serif; font-style: italic; font-size: 17px; color: #6b21a8; text-align: center; border-top: 1.5px solid #d8b4fe; border-bottom: 1.5px solid #d8b4fe; padding: 14px 12px; margin: 16px 0; line-height: 1.7; }
     /* Phase 1: figure ラップ */
@@ -889,6 +907,7 @@
         <button class="nav-tab flex-1 py-2.5 text-[10px] font-medium text-gray-400 border-b-2 border-transparent" data-target="section-cycles">サイクル</button>
         <button class="nav-tab flex-1 py-2.5 text-[10px] font-medium text-gray-400 border-b-2 border-transparent" data-target="section-dataset">詳細鑑定</button>
         <button class="nav-tab flex-1 py-2.5 text-[10px] font-medium text-gray-400 border-b-2 border-transparent" data-target="section-strengths">強み診断</button>
+        <button class="nav-tab flex-1 py-2.5 text-[10px] font-medium text-gray-400 border-b-2 border-transparent" data-target="section-brandkit">ブランド設計</button>
       </div>
     </div>
 
@@ -2114,6 +2133,74 @@
 
       </div>
 
+      <!-- ===== SECTION: ブランド設計 ===== -->
+      <div id="section-brandkit" class="space-y-5">
+
+        <!-- Intro / Header -->
+        <div class="bg-white shadow-sm border border-gray-100 rounded-xl p-5 space-y-4">
+          <div class="text-center">
+            <h3 class="text-base font-bold text-purple-700">自分ブランド設計</h3>
+            <p class="text-[10px] text-purple-400 mt-0.5">数秘×強みから、あなた本人の事業の素材をつくる</p>
+          </div>
+          <p class="text-xs text-gray-600 leading-relaxed">
+            あなたの数秘と強みの診断結果をもとに、AIが「自分ブランド事業」を立ち上げるための素材一式を生成します。①ポジショニング ②LP・セールスコピー ③商品設計 ④30日分のSNS発信カレンダー。
+          </p>
+          <!-- 品質免責 (Brand Gate 条件3) -->
+          <div class="text-[10px] text-amber-800 leading-relaxed bg-amber-50 rounded-lg p-3 border border-amber-200">
+            ここで生成されるのは、AIによる「素材・叩き台」です。あなた自身が手を入れて完成させることを前提にしています。内容の正確さや事業の成果を保証するものではありません。
+          </div>
+
+          <!-- Locked (診断未完了) -->
+          <div id="bk-locked" class="hidden">
+            <div class="text-[11px] text-gray-500 leading-relaxed bg-gray-50 rounded-lg p-3 border border-gray-200" id="bk-locked-msg">
+              ブランド設計には、数秘鑑定と強み診断の両方の結果が必要です。先に2つの診断を完了させてください。
+            </div>
+          </div>
+
+          <!-- Start (生成ボタン) -->
+          <div id="bk-start" class="hidden">
+            <button id="bk-btn-generate" class="w-full gradient-cta text-white rounded-full py-3 font-semibold text-sm shadow-lg">あなたのブランド素材を生成する</button>
+            <p class="text-[9px] text-gray-400 mt-2 text-center">生成には30秒〜1分ほどかかります。</p>
+          </div>
+
+          <!-- Loading -->
+          <div id="bk-loading" class="hidden text-center py-6">
+            <div class="flex flex-col items-center gap-3">
+              <svg class="w-8 h-8 animate-spin text-purple-500" fill="none" viewBox="0 0 24 24">
+                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path>
+              </svg>
+              <p class="text-xs text-purple-500">あなたの診断結果から、ブランド素材を生成しています…</p>
+            </div>
+          </div>
+
+          <!-- Error -->
+          <div id="bk-error" class="hidden space-y-3">
+            <div class="text-xs text-red-600 leading-relaxed bg-red-50 rounded-lg p-3 border border-red-200" id="bk-error-msg">生成に失敗しました。</div>
+            <button id="bk-btn-retry" class="w-full bg-purple-50 text-purple-700 border border-purple-200 rounded-full py-2.5 font-semibold text-sm">もう一度試す</button>
+          </div>
+        </div>
+
+        <!-- Result (4 artifacts) -->
+        <div id="bk-result" class="hidden space-y-5"></div>
+
+        <!-- 覚悟ゲート (Brand Gate 条件2) -->
+        <div id="bk-gate" class="hidden">
+          <div class="bg-white shadow-sm border border-purple-100 rounded-xl p-5 space-y-4">
+            <div class="text-center">
+              <h3 class="text-sm font-bold text-purple-700">ここから先は、一人で歩く道</h3>
+            </div>
+            <p class="text-[11px] text-gray-600 leading-relaxed">
+              この素材は、あなた一人でも形にできるように作られています。受け取って、自分の手で動かしてください。それで十分です。<br><br>
+              もし「一人で守り続けるのではなく、覚悟を分かち合える誰かと進みたい」と本気で思ったときだけ、その先の扉があります。迎えに行くことはしません。扉を開くのは、あなたの覚悟だけです。
+            </p>
+            <button id="bk-gate-open" class="w-full bg-purple-50 text-purple-700 border border-purple-200 rounded-full py-2.5 font-semibold text-sm">覚悟を持って、その先の扉を見る</button>
+            <div id="bk-gate-reveal" class="hidden"></div>
+          </div>
+        </div>
+
+      </div>
+
 
       <footer class="text-center py-4">
         <p class="text-[10px] text-gray-300">&copy; 2026 数秘AIライフコンパス. あなたの輝く人生を心から応援しています。</p>
@@ -2654,8 +2741,139 @@
         const target = document.getElementById(tab.dataset.target);
         if (target) target.scrollIntoView({ behavior: 'smooth', block: 'start' });
         if (tab.dataset.target === 'section-strengths') { window.__refreshStrengthsNumCross && window.__refreshStrengthsNumCross(); }
+        if (tab.dataset.target === 'section-brandkit') { window.__refreshBrandKitGate && window.__refreshBrandKitGate(); }
       });
     });
+
+    // -- F2: Brand-kit UI (name-neutral; consumes dp_v1 via window.__generateBrandKit) --
+    (function () {
+      const $ = (id) => document.getElementById(id);
+      const esc = (s) => String(s == null ? '' : s)
+        .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+      const show = (el) => { if (el) el.classList.remove('hidden'); };
+      const hide = (el) => { if (el) el.classList.add('hidden'); };
+      // 立会の窓口（中立・名義非表示）。差し替えはこの2定数のみ。
+      const CONTACT_EMAIL = 'kodawarimaxjp@gmail.com';
+      const CONTACT_SUBJECT = '数秘AIライフコンパス｜お問い合わせ';
+
+      function refreshBrandKitGate() {
+        const getP = window.__getDiagnosticProfile;
+        const p = (typeof getP === 'function') ? getP() : null;
+        const complete = !!(p && p.status && p.status.complete);
+        hide($('bk-loading')); hide($('bk-error'));
+        const resultShown = $('bk-result') && !$('bk-result').classList.contains('hidden');
+        if (resultShown) return;
+        if (complete) { show($('bk-start')); hide($('bk-locked')); }
+        else { hide($('bk-start')); show($('bk-locked')); }
+      }
+      window.__refreshBrandKitGate = refreshBrandKitGate;
+
+      function artifactCard(title, sub, bodyHtml) {
+        return `<div class="bg-white shadow-sm border border-gray-100 rounded-xl p-5 space-y-3">
+          <div><h3 class="text-sm font-bold text-purple-700">${esc(title)}</h3>
+          <p class="text-[10px] text-purple-400 mt-0.5">${esc(sub)}</p></div>
+          ${bodyHtml}</div>`;
+      }
+      function row(label, val) {
+        if (val == null || val === '') return '';
+        return `<div class="space-y-0.5"><div class="text-[10px] font-semibold text-purple-500">${esc(label)}</div>
+          <div class="text-xs text-gray-700 leading-relaxed">${esc(val)}</div></div>`;
+      }
+
+      function renderBrandKit(kit) {
+        const pos = kit.positioning || {};
+        const lp = kit.lp || {};
+        const prod = kit.product || {};
+        const sns = Array.isArray(kit.snsCalendar) ? kit.snsCalendar : [];
+
+        const posBody = row('キャッチコピー', pos.catchphrase) + row('狙う相手', pos.target)
+          + row('独自の価値', pos.uniqueValue) + row('約束', pos.promise) + row('なぜあなたか', pos.why);
+
+        const sections = Array.isArray(lp.sections) ? lp.sections : [];
+        const secHtml = sections.map((s) => `<div class="bg-purple-50 rounded-lg p-3 border border-purple-100 space-y-1">
+          <div class="text-[11px] font-semibold text-purple-700">${esc(s.heading)}</div>
+          <div class="text-[11px] text-gray-600 leading-relaxed">${esc(s.body)}</div></div>`).join('');
+        const lpBody = row('ヘッドライン', lp.headline) + row('サブ', lp.subheadline)
+          + (secHtml ? `<div class="space-y-2">${secHtml}</div>` : '') + row('CTA', lp.cta);
+
+        const outline = Array.isArray(prod.outline) ? prod.outline : [];
+        const outlineHtml = outline.length
+          ? `<div class="space-y-0.5"><div class="text-[10px] font-semibold text-purple-500">中身の構成</div>
+             <ul class="list-disc list-inside text-xs text-gray-700 leading-relaxed space-y-0.5">
+             ${outline.map((o) => `<li>${esc(o)}</li>`).join('')}</ul></div>` : '';
+        const prodBody = row('商品名', prod.name) + row('形式', prod.format)
+          + row('価格の目安', prod.priceIdea) + outlineHtml + row('誰のための商品か', prod.whoFor);
+
+        const snsRows = sns.map((d) => `<tr class="border-b border-gray-100 align-top">
+          <td class="py-1.5 pr-2 text-[10px] text-purple-500 font-semibold whitespace-nowrap">Day ${esc(d.day)}</td>
+          <td class="py-1.5 pr-2 text-[10px] text-gray-500 whitespace-nowrap">${esc(d.format)}</td>
+          <td class="py-1.5 text-[11px] text-gray-700 leading-relaxed">
+            <div class="font-semibold text-gray-800">${esc(d.theme)}</div>
+            <div class="text-purple-600">${esc(d.hook)}</div>
+            <div class="text-gray-600">${esc(d.post)}</div></td></tr>`).join('');
+        const snsBody = `<div class="overflow-x-auto"><table class="w-full text-left">
+          <thead><tr class="border-b border-purple-100">
+            <th class="py-1 pr-2 text-[9px] text-purple-400 font-medium">日</th>
+            <th class="py-1 pr-2 text-[9px] text-purple-400 font-medium">形式</th>
+            <th class="py-1 text-[9px] text-purple-400 font-medium">テーマ・フック・投稿</th>
+          </tr></thead><tbody>${snsRows}</tbody></table></div>
+          <p class="text-[9px] text-gray-400 mt-2">全${sns.length}日分。</p>`;
+
+        const html = artifactCard('① ポジショニング', 'あなたが何者で、誰に何を約束するか', posBody)
+          + artifactCard('② LP・セールスコピー', 'そのまま下書きに使える構成案', lpBody)
+          + artifactCard('③ 商品設計', '最初に売る商品のかたち', prodBody)
+          + artifactCard('④ 30日SNS発信カレンダー', '認知→信頼→商品接続の30日', snsBody);
+        const r = $('bk-result'); if (r) { r.innerHTML = html; show(r); }
+      }
+
+      const ERR = {
+        INCOMPLETE: '数秘鑑定と強み診断の両方を完了させてからお試しください。',
+        EMPTY: 'AIからの応答が空でした。もう一度お試しください。',
+        PARSE: 'AIの応答を読み取れませんでした。もう一度お試しください。',
+        NETWORK: '通信に失敗しました。電波の良い場所でもう一度お試しください。'
+      };
+
+      async function onGenerate() {
+        hide($('bk-start')); hide($('bk-locked')); hide($('bk-error'));
+        hide($('bk-result')); hide($('bk-gate'));
+        show($('bk-loading'));
+        let res;
+        try { res = await window.__generateBrandKit(); }
+        catch (e) { res = { ok: false, error: 'NETWORK' }; }
+        hide($('bk-loading'));
+        if (res && res.ok) {
+          renderBrandKit(res.kit);
+          show($('bk-gate'));
+        } else {
+          const code = (res && res.error) || 'NETWORK';
+          const msg = $('bk-error-msg'); if (msg) msg.textContent = ERR[code] || ERR.NETWORK;
+          show($('bk-error'));
+          if (code === 'INCOMPLETE') show($('bk-locked'));
+        }
+      }
+
+      function wire() {
+        const g = $('bk-btn-generate'); if (g) g.addEventListener('click', onGenerate);
+        const r = $('bk-btn-retry'); if (r) r.addEventListener('click', onGenerate);
+        const gate = $('bk-gate-open');
+        if (gate) gate.addEventListener('click', () => {
+          const rv = $('bk-gate-reveal');
+          if (!rv) return;
+          rv.innerHTML = `<div class="mt-3 bg-purple-50 rounded-lg p-4 border border-purple-100 space-y-2">
+            <p class="text-[11px] text-gray-700 leading-relaxed">
+              あなたが本気で覚悟を決めたなら、その先には「一人で守り続けなくていい」場所があります。
+              ただし、こちらから売り込むことはありません。連絡するかどうかは、あなた自身が決めてください。</p>
+            <a data-bk-witness-link href="#" class="block text-center text-[11px] text-purple-600 underline">（立会の窓口リンクは未設定）</a>
+          </div>`;
+          show(rv);
+          hide(gate);
+        });
+        refreshBrandKitGate();
+      }
+
+      if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', wire);
+      else wire();
+    })();
 
     // Personal cycle descriptions
     const cycleDescriptions = {
@@ -3896,51 +4114,41 @@ ${numContext}
     // Dataset sections renderer
     // =========================================================
     // =========================================================
-    // ② 3つの軸: AXIS_DEF
+    // ② 3つの軸: 値ベース分類 (正典: 値で分類)
+    // 自分軸SELF=1,4,7 / 他人軸SHARE=2,5,8 / 導き軸SPIRIT=3,6,9
+    // 実際の分類は classifyAxes(r) で行う（AXIS_POSITIONS を value ベースに振り分け）
     // =========================================================
-    const AXIS_DEF = [
+    // 各軸の表示定義（ポジション固定ではない）
+    const AXIS_DISPLAY = [
       {
         id: 'axis-self',
+        key: 'self',
         name: '自分軸',
-        sub: '内なる本質',
-        catch: 'ありのままの自分の核',
-        desc: 'あなたが生まれ持つ"本来の核"。素のままの性質と人生の目的を示します。',
-        items: [
-          { label: '誕生数', key: 'destiny' },
-          { label: '運命数', key: 'lifePath' },
-        ],
+        nums: '1・4・7',
+        desc: '値が1・4・7の数が集まる軸。ありのままの自分の核・自主性・独立のエネルギー。',
         color: 'purple',
       },
       {
         id: 'axis-other',
+        key: 'share',
         name: '他人軸',
-        sub: '外から見た自分',
-        catch: '社会の中での見られ方',
-        desc: '社会の中での"見られ方"。第一印象と対外的な役割を示します。',
-        items: [
-          { label: '人格数', key: 'persona' },
-          { label: '社会数', key: 'ground' },
-        ],
+        nums: '2・5・8',
+        desc: '値が2・5・8の数が集まる軸。対人・交流・社会との接点のエネルギー。',
         color: 'indigo',
       },
       {
         id: 'axis-guide',
+        key: 'spirit',
         name: '導き軸',
-        sub: '向かう方向',
-        catch: '人生が向かう方向',
-        desc: '人生がこれから"向かっていく方向"。成長と成熟のテーマを示します。',
-        items: [
-          { label: '成長数', key: 'spirit' },
-          { label: '第2目標数', key: 'target2' },
-          { label: '第3目標数', key: 'target3' },
-          { label: '成熟数', key: 'maturity' },
-        ],
+        nums: '3・6・9',
+        desc: '値が3・6・9の数が集まる軸。精神性・使命・人生の方向性のエネルギー。',
         color: 'violet',
       },
     ];
 
-    // 羅針盤キーワードから自然文サマリーを生成（Fix3: キーワード羅列→文章化）
-    function getAxisSummary(items, r) {
+    // 羅針盤キーワードから自然文サマリーを生成
+    // items: [{label, val}, ...] の配列（classifyAxes の戻り値の各配列）
+    function getAxisSummary(items) {
       if (!DATASET) return '';
       const t = DATASET.tables || {};
       const coreKw = (t['羅針盤キーワード'] || {})['コアキーワード'] || {};
@@ -3948,10 +4156,11 @@ ${numContext}
       // 各数字のポジティブ表現を取得
       const positives = [];
       const cores = [];
-      items.forEach(item => {
-        const val = r[item.key];
+      items.forEach(function(item) {
+        const val = item.val;
         if (val == null) return;
-        const lookupN = (val > 9 && val !== 11 && val !== 22 && val !== 33) ? Math.min(val, 9) : val;
+        const lookupN = normalizeTo9(val);
+        if (!lookupN) return;
         const kw = coreKw[String(lookupN)];
         if (!kw) return;
         if (kw['ポジティブ表現']) positives.push(kw['ポジティブ表現'].split('・')[0]);
@@ -3960,9 +4169,9 @@ ${numContext}
 
       if (positives.length === 0 && cores.length === 0) {
         // fallback to numDB
-        const vals = items.map(i => r[i.key]).filter(v => v != null);
-        const parts = vals.map(v => {
-          const nd = numDB[v] || numDB[Math.min(v, 9)];
+        const parts = items.map(function(item) {
+          const v = item.val;
+          const nd = numDB[v] || numDB[normalizeTo9(v)];
           return nd ? (nd.core || '').split('。')[0].slice(0, 18) : null;
         }).filter(Boolean);
         return parts.join('、') + (parts.length ? 'な傾向があります。' : '');
@@ -3977,7 +4186,6 @@ ${numContext}
         return uniqPos[0] + 'でありながら' + uniqPos[1] + 'な面も持つ、バランス感覚に優れた傾向があります。';
       }
       if (uniqPos.length === 1) {
-        // 構成する数字が同じ value に揃っている＝一貫した性質
         if (positives.length >= 2) {
           return uniqPos[0] + 'という性質が一貫して強く表れる、軸のぶれない傾向があります。';
         }
@@ -3991,49 +4199,60 @@ ${numContext}
       const card = document.getElementById('card-three-axes');
       if (!grid || !card) return;
       grid.innerHTML = '';
-      AXIS_DEF.forEach(axis => {
-        const col = axis.color;
-        const bg     = `bg-${col}-50`;
-        const border = `border-${col}-200`;
-        const hdr    = `text-${col}-700`;
-        const chip   = `bg-${col}-100 text-${col}-700`;
-        const subCls = `text-${col}-500`;
-        const descCls = `text-${col}-600`;
 
-        const summary = getAxisSummary(axis.items, r);
+      // 値ベースで分類（正典準拠: 1,4,7=自分軸 / 2,5,8=他人軸 / 3,6,9=導き軸）
+      const classified = classifyAxes(r);
+
+      AXIS_DISPLAY.forEach(function(axis) {
+        const col = axis.color;
+        const bg     = 'bg-' + col + '-50';
+        const border = 'border-' + col + '-200';
+        const hdr    = 'text-' + col + '-700';
+        const chip   = 'bg-' + col + '-100 text-' + col + '-700';
+        const descCls = 'text-' + col + '-600';
+
+        // その軸に属するアイテム（値で分類済み）
+        const axisItems = classified[axis.key] || [];
+        const summary = getAxisSummary(axisItems);
 
         const div = document.createElement('div');
-        div.className = `rounded-xl p-4 border ${bg} ${border}`;
+        div.className = 'rounded-xl p-4 border ' + bg + ' ' + border;
 
-        // 軸名
-        const title = document.createElement('p');
-        title.className = `text-sm font-bold ${hdr} mb-0.5`;
-        title.textContent = axis.name;
-        div.appendChild(title);
+        // 軸名（値レンジ表示付き）
+        const titleEl = document.createElement('p');
+        titleEl.className = 'text-sm font-bold ' + hdr + ' mb-0.5';
+        titleEl.textContent = axis.name + '（' + axis.nums + '）';
+        div.appendChild(titleEl);
 
-        // Fix1: 定義文（軸の意味）
+        // 定義文（軸の意味）
         const defEl = document.createElement('p');
-        defEl.className = `text-[11px] ${descCls} leading-snug mb-2`;
+        defEl.className = 'text-[11px] ' + descCls + ' leading-snug mb-2';
         defEl.textContent = axis.desc;
         div.appendChild(defEl);
 
-        // 数字チップ
+        // 数字チップ（値ベースで分類されたポジション）
         const chips = document.createElement('div');
         chips.className = 'flex flex-wrap gap-1 mb-2';
-        axis.items.forEach(item => {
-          const val = r[item.key];
-          if (val == null) return;
-          const c = document.createElement('span');
-          // 優先3: バッジ min-height:22px、font-size≥11px
-          c.className = `inline-flex items-center gap-1 rounded-full px-2 py-0.5 font-semibold ${chip}`;
-          c.style.fontSize = '11px';
-          c.style.minHeight = '22px';
-          c.textContent = `${item.label} ${val}`;
-          chips.appendChild(c);
-        });
+        if (axisItems.length === 0) {
+          const empty = document.createElement('span');
+          empty.style.fontSize = '11px';
+          empty.style.minHeight = '22px';
+          empty.style.color = '#9ca3af';
+          empty.textContent = '該当なし';
+          chips.appendChild(empty);
+        } else {
+          axisItems.forEach(function(item) {
+            const c = document.createElement('span');
+            c.className = 'inline-flex items-center gap-1 rounded-full px-2 py-0.5 font-semibold ' + chip;
+            c.style.fontSize = '11px';
+            c.style.minHeight = '22px';
+            c.textContent = item.label + ' ' + item.val;
+            chips.appendChild(c);
+          });
+        }
         div.appendChild(chips);
 
-        // Fix3: 文章化サマリー — 軸タイトルより小さく(12px/gray-500)
+        // 文章化サマリー
         if (summary) {
           const sum = document.createElement('p');
           sum.style.fontSize = '12px';
@@ -4108,6 +4327,43 @@ ${numContext}
       if (n === 33) return 6;
       if (n > 9) return ((n - 1) % 9) + 1;
       return n;
+    }
+
+    // =========================================================
+    // 3軸共通分類ヘルパー (正典: 値で分類)
+    // 自分軸SELF=1,4,7 / 他人軸SHARE=2,5,8 / 導き軸SPIRIT=3,6,9
+    // 対象ポジションは buildOwnershipMap の sources の正数ウェイトのみ
+    // (誕生数/運命数/人格数/社会数/成長数/第2目標/第3目標/成熟数)
+    // 戻り値: { self:[{label,val},...], share:[...], spirit:[...] }
+    // =========================================================
+    const AXIS_POSITIONS = [
+      { label: '誕生数',  key: 'destiny'  },
+      { label: '運命数',  key: 'lifePath' },
+      { label: '人格数',  key: 'persona'  },
+      { label: '社会数',  key: 'ground'   },
+      { label: '成長数',  key: 'spirit'   },
+      { label: '第2目標', key: 'target2'  },
+      { label: '第3目標', key: 'target3'  },
+      { label: '成熟数',  key: 'maturity' },
+    ];
+    const AXIS_VALUE_MAP = {
+      1:'self', 4:'self', 7:'self',
+      2:'share', 5:'share', 8:'share',
+      3:'spirit', 6:'spirit', 9:'spirit',
+    };
+
+    function classifyAxes(r) {
+      const result = { self: [], share: [], spirit: [] };
+      AXIS_POSITIONS.forEach(function(pos) {
+        const raw = r[pos.key];
+        if (raw == null || raw === 0) return;
+        const n = normalizeTo9(raw);
+        if (n < 1 || n > 9) return;
+        const axis = AXIS_VALUE_MAP[n];
+        if (!axis) return;
+        result[axis].push({ label: pos.label, val: raw });
+      });
+      return result;
     }
 
     // r からスコアマップを生成
@@ -4672,6 +4928,193 @@ ${numContext}
         </div>`;
     });
 
+    // =========================================================
+    // VOCATION MATRIX — THE MATRIX CODE 天職・職業適性
+    // Source: ワークブック "THE MATRIX CODE" (C)2001-2023
+    // 因子3数(社会数・成長数・人格数)→結果2数(運命数・成熟数)
+    // 手編集の正典: data/vocation-matrix.json
+    // =========================================================
+    const VOCATION_MATRIX = {
+      numberMeaning: {
+        "1":{"theme":"自己信頼","power":"意志力","archetype":"先駆者・斬新さ・革新性・指揮官","keywords":["リーダーシップ","イニシアティブ","オリジナリティ","パイオニア","フロンティア"]},
+        "2":{"theme":"自己親愛","power":"感応力","archetype":"支援者・繊細さ・感受性・外交官","keywords":["パートナーシップ","フィーリング","イマジネーション","エモーション","ハートフル"]},
+        "3":{"theme":"自己肯定","power":"表現力","archetype":"啓蒙者・閃き・社交性・芸術家","keywords":["クリエイティブ","インスピレーション","ユーモア","ジョイフル","ポジティブパワー"]},
+        "4":{"theme":"自己存在","power":"継続力","archetype":"観察者・堅実さ・本物志向・事業家","keywords":["リアリティ","ビーイング","イグジスタンス","グランディング","マイペース"]},
+        "5":{"theme":"自己発見","power":"活動力","archetype":"探求者・自発性・進歩的・報道官","keywords":["コミュニケーション","アドベンチャー","マインドパワー","フレキシブル","フリーダム"]},
+        "6":{"theme":"自己責任","power":"理解力","archetype":"教育者・美意識・無償の愛・奉仕家","keywords":["リレーションシップ","リスポンシビリティー","フェア","ハーモニー","バランス"]},
+        "7":{"theme":"自己変革","power":"直観力","archetype":"探究者・先見性・洞察力・分析官","keywords":["スピリチュアリティー","インテリジェンス","イノベーション","ユニーク","ウイズダム"]},
+        "8":{"theme":"自己実現","power":"統率力","archetype":"統治者・大胆さ・公明正大・投資家","keywords":["リアライゼーション","マニフェスト","チャレンジ","ステイタス","パワーバランス"]},
+        "9":{"theme":"自己変容","power":"創造力","archetype":"調停者・多様性・共感能力・夢想家","keywords":["オールマイティー","クリエイティブ","ロマンティック","コンパッション","サレンダー"]}
+      },
+      systemA_unmei: {
+        "7":{"cells":[
+          {"pair":[1,6],"desc":"自主独立の高潔な精神！知的探究心が旺盛で直観的、研究熱心な職人気質。高い視座と洞察力、独自の視点を活かした革新的な叡智で己の道を極める。","jobs":["啓蒙家","先駆者","執筆家","研究家","発明家","宗教家","マスター","文化人"]},
+          {"pair":[2,5],"desc":"自由な発想と鋭いアンテナ！知的好奇心や探究心が強く言語能力が優れている。相手の思いを素早く汲み取り、適材適所で的確にアドバイスする才能がある。","jobs":["講演家","執筆家","人材育成","評論家","研究家","分析官","コンサルタント","アドバイザー"]},
+          {"pair":[3,4],"desc":"才気溢れる閃きと直観力！高い視座と分析能力を活かし、独自の道を極める。研ぎ澄まされた感性、現実を見据えた上で、研究熱心に取り組む職人気質。","jobs":["啓蒙家","発明家","執筆業","技師","設計士","治療家","陶芸家","鑑定士","アナリスト"]},
+          {"pair":[7,9],"desc":"冷静沈着で探究心旺盛！高い視座と広い視野を活かし、独自の見解を見出す。緻密に分析する面と多面的に捉える面があり、研究熱心で己の道を切り拓く。","jobs":["啓蒙家","執筆家","研究者","発明家","劇作家","鑑定士","職人","師マスター","宗教家"]},
+          {"pair":[8,8],"desc":"高潔さと不屈の精神！明晰な頭脳で人生の目標に向かって実力を発揮する。器や度量が大きく、同志や仲間との連携を図りながら組織作りに精を出す。","jobs":["起業家","政治家","伝統芸能","財団組織","社会貢献","宗教家","投資家","コンサルタント"]}
+        ]},
+        "8":{"cells":[
+          {"pair":[1,7],"desc":"独立心旺盛で行動力抜群！自負心が強く負けず嫌い、揺るぎない信念で挑戦！困難や試練に遭遇しても屈する事なく、高潔な精神でリーダーシップを発揮！","jobs":["啓蒙家","投資家","資本家","技術者","専門家","政治家","社会事業家","文化人"]},
+          {"pair":[2,6],"desc":"物腰は柔らかいが大胆な発言力を持つ。真の豊かさを実現させる力を持つ。相手とのバランスを汲み取りながら、人材育成や支援活動で才能を発揮する。","jobs":["起業家","慈善家","外交官","秘書","家元","接客業","人材育成","オーガナイザー"]},
+          {"pair":[3,5],"desc":"鋭い閃きと自由なる精神！広い視野と豊かな発想で人を啓蒙する力を持つ。抜群のバイタリティーと行動力で、不可能を可能にするパワーを発揮する。","jobs":["啓蒙家","講演家","社会事業家","弁護士","芸能人","スポーツ選手","プロデューサー"]},
+          {"pair":[4,4],"desc":"泰然自若の精神！生真面目で損得に敏感。戦略的に目標を実現させる力がある。本物志向で実力派、曖昧さを嫌う。真摯な姿勢と実行力で自らの志を貫き通す。","jobs":["企業家","建設業","不動産","製造業","法律家","検察官","政治家","社会事業家"]},
+          {"pair":[8,9],"desc":"独立心旺盛で不屈の精神！抜群のバイタリティーで人生の目標を達成する。公明正大で親分肌。困難や試練に遭遇しても屈する事なく実力を発揮する。","jobs":["企業家","投資家","製造業","不動産","貿易商","政治家","監督","芸能人","文化人"]}
+        ]},
+        "9":{"cells":[
+          {"pair":[1,8],"desc":"自主独立の高潔な精神！何事にも直観的で情熱的、揺るぎない信念を持つ。懐が広く頼り甲斐があり、高い理想や浪漫を抱きながら社会貢献を目指す。","jobs":["啓蒙家","起業家","講演家","執筆家","弁護士","演出家","宗教家","文化人"]},
+          {"pair":[2,7],"desc":"繊細な心と豊かな感受性。高潔な精神と慈悲心を持って「器」を豊かにする。相手の思いや考えを汲み取り、多くの人を支援しながら社会貢献を目指す。","jobs":["慈善家","執筆家","研究家","漫画家","治療家","占術師","鑑定士","アドバイザー"]},
+          {"pair":[3,6],"desc":"鋭い感性と高潔な精神！美意識が高く、クリエイティブな才能を発揮する。広い視野と発想力豊か、人類愛を胸に抱きながら理想の社会貢献を目指す。","jobs":["芸術家","劇作家","執筆業","教育者","治療家","宗教家","映画人","クリエーター"]},
+          {"pair":[4,5],"desc":"鋭い視点と広い視野！真摯な姿勢で物事を的確に判断し、自らの思いを貫き通す。物事の多面性と多様性を理解した上で、人道主義的な態度で社会貢献を目指す。","jobs":["環境家","治療家","講演家","執筆家","弁護士","貿易業","NPO","コンサルタント"]},
+          {"pair":[9,9],"desc":"鋭い感性と高潔な精神！自由な発想と広い視野でクリエイティビティを発揮！特定の時代性や地域性を超えた、革新的なリーダーとして社会貢献を目指す。","jobs":["啓蒙家","慈善家","教育者","医師","治療家","映画人","芸術家","宗教家","ヒーラー"]}
+        ]}
+      },
+      systemB_seijuku: {
+        "1":{"cells":[
+          {"pair":[1,9],"desc":"自主独立の高潔な精神！何事にも直観的で情熱的、意志の強さを持つ。自尊心や向上心が強く、気高きリーダーとして新たな時代を創造する。","jobs":["啓蒙家","起業家","先駆者","講演家","技術者","発明家","宗教家","文化人"]},
+          {"pair":[2,8],"desc":"物腰は柔らかいが大胆な発言力を持ち、多くの人を支援する立場を取る。相手とのバランスを考慮しながら、親密なリーダーシップを発揮させる。","jobs":["外交官","執筆家","弁護士","調停者","秘書","家元","支援者","アドバイザー"]},
+          {"pair":[3,7],"desc":"煌めく才気溢れる精神！頭脳明晰で発想力豊か、人を啓蒙する力を持つ。自尊心が高く華やかさがあり、高い視座を持つリーダーとして活躍する。","jobs":["啓蒙家","講演家","執筆業","技術者","研究者","発明家","宗教家","デザイナー"]},
+          {"pair":[4,6],"desc":"高き理想を胸に抱く！真摯な姿勢で物事に取り組み、自らの意志を貫き通す。美意識が高く、すべてに造詣が深い。技量のあるリーダーとして活躍する。","jobs":["起業家","技術者","建築家","会計士","教育者","出版編集","プランナー","オーガナイザー"]},
+          {"pair":[5,5],"desc":"斬新な発想と不屈の精神！冒険心と瞬発力を持って人生目標を達成する。自由な精神を磨きながら革新的なリーダーとして新たな時代を切り拓く。","jobs":["先駆者","IT起業家","講演家","演出家","貿易業","探検家","広告宣伝","コンサルタント"]}
+        ]},
+        "2":{"cells":[
+          {"pair":[1,1],"desc":"自尊心が高く自主独立の精神を持ち、人々への支援サポートは惜しまない。人々の士気や向上心を高め、親身になって新たな可能性へ導く才能がある。","jobs":["啓蒙家","外交官","執筆家","芸術家","教育者","支援者","アドバイザー"]},
+          {"pair":[2,9],"desc":"物腰柔らかく協調性があり、相手の気持ちを汲み取り、愛情深く接する。想像力豊かで直感的。美しいものや目に見えない世界を描く才能がある。","jobs":["音楽家","小説家","漫画家","教育者","秘書","保育士","治療家","セラピスト"]},
+          {"pair":[3,8],"desc":"鋭い閃きと不屈の精神！前向きな態度で外交能力に優れた才能を発揮する。多くの機会やチャンスを活かす事が上手で物事を発展させる器量がある。","jobs":["外交官","交渉人","芸術家","講演家","支援者","参謀","福祉","オーガナイザー"]},
+          {"pair":[4,7],"desc":"真摯な姿勢と気高き精神！何事にも真摯に取り組み、確実な結果を生み出す。粘り強く緻密な作業も得意。本質的な価値や本物を見極める鋭い視点を持つ。","jobs":["研究家","執筆家","薬剤師","治療家","園芸家","伝統芸能","職人","プログラマー"]},
+          {"pair":[5,6],"desc":"美意識が高く直感的！豊かな感受性と想像力が活かされて、センス抜群！自らの理想は高く、母性的な優しさと明るさを持ち、美しいものを愛する。","jobs":["外交官","秘書","執筆家","看護師","芸術家","美容家","タレント","アドバイザー"]}
+        ]},
+        "3":{"cells":[
+          {"pair":[1,2],"desc":"鋭い閃きと斬新な発想！未来のヴィジョンを描くクリエイティビティを発揮！純真な心とユーモアのセンスを活かし、創作活動や啓蒙活動で才能を発揮する。","jobs":["啓蒙家","講演家","執筆家","芸術家","セミナー講師","タレント","クリエーター"]},
+          {"pair":[3,9],"desc":"自由な発想と鋭い感性！多芸多才でマルチ、天性の芸術的センスに溢れている。鋭い閃きとユーモアのセンスを活かしたクリエイティブな世界で才能を発揮する。","jobs":["芸術家","啓蒙家","企画開発","セラピスト","デザイナー","芸能人","クリエーター"]},
+          {"pair":[4,8],"desc":"鋭い感性と閃き！夢と現実を見据えながら人生に引き寄せるパワーを持つ。人生の目標や願望に向かって企画プランを立て、実現させる技量を発揮する。","jobs":["起業家","設計士","環境事業","セミナー講師","企画開発","プランナー","プロデューサー"]},
+          {"pair":[5,7],"desc":"才気溢れる精神性！研ぎ澄まされた感性と斬新な発想で創作活動を展開する。明晰な頭脳と流暢な言語能力を活かして、多方面でパフォーマンスを発揮する。","jobs":["啓蒙家","芸術家","冒険家","執筆家","評論家","発明家","プランナー","キャスター"]},
+          {"pair":[6,6],"desc":"美意識が高く、磨かれたセンス！慈愛に満ちた母性と豊かな感受性を活かし、人々を魅了しながら美しい調和を生み出す。創作活動などで才能を発揮する。","jobs":["芸術家","美容家","教育者","人材育成","セラピスト","デザイナー","芸能人","モデル"]}
+        ]},
+        "4":{"cells":[
+          {"pair":[1,3],"desc":"自尊心が強く自主独立の精神！何事にも真摯な姿勢で希望を持って取り組む。斬新な発想と創作意欲に優れ、新たな価値あるものを生み出すパワーを持つ。","jobs":["啓蒙家","起業家","講演家","健康産業","NPO事業","職人","園芸","サロン運営"]},
+          {"pair":[2,2],"desc":"物腰は柔らかく、相手の気持ちを汲み取り、多くの人を支援する力を持つ。お互いの関係性を配慮した上で、卓越した説得力と交渉力を発揮させる。","jobs":["外交官","教育者","執筆家","交渉人","心理療法士","セラピスト","アドバイザー"]},
+          {"pair":[4,9],"desc":"泰然自若の精神！現実的な視点と洞察力で物事の本質を見極める力を持つ。社会性を踏まえた上で、人々の安全性と快適な暮らしのサポートを惜しまない。","jobs":["事業家","技術者","設計士","会計士","編集者","治療師","農業","園芸家","環境事業"]},
+          {"pair":[5,8],"desc":"質実剛健の精神性！誰に対しても屈する事はなく、自らの意思を貫き通す。仲間や組織をパワフルにリードし、優れた組織を構築する才能を発揮する。","jobs":["事業家","建築家","不動産","法律家","政治家","評論家","環境事業","コンサルタント"]},
+          {"pair":[6,7],"desc":"物静かで誠実な人柄！美と調和を愛し、信頼関係の中で事業を構築させる。鋭い視点と洞察力を持って物事を探究し、独自の世界を構築する力を持つ。","jobs":["事業家","執筆家","芸術家","美術評論家","鑑定士","職人","NPO事業","オーガナイザー"]}
+        ]},
+        "5":{"cells":[
+          {"pair":[1,4],"desc":"自主独立の気高き精神！斬新な発想と行動力があり、自由な精神を持つ。新たな可能性に向かって新時代を切り拓くリーダーとして才能を発揮する。","jobs":["先駆者","起業家","啓蒙家","講演家","技術者","演出家","冒険家","アドバイザー"]},
+          {"pair":[2,3],"desc":"天真爛漫で明朗快活！天性の閃きと好奇心で遊び心に満ちた世界を創り出す。美的センスと豊かな想像力、人を魅了するデザインや作品を生み出す力を持つ。","jobs":["外交官","音楽家","執筆家","広告業","飲食業","セラピスト","デザイナー","タレント"]},
+          {"pair":[5,9],"desc":"鋭い感性と天賦の才能を発揮！広い視野と時代性を超越した世界観を持つ。好奇心旺盛で豊かな発想力、未知の領域へ向けて人々を啓蒙する力を持つ。","jobs":["起業家","講演家","執筆業","弁護士","通訳","広告業","海外貿易","コンサルタント"]},
+          {"pair":[6,8],"desc":"高き理想を実現！誰に対しても友好的で、バランス感覚に優れた才能を持つ。すべてに造詣が深く、頼りになる人柄！技量のあるリーダーとして活躍する。","jobs":["起業家","講演家","人材育成","接客業","芸能人","セラピスト","アドバイザー"]},
+          {"pair":[7,7],"desc":"自由な発想と高潔な精神！明晰さと研ぎ澄まされた感性で才能を発揮する。知的好奇心と探究心旺盛、革新的なリーダーとして新たな時代を切り拓く。","jobs":["IT起業家","評論家","執筆家","革命家","探検家","海外貿易","鑑定士","コンサルタント"]}
+        ]},
+        "6":{"cells":[
+          {"pair":[1,5],"desc":"気高き精神！斬新な発想と大胆な行動力で、人材育成や慈善活動を支援する。正義感と向上心を持って、新しい時代を創造するリーダーシップを発揮する。","jobs":["起業家","慈善家","啓蒙家","人材育成","社会事業家","商店経営","アドバイザー"]},
+          {"pair":[2,4],"desc":"物腰は柔らかく、相手の気持ちを汲み取り、多くの人を支援する力を持つ。まわりとの協調性を図りながら、事業を組み立て組織をまとめる才能がある。","jobs":["起業家","外交官","音楽家","教育者","接客業","秘書","看護士","心理カウンセラー"]},
+          {"pair":[3,3],"desc":"煌めく才気溢れる精神！好奇心旺盛で発想力豊か、人を啓蒙する力を持つ。鋭い感性と天性の美意識を発揮し、人を魅了する創作活動で才能を発揮する。","jobs":["啓蒙家","芸術家","美術関係","芸能人","クリエーター","デザイナー","モデル"]},
+          {"pair":[6,9],"desc":"高き理想と人道支援！母性的な優しさと慈愛心で、心の繋がりを大切にする。美意識が高く、すべてに造詣が深い。無償の愛で美と調和に満ちた世界を創造する。","jobs":["慈善活動","教育者","医療","福祉","美術関係","美容家","デザイナー","カウンセラー"]},
+          {"pair":[7,8],"desc":"鋭い直観と不屈の精神！人生目標を掲げながら、真の豊かさを実現させる。明晰さと直観力を培いながら、研究開発や社会事業へ多大な支援活動を行う。","jobs":["起業家","教育者","医療","家元","技師","治療家","投資家","慈善活動","社会事業"]}
+        ]},
+        "7":{"cells":[
+          {"pair":[1,6],"desc":"自主独立の高潔な精神！知的探究心が旺盛で直観的、研究熱心な職人気質。高い視座と洞察力、独自の視点を活かした革新的な叡智で己の道を極める。","jobs":["啓蒙家","先駆者","執筆家","研究家","発明家","宗教家","マスター","文化人"]},
+          {"pair":[2,5],"desc":"自由な発想と鋭いアンテナ！知的好奇心や探究心が強く言語能力が優れている。相手の思いを素早く汲み取り、適材適所で的確にアドバイスする才能がある。","jobs":["講演家","執筆家","人材育成","評論家","研究家","分析官","コンサルタント","アドバイザー"]},
+          {"pair":[3,4],"desc":"才気溢れる閃きと直観力！高い視座と分析能力を活かし、独自の道を極める。研ぎ澄まされた感性、現実を見据えた上で、研究熱心に取り組む職人気質。","jobs":["啓蒙家","発明家","執筆業","技師","設計士","治療家","陶芸家","鑑定士","アナリスト"]},
+          {"pair":[7,9],"desc":"冷静沈着で探究心旺盛！高い視座と広い視野を活かし、独自の見解を見出す。緻密に分析する面と多面的に捉える面があり、研究熱心で己の道を切り拓く。","jobs":["啓蒙家","執筆家","研究者","発明家","劇作家","鑑定士","職人","師マスター","宗教家"]},
+          {"pair":[8,8],"desc":"高潔さと不屈の精神！明晰な頭脳で人生の目標に向かって実力を発揮する。器や度量が大きく、同志や仲間との連携を図りながら組織作りに精を出す。","jobs":["起業家","政治家","伝統芸能","財団組織","社会貢献","宗教家","投資家","コンサルタント"]}
+        ]},
+        "8":{"cells":[
+          {"pair":[1,7],"desc":"独立心旺盛で行動力抜群！自負心が強く負けず嫌い、揺るぎない信念で挑戦！困難や試練に遭遇しても屈する事なく、高潔な精神でリーダーシップを発揮！","jobs":["啓蒙家","投資家","資本家","技術者","専門家","政治家","社会事業家","文化人"]},
+          {"pair":[2,6],"desc":"物腰は柔らかいが大胆な発言力を持つ。真の豊かさを実現させる力を持つ。相手とのバランスを汲み取りながら、人材育成や支援活動で才能を発揮する。","jobs":["起業家","慈善家","外交官","秘書","家元","接客業","人材育成","オーガナイザー"]},
+          {"pair":[3,5],"desc":"鋭い閃きと自由なる精神！広い視野と豊かな発想で人を啓蒙する力を持つ。抜群のバイタリティーと行動力で、不可能を可能にするパワーを発揮する。","jobs":["啓蒙家","講演家","社会事業家","弁護士","芸能人","スポーツ選手","プロデューサー"]},
+          {"pair":[4,4],"desc":"泰然自若の精神！生真面目で損得に敏感。戦略的に目標を実現させる力がある。本物志向で実力派、曖昧さを嫌う。真摯な姿勢と実行力で自らの志を貫き通す。","jobs":["企業家","建設業","不動産","製造業","法律家","検察官","政治家","社会事業家"]},
+          {"pair":[8,9],"desc":"独立心旺盛で不屈の精神！抜群のバイタリティーで人生の目標を達成する。公明正大で親分肌。困難や試練に遭遇しても屈する事なく実力を発揮する。","jobs":["企業家","投資家","製造業","不動産","貿易商","政治家","監督","芸能人","文化人"]}
+        ]},
+        "9":{"cells":[
+          {"pair":[1,8],"desc":"自主独立の高潔な精神！何事にも直観的で情熱的、揺るぎない信念を持つ。懐が広く頼り甲斐があり、高い理想や浪漫を抱きながら社会貢献を目指す。","jobs":["啓蒙家","起業家","講演家","執筆家","弁護士","演出家","宗教家","文化人"]},
+          {"pair":[2,7],"desc":"繊細な心と豊かな感受性。高潔な精神と慈悲心を持って「器」を豊かにする。相手の思いや考えを汲み取り、多くの人を支援しながら社会貢献を目指す。","jobs":["慈善家","執筆家","研究家","漫画家","治療家","占術師","鑑定士","アドバイザー"]},
+          {"pair":[3,6],"desc":"鋭い感性と高潔な精神！美意識が高く、クリエイティブな才能を発揮する。広い視野と発想力豊か、人類愛を胸に抱きながら理想の社会貢献を目指す。","jobs":["芸術家","劇作家","執筆業","教育者","治療家","宗教家","映画人","クリエーター"]},
+          {"pair":[4,5],"desc":"鋭い視点と広い視野！真摯な姿勢で物事を的確に判断し、自らの思いを貫き通す。物事の多面性と多様性を理解した上で、人道主義的な態度で社会貢献を目指す。","jobs":["環境家","治療家","講演家","執筆家","弁護士","貿易業","NPO","コンサルタント"]},
+          {"pair":[9,9],"desc":"鋭い感性と高潔な精神！自由な発想と広い視野でクリエイティビティを発揮！特定の時代性や地域性を超えた、革新的なリーダーとして社会貢献を目指す。","jobs":["啓蒙家","慈善家","教育者","医師","治療家","映画人","芸術家","宗教家","ヒーラー"]}
+        ]}
+      },
+      categories: {
+        "1":["独立心＆気高き精神=起業家・講演家・医師・教師・教育者・宗教家","決断力＆不屈の精神=啓蒙家・政治家・先駆者・リーダー・社会運動家","独創性＆斬新な発想=技術者・研究開発者・発明家・執筆家・演出家","向上心＆実力の世界=家元・職人・芸能人・文化人・デザイナー・スポーツ選手"],
+        "2":["外交的＆参謀役=外交官・参謀・秘書・助手・交渉人・支援サポート","受容性＆奉仕の精神=看護師・介護士・保育士・教師・治療家・セラピスト","感受性＆繊細な心=詩人・音楽家・画家・小説家・霊能者・心理カウンセラー","緻密さ＆細かい作業=会計士・漫画家・師匠・手工芸・美容師・プログラマー"],
+        "3":["豊かな発想＆創造力=芸術家・映画関係・デザイナー・クリエーター","鋭い閃き＆表現力=執筆家・漫才師・コメディアン・企画開発・プランナー","前向き精神＆言語能力=啓蒙家・講演家・セミナー講師・キャスター","天真爛漫＆華やかさ=芸能人・演劇・タレント・モデル・パフォーマー"],
+        "4":["鋭い視点＆洞察力=事業家・財務・金融業・法律家・学者・博士研究員・評論家","本物志向＆几帳面=出版業・編集エディター・税理士・会計士・オーガナイザー","技術能力＆構築力=技術者・研究開発・建築家・設計士・環境事業・NPO事業","自然派＆職人気質=農業・園芸・職人・健康産業・鍼灸師・治療家・セラピスト"],
+        "5":["雄弁＆不屈の精神=起業家・政治家・革命家・弁護士・IT関連・コンサルタント","宣伝力＆冒険心=広告業・販売業・飲食業・旅行業・海外駐在員・海外貿易","明晰さ＆巧みな話術=講演家・執筆家・通訳・声優・評論家・ジャーナリスト","躍動感＆パワフル=芸能人・タレント・モデル・歌手・ダンサー・スポーツ選手"],
+        "6":["正義感＆頼り甲斐=起業家・人材育成・環境事業・社会事業家・慈善活動家","慈愛の心＆奉仕の心=医師・薬剤師・看護士・治療家・医療関係・福祉関係","受容性＆親身な姿勢=教師・教育者・接客業・セラピスト・心理カウンセラー","美意識＆華やかな世界=芸能人・モデル・デザイナー・美容家・美術商・商店経営"],
+        "7":["洞察力＆崇高な精神=専門家・学者・教授・科学者・天文学者・宗教家・占術家","識別力＆鋭い視点=執筆家・評論家・発明家・調査分析・コンサルタント","技術力＆研究熱心=技師・研究者・職人・鑑定士・古美術・治療家・漢方医","独創性＆粘り強さ=家元・師マスター・伝統芸能・写真家・芸術家・工芸作家"],
+        "8":["実行力＆不屈の精神=企業家・資本家・政治家・スポーツ選手・プロデューサー","推察力＆利潤の追求=投資家・金融業・貿易商・販売業・飲食業・商店経営","正義感＆公平な視点=法律家・弁護士・検察官・警察官・自衛官・支配人","組織力＆実力の世界=建設業・土木業・製造業・不動産業・社会事業家"],
+        "9":["癒す力＆奉仕精神=医師・薬剤師・治療家・介護士・福祉関係・人道支援","鋭い感性＆創造力=芸術家・音楽家・映画人・俳優・クリエーター・ディレクター","理想＆崇高な精神=思想家・宗教家・慈善家・革命家・改革者・社会運動家","繊細さ＆共感能力=教育者・小説家・漫画家・夢想家・占術師・カウンセラー"]
+      }
+    };
+
+    // pairSet の順不同一致ヘルパー
+    function _pairMatches(pair, a, b) {
+      return (pair[0] === a && pair[1] === b) || (pair[0] === b && pair[1] === a);
+    }
+
+    // 系統A/B から該当 cell を探す（順不同）
+    function _findCell(cells, n1, n2) {
+      for (const cell of cells) {
+        if (_pairMatches(cell.pair, n1, n2)) return cell;
+      }
+      return null;
+    }
+
+    // 2マトリクス天職計算
+    // 引数 r: lastResults（.ground=社会数, .spirit=成長数, .persona=人格数,
+    //                        .lifePath=運命数, .maturity=成熟数）
+    // 戻り値: { sysA: {num, cellPair, jobs, matched}, sysB: {num, cellPair, jobs, matched},
+    //           core: string[], lp_nm: {theme,keywords}, mat_nm: {theme,keywords} }
+    function computeVocation(r) {
+      const ground  = normalizeTo9(r.ground);   // 社会数
+      const spirit  = normalizeTo9(r.spirit);   // 成長数
+      const persona = normalizeTo9(r.persona);  // 人格数
+      const lp      = normalizeTo9(r.lifePath); // 運命数（正規化）
+      const mat     = normalizeTo9(r.maturity); // 成熟数（正規化）
+
+      // 系統A: 運命数1-6はsystemB同主数で代用
+      const sysASource = (lp >= 7 && lp <= 9)
+        ? VOCATION_MATRIX.systemA_unmei[String(lp)]
+        : VOCATION_MATRIX.systemB_seijuku[String(lp)];
+
+      // 系統B: systemB_seijuku[成熟数]
+      const sysBSource = VOCATION_MATRIX.systemB_seijuku[String(mat)];
+
+      // 系統A: (社会数, 成長数) でセル検索
+      let sysACell = null, sysAMatched = false;
+      if (sysASource && Array.isArray(sysASource.cells)) {
+        sysACell = _findCell(sysASource.cells, ground, spirit);
+        sysAMatched = !!sysACell;
+        // フォールバック: 一致なし → null（カテゴリで補完）
+      }
+
+      // 系統B: (社会数, 人格数) でセル検索
+      let sysBCell = null, sysBMatched = false;
+      if (sysBSource && Array.isArray(sysBSource.cells)) {
+        sysBCell = _findCell(sysBSource.cells, ground, persona);
+        sysBMatched = !!sysBCell;
+      }
+
+      const sysAJobs = (sysACell && sysACell.jobs) ? sysACell.jobs : [];
+      const sysBJobs = (sysBCell && sysBCell.jobs) ? sysBCell.jobs : [];
+
+      // 重複（天職の核）: 両系統に共通する職種
+      const sysASet = new Set(sysAJobs);
+      const core = sysBJobs.filter(j => sysASet.has(j));
+
+      const lp_nm  = VOCATION_MATRIX.numberMeaning[String(lp)]  || {};
+      const mat_nm = VOCATION_MATRIX.numberMeaning[String(mat)] || {};
+
+      return {
+        sysA:      { num: lp,  cellPair: sysACell ? sysACell.pair : null, jobs: sysAJobs, matched: sysAMatched, fallback: lp < 7, _cell: sysACell },
+        sysB:      { num: mat, cellPair: sysBCell ? sysBCell.pair : null, jobs: sysBJobs, matched: sysBMatched, _cell: sysBCell },
+        core,
+        lp_nm,
+        mat_nm,
+        ground, spirit, persona
+      };
+    }
+
     function renderDatasetSections(r) {
       if (!DATASET) return;
       const t = DATASET.tables || {};
@@ -5109,6 +5552,146 @@ ${numContext}
           careerDiv.appendChild(block);
         }
 
+        // ── VOCATION MATRIX 天職ブロック ──
+        const voc = computeVocation(r);
+
+        // セパレータ（既存ブロックと天職ブロックの間）
+        if (careerDiv.children.length > 0) {
+          const sep = document.createElement('hr');
+          sep.className = 'border-purple-100 my-3';
+          careerDiv.appendChild(sep);
+          const sepLabel = document.createElement('p');
+          sepLabel.className = 'text-xs font-bold text-purple-600 mb-2';
+          sepLabel.textContent = '▼ THE MATRIX CODE 2マトリクス天職分析';
+          careerDiv.appendChild(sepLabel);
+        }
+
+        // ── 系統A: 運命数の道（社会数×成長数）──
+        const sysABlock = document.createElement('div');
+        sysABlock.className = 'voc-section voc-section--a';
+        const lp_nm = voc.lp_nm;
+        const sysATtl = document.createElement('p');
+        sysATtl.className = 'voc-section__title';
+        sysATtl.textContent = '運命数' + r.lifePath + ' の道（社会数×成長数）' + (voc.sysA.fallback ? ' ※代用' : '');
+        sysABlock.appendChild(sysATtl);
+        if (lp_nm.theme) {
+          const sysATheme = document.createElement('p');
+          sysATheme.className = 'voc-section__sub';
+          sysATheme.textContent = lp_nm.theme + '・' + (lp_nm.archetype || '') + ' ／ ' + ((lp_nm.keywords || []).join(' / '));
+          sysABlock.appendChild(sysATheme);
+        }
+        if (voc.sysA.matched) {
+          const sysAMatchNote = document.createElement('p');
+          sysAMatchNote.className = 'text-[10px] text-indigo-400 mb-1';
+          sysAMatchNote.textContent = 'あなたの社会数' + voc.ground + '×成長数' + voc.spirit + ' の組み合わせ';
+          sysABlock.appendChild(sysAMatchNote);
+          // desc表示（あれば）
+          const sysACellObj = voc.sysA._cell;
+          if (sysACellObj && sysACellObj.desc) {
+            const descEl = document.createElement('p');
+            descEl.className = 'voc-section__desc';
+            descEl.textContent = sysACellObj.desc;
+            sysABlock.appendChild(descEl);
+          }
+        } else {
+          const sysAFallback = document.createElement('p');
+          sysAFallback.className = 'text-[11px] text-gray-400 mb-1';
+          sysAFallback.textContent = '※あなたの組合せは主数カテゴリで補完します';
+          sysABlock.appendChild(sysAFallback);
+        }
+        if (voc.sysA.jobs.length > 0) {
+          const chipsA = document.createElement('div');
+          chipsA.className = 'voc-section__chips';
+          voc.sysA.jobs.forEach(function(job) {
+            const c = document.createElement('span');
+            c.className = 'voc-chip voc-chip--a';
+            c.textContent = job;
+            chipsA.appendChild(c);
+          });
+          sysABlock.appendChild(chipsA);
+        }
+        careerDiv.appendChild(sysABlock);
+
+        // ── 系統B: 成熟数の道（社会数×人格数）──
+        const sysBBlock = document.createElement('div');
+        sysBBlock.className = 'voc-section voc-section--b';
+        const mat_nm = voc.mat_nm;
+        const sysBTtl = document.createElement('p');
+        sysBTtl.className = 'voc-section__title';
+        sysBTtl.textContent = '成熟数' + r.maturity + ' の道（社会数×人格数）';
+        sysBBlock.appendChild(sysBTtl);
+        if (mat_nm.theme) {
+          const sysBTheme = document.createElement('p');
+          sysBTheme.className = 'voc-section__sub';
+          sysBTheme.textContent = mat_nm.theme + '・' + (mat_nm.archetype || '') + ' ／ ' + ((mat_nm.keywords || []).join(' / '));
+          sysBBlock.appendChild(sysBTheme);
+        }
+        if (voc.sysB.matched) {
+          const sysBMatchNote = document.createElement('p');
+          sysBMatchNote.className = 'text-[10px] text-violet-400 mb-1';
+          sysBMatchNote.textContent = 'あなたの社会数' + voc.ground + '×人格数' + voc.persona + ' の組み合わせ';
+          sysBBlock.appendChild(sysBMatchNote);
+          // desc表示（あれば）
+          const sysBCellObj = voc.sysB._cell;
+          if (sysBCellObj && sysBCellObj.desc) {
+            const descEl = document.createElement('p');
+            descEl.className = 'voc-section__desc';
+            descEl.textContent = sysBCellObj.desc;
+            sysBBlock.appendChild(descEl);
+          }
+        } else {
+          const sysBFallback = document.createElement('p');
+          sysBFallback.className = 'text-[11px] text-gray-400 mb-1';
+          sysBFallback.textContent = '※あなたの組合せは主数カテゴリで補完します';
+          sysBBlock.appendChild(sysBFallback);
+        }
+        if (voc.sysB.jobs.length > 0) {
+          const chipsB = document.createElement('div');
+          chipsB.className = 'voc-section__chips';
+          voc.sysB.jobs.forEach(function(job) {
+            const c = document.createElement('span');
+            c.className = 'voc-chip voc-chip--b';
+            c.textContent = job;
+            chipsB.appendChild(c);
+          });
+          sysBBlock.appendChild(chipsB);
+        }
+        careerDiv.appendChild(sysBBlock);
+
+        // ── 天職コアブロック（重複職種）── ※最後に表示（両道を見てから核へ）
+        const coreBlock = document.createElement('div');
+        if (voc.core.length > 0) {
+          coreBlock.className = 'voc-section voc-section--core';
+          const coreTtl = document.createElement('p');
+          coreTtl.className = 'voc-section__title';
+          coreTtl.textContent = '★ あなたの天職（両系統が示す核）';
+          coreBlock.appendChild(coreTtl);
+          const coreDesc = document.createElement('p');
+          coreDesc.className = 'text-[11px] text-purple-600 leading-snug mb-2';
+          coreDesc.textContent = '運命数と成熟数、二つの道が共通して示す職種。ここにあなたの天職の核があります。';
+          coreBlock.appendChild(coreDesc);
+          const chips = document.createElement('div');
+          chips.className = 'voc-section__chips';
+          voc.core.forEach(function(job) {
+            const c = document.createElement('span');
+            c.className = 'voc-chip voc-chip--core';
+            c.textContent = job;
+            chips.appendChild(c);
+          });
+          coreBlock.appendChild(chips);
+        } else {
+          coreBlock.className = 'voc-section';
+          const coreTtl = document.createElement('p');
+          coreTtl.className = 'voc-section__title';
+          coreTtl.textContent = '★ あなたの天職（THE MATRIX CODE）';
+          coreBlock.appendChild(coreTtl);
+          const coreNote = document.createElement('p');
+          coreNote.className = 'text-[11px] text-gray-500 mb-1';
+          coreNote.textContent = '2つのマトリクスが異なる方向を示しています。どちらの道も可能性です。';
+          coreBlock.appendChild(coreNote);
+        }
+        careerDiv.appendChild(coreBlock);
+
         careerCard.style.display = careerDiv.children.length > 0 ? '' : 'none';
       }
     }
@@ -5395,13 +5978,12 @@ ${numContext}
       const pyDB = PERSONAL_YEAR_DB[pyBase] || PERSONAL_YEAR_DB[1];
 
       // Axis balance text
-      const selfNums = [r.destiny, r.lifePath];
-      const otherNums = [r.persona, r.ground];
-      const guideNums = [r.spirit, r.target2 || 0, r.target3 || 0, r.maturity];
-      const selfAvg = selfNums.reduce((a,b)=>a+b,0)/selfNums.length;
-      const otherAvg = otherNums.reduce((a,b)=>a+b,0)/otherNums.length;
-      const guideAvg = guideNums.reduce((a,b)=>a+b,0)/guideNums.length;
-      const dominantAxis = selfAvg >= otherAvg && selfAvg >= guideAvg ? '自分軸' : otherAvg >= guideAvg ? '他人軸' : '導き軸';
+      // 支配軸: 値ベース分類（正典準拠）で個数が最多の軸
+      const _axisForReport = classifyAxes(r);
+      const _selfCnt = _axisForReport.self.length;
+      const _shareCnt = _axisForReport.share.length;
+      const _spiritCnt = _axisForReport.spirit.length;
+      const dominantAxis = _selfCnt >= _shareCnt && _selfCnt >= _spiritCnt ? '自分軸' : _shareCnt >= _spiritCnt ? '他人軸' : '導き軸';
 
       const stageLabel = r.age <= (r.periods && r.periods.first ? r.periods.first : 35)
         ? '第1期（成長期）'
@@ -5535,43 +6117,42 @@ ${numContext}
 
       // ── 3つの軸 (Phase 2: 章番号)
       // ── 3軸レーダーチャート SVG生成 (buildAxesSvg ヘルパー)
+      // スコア = 各軸に該当する保有数の個数（正典: 値で分類）
       const axesSvgHtml = (function buildAxesSvg() {
         try {
-          // 正規化: マスター数 11→2, 22→4, 33→6。その他>9は%9||9
-          function normNum(n) {
-            if (!n || isNaN(n)) return 1;
-            if (n === 11) return 2;
-            if (n === 22) return 4;
-            if (n === 33) return 6;
-            if (n > 9) return (n % 9) || 9;
-            return Math.max(1, Math.min(9, n));
-          }
-          const snSelf = [r.destiny, r.lifePath].map(normNum);
-          const snOther = [r.persona, r.ground].map(normNum);
-          const rawGuide = [r.spirit, r.target2||0, r.target3||0, r.maturity].filter(v=>v>0);
-          const snGuide = rawGuide.map(normNum);
-          const saRaw = snSelf.reduce((a,b)=>a+b,0)/snSelf.length;
-          const oaRaw = snOther.reduce((a,b)=>a+b,0)/snOther.length;
-          const gaRaw = snGuide.length ? snGuide.reduce((a,b)=>a+b,0)/snGuide.length : 1;
-          const saDisp = Math.round(saRaw * 10) / 10;
-          const oaDisp = Math.round(oaRaw * 10) / 10;
-          const gaDisp = Math.round(gaRaw * 10) / 10;
+          // 値ベース分類（共通ヘルパー使用）
+          const classified = classifyAxes(r);
+          const selfCount  = classified.self.length;
+          const shareCount = classified.share.length;
+          const spiritCount = classified.spirit.length;
+          // 最大値（正規化用）。最小1を保証してゼロ除算を防ぐ
+          const maxCount = Math.max(selfCount, shareCount, spiritCount, 1);
+          // ラベルに個数を表示（例: "自分軸 3"）
+          const saDisp = selfCount;
+          const oaDisp = shareCount;
+          const gaDisp = spiritCount;
+          // レーダー半径は個数 / 最大値 で正規化
+          const saRaw = selfCount / maxCount;
+          const oaRaw = shareCount / maxCount;
+          const gaRaw = spiritCount / maxCount;
 
           const svgCx = 120, svgCy = 110, maxR = 78;
+          // 最大目盛り = maxCount、グリッドは maxCount の 1/3 刻み
           const axisPts = [
-            { angle: -Math.PI/2,                        label: '自分軸', val: saRaw, disp: saDisp },
-            { angle: -Math.PI/2 + 2*Math.PI/3,         label: '他人軸', val: oaRaw, disp: oaDisp },
-            { angle: -Math.PI/2 + 4*Math.PI/3,         label: '導き軸', val: gaRaw, disp: gaDisp },
+            { angle: -Math.PI/2,                   label: '自分軸', val: saRaw, disp: saDisp },
+            { angle: -Math.PI/2 + 2*Math.PI/3,     label: '他人軸', val: oaRaw, disp: oaDisp },
+            { angle: -Math.PI/2 + 4*Math.PI/3,     label: '導き軸', val: gaRaw, disp: gaDisp },
           ];
           function ptAt(angle, r2) {
             return { x: svgCx + Math.cos(angle)*r2, y: svgCy + Math.sin(angle)*r2 };
           }
-          // 背景グリッド三角(3,6,9)
+          // 背景グリッド三角(1/3, 2/3, 3/3 のスケール)
           let gridSvg = '';
-          [3,6,9].forEach(function(gv) {
-            const gr = (gv/9)*maxR;
+          [1, 2, 3].forEach(function(step) {
+            const gr = (step/3)*maxR;
+            const gv = Math.round(maxCount * step / 3);
             const gPts = axisPts.map(function(p) { return ptAt(p.angle, gr); });
-            gridSvg += '<polygon points="' + gPts.map(function(p) { return p.x.toFixed(1)+','+p.y.toFixed(1); }).join(' ') + '" fill="none" stroke="#e9d5ff" stroke-width="'+(gv===9?1:0.7)+'"/>';
+            gridSvg += '<polygon points="' + gPts.map(function(p) { return p.x.toFixed(1)+','+p.y.toFixed(1); }).join(' ') + '" fill="none" stroke="#e9d5ff" stroke-width="'+(step===3?1:0.7)+'"/>';
             const glp = ptAt(axisPts[0].angle, gr);
             gridSvg += '<text x="'+(glp.x+4).toFixed(1)+'" y="'+glp.y.toFixed(1)+'" font-size="7" fill="#c4b5fd" text-anchor="start" dominant-baseline="middle">'+gv+'</text>';
           });
@@ -5581,10 +6162,10 @@ ${numContext}
             const ep = ptAt(p.angle, maxR);
             axisLines += '<line x1="'+svgCx+'" y1="'+svgCy+'" x2="'+ep.x.toFixed(1)+'" y2="'+ep.y.toFixed(1)+'" stroke="#ddd6fe" stroke-width="0.8"/>';
           });
-          // データポリゴン
-          const dataPts = axisPts.map(function(p) { return ptAt(p.angle, (Math.min(p.val,9)/9)*maxR); });
+          // データポリゴン（val は 0〜1 の正規化済み比率）
+          const dataPts = axisPts.map(function(p) { return ptAt(p.angle, p.val * maxR); });
           const polyStr = dataPts.map(function(p) { return p.x.toFixed(1)+','+p.y.toFixed(1); }).join(' ');
-          // ラベルと数値
+          // ラベルと個数
           let labelsStr = '';
           const anchors = ['middle', 'end', 'start'];
           const labelR = maxR + 22;
@@ -5592,9 +6173,8 @@ ${numContext}
           axisPts.forEach(function(p, i) {
             const lp = ptAt(p.angle, labelR);
             const vp = ptAt(p.angle, valR);
-            // ラベル y オフセット: 上頂点は上へ、下2頂点は下へ
             const ly = i === 0 ? lp.y - 10 : lp.y + 12;
-            const vy = i === 0 ? vp.y + 0 : vp.y + 12;
+            const vy = i === 0 ? vp.y + 0  : vp.y + 12;
             labelsStr += '<text x="'+lp.x.toFixed(1)+'" y="'+ly.toFixed(1)+'" text-anchor="'+anchors[i]+'" font-family="sans-serif" font-size="9" fill="#7e22ce" font-weight="700">'+p.label+'</text>';
             labelsStr += '<text x="'+vp.x.toFixed(1)+'" y="'+vy.toFixed(1)+'" text-anchor="'+anchors[i]+'" font-family="Lora,serif" font-size="11" fill="#6b21a8" font-weight="700">'+p.disp+'</text>';
           });
@@ -5606,24 +6186,34 @@ ${numContext}
           return '<figure class="pr-compat-figure" style="margin:14px 0 10px;">'
             + '<svg viewBox="0 0 240 220" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="3軸レーダーチャート" style="width:min(300px,100%);height:auto;overflow:visible;display:block;margin:0 auto;">'
             + '<rect width="240" height="220" fill="#faf5ff" rx="12"/>'
-            + '<text x="120" y="15" text-anchor="middle" font-family="serif" font-size="10" fill="#9333ea" font-weight="700">3軸エネルギーバランス</text>'
+            + '<text x="120" y="15" text-anchor="middle" font-family="serif" font-size="10" fill="#9333ea" font-weight="700">3軸エネルギーバランス（個数）</text>'
             + gridSvg + axisLines
             + '<polygon points="'+polyStr+'" fill="rgba(126,34,206,0.18)" stroke="#7e22ce" stroke-width="1.8" stroke-linejoin="round"/>'
             + dotStr + labelsStr
             + '</svg>'
-            + '<figcaption style="font-size:12px;color:#9ca3af;margin-top:4px;">自分軸・他人軸・導き軸のバランス</figcaption>'
+            + '<figcaption style="font-size:12px;color:#9ca3af;margin-top:4px;">自分軸・他人軸・導き軸のバランス（数字は該当する保有数の個数）</figcaption>'
             + '</figure>';
         } catch(e) { return ''; }
       })();
+
+      // 3軸章テキスト: 値ベース分類（正典準拠）で各軸の該当保有数を列挙
+      function _axisItemsText(items) {
+        if (!items || items.length === 0) return '該当なし';
+        return items.map(function(it) { return it.label + it.val; }).join('・');
+      }
+      const _selfText   = _axisItemsText(_axisForReport.self);
+      const _shareText  = _axisItemsText(_axisForReport.share);
+      const _spiritText = _axisItemsText(_axisForReport.spirit);
+      const _spiritStrong = _axisForReport.spirit.length >= _axisForReport.self.length && _axisForReport.spirit.length >= _axisForReport.share.length && _axisForReport.spirit.length >= 2;
 
       html += `<div class="pr-chapter" id="pr-ch-axes">
         <span class="pr-chapter-num">${nextChNum()}</span>
         <h2>3つの軸 — エネルギーの向き方</h2>
         ${axesSvgHtml}
-        <p>あなたの数秘チャートを「自分軸・他人軸・導き軸」の三方向から見ると、<strong>${prEsc(dominantAxis)}</strong>のエネルギーが相対的に強く現れています。これは、あなたのエネルギーが自然に向かう方向を示しています。強い軸がある一方で、他の軸は意識的に育てていく領域です。</p>
-        <p><strong>自分軸（誕生数${prEsc(String(r.destiny))} × 運命数${prEsc(String(r.lifePath))}）：</strong> あなたの内側から湧き出る衝動（誕生数${prEsc(String(r.destiny))}）と、人生を通じて体現するテーマ（運命数${prEsc(String(r.lifePath))}）が重なる場所です。ここにあなたの「本来の自分」が宿っています。自分軸が強いほど、内側から動く力が自然に発揮されます。</p>
-        <p><strong>他人軸（人格数${prEsc(String(r.persona))} × 社会数${prEsc(String(r.ground))}）：</strong> 外から見たあなたの印象（人格数${prEsc(String(r.persona))}）と、社会や時代との接点（社会数${prEsc(String(r.ground))}）が交わる場所です。他人軸が育つにつれ、あなたの影響力が外の世界に広がっていきます。</p>
-        <p><strong>導き軸（成長数${prEsc(String(r.spirit))} × 成熟数${prEsc(String(r.maturity))}）：</strong> 幼少期から自然に育まれてきた資質（成長数${prEsc(String(r.spirit))}）と、人生後半で統合されていくテーマ（成熟数${prEsc(String(r.maturity))}）が流れる場所です。導き軸は、あなたの人生に方向性と意味をもたらす軸です。</p>
+        <p>あなたの数秘チャートを「自分軸・他人軸・導き軸」の三方向から見ると、<strong>${prEsc(dominantAxis)}</strong>のエネルギーが相対的に強く現れています（${prEsc(dominantAxis === '自分軸' ? String(_selfCnt) : dominantAxis === '他人軸' ? String(_shareCnt) : String(_spiritCnt))}個）。これは、あなたのエネルギーが自然に向かう方向を示しています。強い軸がある一方で、他の軸は意識的に育てていく領域です。</p>
+        <p><strong>自分軸（1・4・7 → ${prEsc(_selfText)}）：</strong> 値が1・4・7の保有数が属する軸。自主性・独立・自己実現のエネルギーが宿る場所です。該当する数が多いほど、内側から湧き出る力が自然に発揮されます。</p>
+        <p><strong>他人軸（2・5・8 → ${prEsc(_shareText)}）：</strong> 値が2・5・8の保有数が属する軸。対人関係・交流・社会との接点のエネルギーが宿る場所です。他人軸が育つにつれ、あなたの影響力が外の世界に広がっていきます。</p>
+        <p><strong>導き軸（3・6・9 → ${prEsc(_spiritText)}）${_spiritStrong ? '【最強】' : ''}：</strong> 値が3・6・9の保有数が属する軸。精神性・使命・人生の方向性のエネルギーが宿る場所です。${_spiritStrong ? '導き軸の数が複数揃っており、精神的使命感が強く表れています。' : '導き軸は、あなたの人生に方向性と意味をもたらす軸です。'}</p>
         <div class="pr-action-block" style="margin-top:12px;">
           <div class="pr-action-block-label">行動提言</div>
           <p><strong>今週試してほしいこと：</strong>最も弱いと感じる軸のエネルギーを、一つの小さな行動で意識的に使ってみましょう。</p>
@@ -5631,14 +6221,48 @@ ${numContext}
         </div>
       </div>`;
 
-      // ── 職業適性 (Phase 2: 章番号)
+      // ── 職業適性 (Phase 2: 章番号 + VOCATION MATRIX統合)
+      const _voc = computeVocation(r);
+      const _vocCoreTxt = _voc.core.length > 0
+        ? '両マトリクスが重なる天職：' + _voc.core.join('・')
+        : '2つの系統が示す職種（重複なし・両方が可能性）';
+      const _vocSysATxt = _voc.sysA.jobs.length > 0
+        ? _voc.sysA.jobs.join('・')
+        : '—';
+      const _vocSysBTxt = _voc.sysB.jobs.length > 0
+        ? _voc.sysB.jobs.join('・')
+        : '—';
+      const _vocLpNm  = _voc.lp_nm;
+      const _vocMatNm = _voc.mat_nm;
+      const _vocSysAFallbackNote = _voc.sysA.fallback
+        ? '（運命数' + r.lifePath + 'は撮影未収録のため成熟数同数で代用）'
+        : '';
+
       html += `<div class="pr-chapter" id="pr-ch-career">
         <span class="pr-chapter-num">${nextChNum()}</span>
         <h2>才能の発揮先 — 職業適性の可能性</h2>
         <p>あなたの運命数${prEsc(String(r.lifePath))}と誕生数${prEsc(String(r.destiny))}の組み合わせが示す才能の方向性を、決めつけではなく可能性として受け取ってください。職業名よりも「どんな状況で、どんな役割のときに最も自分らしく動けるか」を探ることが大切です。</p>
         <p>${prEsc(prGetTemplate(r.lifePath).direction)}</p>
+
+        <div class="pr-highlight" style="margin-top:14px;margin-bottom:12px;">
+          <p style="font-size:12px;font-weight:700;color:#6b21a8;margin-bottom:6px;">★ THE MATRIX CODE 2マトリクス天職分析</p>
+          <p style="font-size:11px;color:#4c1d95;margin-bottom:2px;"><strong>運命数${prEsc(String(r.lifePath))}の道</strong>（社会数${prEsc(String(r.ground))}×成長数${prEsc(String(r.spirit))}）${prEsc(_vocSysAFallbackNote)}</p>
+          <p style="font-size:11px;color:#6b7280;margin-bottom:1px;">${prEsc(_vocLpNm.theme||'')}・${prEsc(_vocLpNm.archetype||'')}</p>
+          ${_voc.sysA._cell && _voc.sysA._cell.desc ? `<p style="font-size:11px;color:#374151;line-height:1.6;background:rgba(224,231,255,0.5);border-radius:6px;padding:6px 8px;margin-bottom:4px;">${prEsc(_voc.sysA._cell.desc)}</p>` : ''}
+          <p style="font-size:11px;color:#4c1d95;margin-bottom:8px;">${prEsc(_vocSysATxt)}</p>
+          <p style="font-size:11px;color:#6b21a8;margin-bottom:2px;"><strong>成熟数${prEsc(String(r.maturity))}の道</strong>（社会数${prEsc(String(r.ground))}×人格数${prEsc(String(r.persona))}）</p>
+          <p style="font-size:11px;color:#6b7280;margin-bottom:1px;">${prEsc(_vocMatNm.theme||'')}・${prEsc(_vocMatNm.archetype||'')}</p>
+          ${_voc.sysB._cell && _voc.sysB._cell.desc ? `<p style="font-size:11px;color:#374151;line-height:1.6;background:rgba(237,233,254,0.5);border-radius:6px;padding:6px 8px;margin-bottom:4px;">${prEsc(_voc.sysB._cell.desc)}</p>` : ''}
+          <p style="font-size:11px;color:#6b21a8;margin-bottom:6px;">${prEsc(_vocSysBTxt)}</p>
+          ${_voc.core.length > 0
+            ? `<p style="font-size:11px;color:#7c3aed;margin-bottom:4px;font-weight:700;">★ 両マトリクスが重なる天職（最も強い示唆）：</p>
+               <p style="font-size:12px;font-weight:700;color:#be185d;">${prEsc(_voc.core.join('・'))}</p>`
+            : `<p style="font-size:11px;color:#7c3aed;">2つのマトリクスが異なる道を示しています。どちらも可能性です。</p>`
+          }
+        </div>
+
         <p>成長数${prEsc(String(r.spirit))}が示す資質は、幼少期から自然と磨かれてきた能力です。それを活かせる場に身を置くとき、あなたは「頑張っている」というよりも「自然にできる」という感覚を得られます。「これは簡単すぎて価値がないと思っていたこと」の中に、実はあなたの才能が隠れていることが多いのです。</p>
-        <p>成熟数${prEsc(String(r.maturity))}は、人生の後半に向かってあなたが統合していくテーマです。今はまだその全貌が見えなくても、日々の積み重ねの中で少しずつ形になっていきます。焦らず、しかし意識的に、そのエネルギーを育てていきましょう。</p>
+        <p>成熟数${prEsc(String(r.maturity))}は、人生の後半に向かってあなたが統合していくテーマです。テーマ「${prEsc(_vocMatNm.theme||'')}」を体現するとき、あなたは本来の力を発揮します。</p>
         <div class="pr-action-block" style="margin-top:12px;">
           <div class="pr-action-block-label">行動提言</div>
           <p><strong>今週試してほしいこと：</strong>「これが得意」と感じることを一つ書き出し、それを誰かの役に立てる場面を意識的に作ってみましょう。</p>
@@ -7539,6 +8163,230 @@ ${palmAnalysisResult?.findings ? '- AI画像分析所見: ' + palmAnalysisResult
           crossEl.classList.add('hidden');
         }
       };
+
+      // -- F0: Diagnostic Profile export (data contract) --
+      // Merges numerology (numerology_data) + strengths (strengths_v1) into one
+      // AI-learnable profile. Brand-NEUTRAL by design: carries the person's own
+      // facts only — no product/brand names — so the same engine serves any user.
+      function buildDiagnosticProfile() {
+        let numData = null, strData = null;
+        try { numData = JSON.parse(localStorage.getItem('numerology_data') || 'null'); } catch (e) {}
+        try { strData = JSON.parse(localStorage.getItem(LS_KEY) || 'null'); } catch (e) {}
+
+        const hasNum = !!(numData && numData.results);
+        const hasStr = !!(strData && strData.results && strData.results.ranked);
+        if (!hasNum && !hasStr) return null;
+
+        const profile = {
+          version: 'dp_v1',
+          generatedAt: new Date().toISOString(),
+          status: { hasNumerology: hasNum, hasStrengths: hasStr, complete: hasNum && hasStr },
+          identity: {},
+          numerology: null,
+          strengths: null,
+          synthesis: {},
+        };
+
+        if (hasNum) {
+          profile.identity = {
+            firstName: numData.firstName || '',
+            birth: { year: numData.year, month: numData.month, day: numData.day },
+          };
+          const r = numData.results;
+          const POS = [
+            ['lifePath', 'cell-lifepath', '運命数'],
+            ['destiny',  'cell-destiny',  '誕生数'],
+            ['maturity', 'cell-maturity', '成熟数'],
+            ['spirit',   'cell-spirit',   '成長数'],
+            ['persona',  'cell-persona',  '人格数'],
+            ['ground',   'cell-ground',   '社会数'],
+            ['ch1',      'cell-ch1',      '克服数'],
+            ['ch2',      'cell-ch2',      '第2挑戦数'],
+            ['ch3',      'cell-ch3',      '第3挑戦数'],
+            ['ch4',      'cell-ch4',      '第4挑戦数'],
+            ['target2',  'cell-target2',  '第2目標数'],
+            ['target3',  'cell-target3',  '第3目標数'],
+          ];
+          const pd = (typeof positionData !== 'undefined') ? positionData : {};
+          const nd = (typeof numDB !== 'undefined') ? numDB : {};
+          const positions = POS
+            .filter(p => r[p[0]] !== undefined && r[p[0]] !== null)
+            .map(([key, cell, fallbackLabel]) => {
+              const value = r[key];
+              const meta = pd[cell] || {};
+              const num = nd[value] || {};
+              return {
+                key,
+                label: meta.name || fallbackLabel,
+                value,
+                theme: meta.theme || '',
+                meaning: num.core || '',
+                traits: num.traits || '',
+              };
+            });
+          profile.numerology = {
+            positions,
+            core: { lifePath: r.lifePath, destiny: r.destiny, persona: r.persona, ground: r.ground },
+            age: r.age,
+          };
+        }
+
+        if (hasStr) {
+          const res = strData.results;
+          const ranked = res.ranked || [];
+          const intensity = res.intensity || {};
+          const domainPct = res.domainPct || {};
+          const domLabel = (d) => (DOMAINS[d] ? DOMAINS[d].label : d);
+          const tipFor = (id) => ((typeof TIPS !== 'undefined' && TIPS[id]) ? TIPS[id] : '');
+          profile.strengths = {
+            top5: ranked.slice(0, 5).map((s, i) => ({
+              rank: i + 1, id: s.id, name: s.name,
+              domain: s.domain, domainLabel: domLabel(s.domain),
+              score: Math.round(intensity[s.id] || 0),
+              def: s.def || '', shadow: s.shadow || '', action: tipFor(s.id),
+            })),
+            full24: ranked.map((s, i) => ({
+              rank: i + 1, id: s.id, name: s.name,
+              domain: s.domain, domainLabel: domLabel(s.domain),
+              score: Math.round(intensity[s.id] || 0),
+            })),
+            domains: Object.keys(domainPct)
+              .map(d => ({ key: d, label: domLabel(d), sub: (DOMAINS[d] && DOMAINS[d].sub) || '', pct: Math.round(domainPct[d]) }))
+              .sort((a, b) => b.pct - a.pct),
+            dominantDomain: null,
+          };
+          const ds = profile.strengths.domains;
+          if (ds[0]) profile.strengths.dominantDomain = { key: ds[0].key, label: ds[0].label };
+          let numCrossText = '';
+          try { if (typeof buildNumCrossText === 'function') numCrossText = buildNumCrossText(ranked) || ''; } catch (e) {}
+          profile.synthesis.numCrossText = numCrossText;
+          if (ranked[0]) profile.synthesis.topStrength = { id: ranked[0].id, name: ranked[0].name, domainLabel: domLabel(ranked[0].domain) };
+        }
+        if (hasNum) {
+          profile.synthesis.lifePath = numData.results.lifePath;
+          profile.synthesis.destiny = numData.results.destiny;
+        }
+        return profile;
+      }
+
+      function saveDiagnosticProfile() {
+        const p = buildDiagnosticProfile();
+        try { if (p) localStorage.setItem('diagnostic_profile_v1', JSON.stringify(p)); } catch (e) {}
+        return p;
+      }
+
+      window.__buildDiagnosticProfile = buildDiagnosticProfile;
+      window.__getDiagnosticProfile = function () {
+        const fresh = saveDiagnosticProfile();
+        if (fresh) return fresh;
+        try { return JSON.parse(localStorage.getItem('diagnostic_profile_v1') || 'null'); } catch (e) { return null; }
+      };
+
+      // -- F1: Brand-kit generation (name-neutral; consumes dp_v1) --
+      function buildBrandKitPrompt(p) {
+        const nz = (v) => (v === undefined || v === null || v === '') ? '-' : v;
+        const name = (p.identity && p.identity.firstName) || 'あなた';
+        const num = p.numerology || {};
+        const numLines = ((num.positions || [])
+          .map((pos) => `- ${pos.label}：${nz(pos.value)}（${pos.meaning || pos.theme || ''}）`).join('\n')) || '- （数秘データなし）';
+        const core = num.core || {};
+        const st = p.strengths || {};
+        const top5Lines = ((st.top5 || [])
+          .map((s) => `- ${s.rank}位 ${s.name}（${s.domainLabel}・${s.score}%）：${s.def || ''}／影：${s.shadow || ''}`).join('\n')) || '- （強みデータなし）';
+        const domLines = ((st.domains || [])
+          .map((d) => `- ${d.label}：${d.pct}%`).join('\n')) || '- （領域データなし）';
+        const syn = p.synthesis || {};
+        const numCross = syn.numCrossText || (syn.topStrength && syn.topStrength.name) || '';
+
+        return `あなたは、一人で事業を営む人の「自分ブランド」を設計する戦略家です。
+以下は ${name}さん の数秘×強みの診断結果です。この結果に基づいて、${name}さん本人の個人ブランド事業を立ち上げるための素材一式を作ってください。
+
+# 診断データ
+## 数秘（${name}さんの数）
+${numLines}
+中核：運命数${nz(core.lifePath)} / 誕生数${nz(core.destiny)} / 人格数${nz(core.persona)} / 社会数${nz(core.ground)}
+
+## 強み（24資質の上位5）
+${top5Lines}
+
+## 強みの領域バランス
+${domLines}
+最も強い領域：${st.dominantDomain ? st.dominantDomain.label : '-'}
+数秘×強みの掛け合わせ：${numCross || '-'}
+
+# 厳守ルール
+- ${name}さん本人のブランドを設計する。既存のブランド名・サービス名・商標は一切使わない（${name}さん自身の名前や言葉で表現する）。
+- すべて強みと数秘の具体的根拠に紐づける。抽象論・きれいごとは禁止。
+- これは「素材・叩き台」。明日から動ける具体性を最優先にする。
+- 出力はJSONのみ。前後の説明文や \`\`\` は不要。
+
+# 出力JSON（このスキーマを厳守）
+{
+  "positioning": {
+    "catchphrase": "10〜20字の一言ポジショニング",
+    "target": "誰に向けるか（具体的な人物像）",
+    "uniqueValue": "${name}さんだけの独自価値（強み×数秘の根拠つき）",
+    "promise": "顧客への約束を一文で",
+    "why": "なぜ${name}さんなのか（数秘と強みで裏付け）"
+  },
+  "lp": {
+    "headline": "ファーストビューの見出し",
+    "subheadline": "補足の一文",
+    "sections": [{ "heading": "見出し", "body": "本文2〜4文" }],
+    "cta": "行動喚起の一文"
+  },
+  "product": {
+    "name": "商品・サービス名（仮）",
+    "format": "提供形態（講座/伴走/コンテンツ等）",
+    "priceIdea": "価格帯の考え方と根拠",
+    "outline": ["中身の構成要素を4〜6個"],
+    "whoFor": "この商品が刺さる人"
+  },
+  "snsCalendar": [
+    { "day": 1, "theme": "テーマ", "hook": "書き出し", "post": "本文80〜140字", "format": "形式（体験談/Tips/問いかけ/告知 等）" }
+  ]
+}
+
+snsCalendar は day 1 から day 30 まで必ず30件。前半=認知・共感、中盤=価値提供・信頼構築、後半=商品への接続、という流れにする。
+くり返す：出力はJSONオブジェクトのみ。`;
+      }
+
+      async function generateBrandKit() {
+        const getP = window.__getDiagnosticProfile;
+        const profile = (typeof getP === 'function') ? getP() : null;
+        if (!profile || !profile.status || !profile.status.complete) {
+          return { ok: false, error: 'INCOMPLETE', profile: profile || null };
+        }
+        const prompt = buildBrandKitPrompt(profile);
+        const userApiKey = ((document.getElementById('geminiApiKey') || {}).value || '').trim();
+        const fetchUrl = userApiKey
+          ? 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=' + userApiKey
+          : GEMINI_PROXY_URL;
+        let result;
+        try {
+          const resp = await fetchWithRetry(fetchUrl, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              contents: [{ parts: [{ text: prompt }] }],
+              generationConfig: { temperature: 0.8, maxOutputTokens: 65536 }
+            })
+          }, 1, 120000);
+          result = await resp.json();
+        } catch (e) {
+          return { ok: false, error: 'NETWORK', detail: String((e && e.message) || e) };
+        }
+        const c0 = result && result.candidates && result.candidates[0];
+        const text = (c0 && c0.content && c0.content.parts && c0.content.parts[0] && c0.content.parts[0].text) || '';
+        if (!text.trim()) return { ok: false, error: 'EMPTY' };
+        let kit;
+        try { kit = parseJsonRobust(text); } catch (e) { return { ok: false, error: 'PARSE', raw: text }; }
+        if (!kit || typeof kit !== 'object') return { ok: false, error: 'PARSE', raw: text };
+        return { ok: true, kit, profile };
+      }
+
+      window.__buildBrandKitPrompt = buildBrandKitPrompt;
+      window.__generateBrandKit = generateBrandKit;
 
       // Init
       showIntro();
