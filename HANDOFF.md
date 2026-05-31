@@ -1,54 +1,44 @@
-# HANDOFF — 数秘AIライフコンパス UX改善 + 新4機能実装
+# HANDOFF — 数秘AIライフコンパス
 
-> 最終更新: 2026-05-30 22:13 JST / 次セッションはこのファイルを最初に読む
+> 最終更新: 2026-05-31 / 次セッションは最初にこれを読む
 
-## このセッションでやったこと（完了）
+## 本番URL / リポ
+- 公開: https://kodawarimax.github.io/numerology-ai-compass/ （GitHub Pages, main push で反映）
+- repo: kodawarimax/numerology-ai-compass / 本体は単一 `index.html`（HTML+JS+Tailwind CDN、ビルド不要）
+- ローカル確認: `python3 -m http.server 8777 --directory <dir>` → http://localhost:8777/index.html（file://不可）
 
-### A. 数秘チャートのレイアウト刷新 + RIO UXレビューで95点達成（✅完了・未デプロイ）
-- チャートを中央寄せflex → **列アンカー型グリッド**（中央スパインに誕生数/目標数/挑戦数を縦整列）に再構築
-- **運命数を社会数の真横**（同高さ・右隣、CSSブリッジ `#cell-ground::after` で接続）に配置 ← 坂本さん明示要件
-- モバイル横溢れ解消・可読性向上・a11y（role=button/aria-label/Esc/focus-visible）・XP撤去
-- RIO実スコア: 54→76→86→91→93→**95/100 達成**
+## このセッションで完成した内容（すべて坂本さん確認済み・✅）
+1. **数秘チャート刷新**（列アンカー型ツリー＋運命数を社会数の真横にCSSブリッジ接続）RIO 95点
+2. **マトリックスコード新4機能**: 職業適性 / 自分軸・他人軸・導き軸(3軸カード) / 他人との相性診断 / 個人年予報。RIO 95点
+3. **数秘マンダラ 3×3グリッド**（230枚OCR・ワークブック正典由来）:
+   - 盤面 **上段1·2·3 / 中段4·5·6 / 下段7·8·9**（坂本さん指示で転置済み）
+   - 列ラベル（左→右）= **自分軸SELF(1·4·7,赤) / 他人軸SHARE(2·5·8,青) / 導き軸SPIRIT(3·6·9,金)**
+   - 行ラベル = PLAN企画(1·2·3) / ARRANGE調整(4·5·6) / DEVELOP展開(7·8·9)
+   - 四隅斜め = 達成(1·5·9) / 哲学(3·5·7)
+   - 各軸に意味語付与、点灯=未保有opacity0.5/保有軸色(lit-1/2/3濃淡)、aria-label・role=dialog・Enter操作・凡例
+   - 関連: `#card-mandala` / `renderMandala()` / `MANDALA_GRID=[[1,2,3],[4,5,6],[7,8,9]]` / `COL_AXES` / `ROW_AXES` / `NUM_LIT_CLS`
+4. **ウェルカムモーダル修正**: カードに `max-h-[90vh] overflow-y-auto` 追加で「セッションを始める」ボタンが見切れる問題を解消
+5. 全機能 console 0エラー / モバイル390px横溢れ0px を維持
 
-### B. マトリックスコード新4機能の実装（⏳ RIO採点ループ進行中・未完了）
-230枚OCR済みデータ（`knowledge-empire/wiki/concepts/numerology/` + `data/numerology-dataset.json`）から:
-1. **職業適性**（`#card-career-aptitude`・詳細鑑定タブ）: 運命数/誕生数→天職、成熟数→後半適職、橋渡し文
-2. **自分軸・他人軸・導き軸**（`#card-three-axes`・チャート直下3カラム）★新コンセプトの核
-   - 自分軸=誕生数+運命数 / 他人軸=人格数+社会数 / 導き軸=成長数+第2,3目標数+成熟数
-3. **他人との相性診断**（`#btn-compat-check`・詳細鑑定タブ）: 相手生年月日→運命数→★評価＋関係パターン＋アドバイス。`#compat-error-msg`にrole=alert/aria-live
-4. **個人年予報**（`#personal-year-forecast`・サイクルタブ）: テーマ/推奨/避けたいこと
+## ⚠️ デプロイ状態（重要・未完了）
+- **コミット `ee12507`（チャート刷新＋新4機能）まではローカルコミット済み**。
+- **その後の差分（マンダラ実装・転置・文字情報付与・ウェルカム修正＝index.html +1160行相当）は未コミット・未push。**
+- 本番(GitHub Pages)へは**未反映**。反映には commit + `git push origin main` が必要。
+- ⚠️ 過去に main 直 push が Claude の安全分類器に拒否された経緯あり。デプロイ時は坂本さんの明示承認を取り、3証拠（コミットSHA・pushログ・本番URLスモークテスト）を添付すること。
 
-## 現在の状態（中断ポイント）
-- **RIO 新4機能スコア: R1=68 → R2=84 → R3=87 → R4採点中（未確定）**
-- 直近修正（R3=87の残課題対応・**ソース反映済み**）:
-  - 新機能サブタイトル4箇所 10px→11px（536/912/998行 + 相性バッジ3063行JS）
-  - 相性結果「相手の運命数◯の本質」ラベルに font-weight:600 追加
-  - 個人年/月/日ラベル（835/839/843行 `<p>`）teal-500 10px → **teal-600 11px**（←最後にこれを修正完了）
-- 静的検証OK: teal_10px残存0 / div 290:290 / script 5:5 / 新機能内text-[10px]の主要箇所解消
+## データ正典（SoT）
+- wiki: `/Users/jungosakamoto/Claude/knowledge-empire/wiki/concepts/numerology/`
+  - `11_numerology_mandala_3x3.md`（マンダラ定義・※盤面は転置前の旧表記なので要更新）
+  - `data/numerology-dataset.json`（職業適性/相性/関係性9種/羅針盤キーワード等）
+- アプリ側 `data/numerology-dataset.json` は **手編集禁止**（wiki→app 一方向同期）。新データはJS定数で持つ。
+- マンダラ算出式は画像になく、既存アプリ算出値を盤面にマッピングする方式。
 
-## 次セッションでやること（再開手順）
-1. **このHANDOFF + `~/.claude/image-cache/.../1.png`（レイアウト見本）を確認**
-2. ローカルサーバー起動:
-   `python3 -m http.server 8777 --directory /Users/jungosakamoto/Claude/dev/products/numerology-ai-compass &`
-   → http://localhost:8777/index.html （file://は不可）
-3. **RIO R4採点の結果を確認**:
-   - 前回のRIOエージェント `a1411f0bf5d5f7b83`（R4依頼済み）の結果ファイル: `/private/tmp/claude-501/-Users-jungosakamoto/b826a401-.../tasks/a1411f0bf5d5f7b83.output`
-   - ※エージェントはセッションをまたぐとクリーンアップされる可能性大 → その場合は**新規rio-ux-designerを起動して再採点**（テンプレは下記）
-4. **95未満なら**: RIO実指摘を実装（小修正は直接Edit、大きいものはimplementation-leadに委任）→ 再採点（ループ継続）
-5. **95到達後**: ユーザーにデプロイ可否を確認 → 承認後 commit+push
+## 次セッションの選択肢
+- A) 本番デプロイ（承認後 commit+push、3証拠付き報告）
+- B) さらにUX磨き（RIO最終採点）
+- C) 未実装の正典コンセプト（日橋数/カルマ数/セフィロト等。前回の表参照）
 
-## デプロイ（要・坂本さん承認）
-- 変更は **`index.html` ローカルのみ・未コミット**（A/B両方）。
-- 公開先: GitHub Pages `kodawarimax/numerology-ai-compass`（main push で反映）。
-- ⚠️ 過去に main への直接 push が権限分類器に拒否された経緯あり → デプロイ時は明示承認を取る。3証拠（コミットSHA+pushログ+本番スモーク）必須。
-
-## 重要な規律・教訓（このセッションでの反省）
-- **完了通知が来るまでスコアを確定扱いしない**。途中のoutputファイルや送信失敗を成功と誤認しないこと（このセッションで数回やらかして撤回した）。
-- SendMessageは `to`（agentId）+ `summary` 必須。
-- データSoT: wiki側 `numerology-dataset.json` が正典。アプリ側コピーは `it-system-dev/cli/sync-dataset.sh` で wiki→app 一方向同期。**アプリ側JSON手編集禁止**（新データはJS定数で持つ）。
-- RIO再採点テンプレ要点: ライブURL必須 / デスクトップ1180×1600＋モバイル390×844両方 / 入力=太郎・1982-7-15・占う日2026-5-30 / 相性は相手1990-3-3を実type / computedStyle実測 / 「95到達Yes/No明確に」。
-
-## 主要ファイル
-- 本体: `/Users/jungosakamoto/Claude/dev/products/numerology-ai-compass/index.html`（単一HTML+JS+Tailwind CDN、ビルド不要）
-- データ: 同 `data/numerology-dataset.json`（tables: 職業適性/相性/関係性9種/羅針盤キーワード等）
-- 正典wiki: `/Users/jungosakamoto/Claude/knowledge-empire/wiki/concepts/numerology/`（00_index.md, 10_matrix_code_cosmosphere.md 他）
+## 教訓（このセッション）
+- 完了通知(task-notification)が来るまでスコアや結果を確定扱いしない。実行中outputファイルの途中状態を成果と誤認しない。
+- RIOの95点固定ループは消耗が大きい。実用水準到達後は1回採点 or ユーザー判断を仰ぐ。
+- Playwrightスクショの保存先は環境依存で読めないことがある→DOM実測(computedStyle/getBoundingClientRect)で検証する方が確実。

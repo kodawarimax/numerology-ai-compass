@@ -211,6 +211,227 @@
 
     .fade-in { animation: fadeIn 0.4s ease-out; }
     @keyframes fadeIn { from { opacity:0; transform:translateY(8px); } to { opacity:1; transform:translateY(0); } }
+
+    /* ===== 数秘マンダラ — 5×5 Grid (正典レイアウト) ===== */
+    .mandala-grid {
+      display: grid;
+      /* col: 左辺ラベル | 3セル列 | 右辺ラベル */
+      grid-template-columns: minmax(42px,auto) 1fr 1fr 1fr minmax(42px,auto);
+      /* row: 上辺ラベル | 3セル行 | 下辺ラベル */
+      grid-template-rows: auto 1fr 1fr 1fr auto;
+      gap: 4px;
+      width: 100%;
+      box-sizing: border-box;
+      overflow: hidden; /* 横溢れ防止 */
+    }
+
+    /* 列軸ラベル（上辺・下辺 — PLAN/ARRANGE/DEVELOP） */
+    .mandala-col-header {
+      text-align: center;
+      padding: 4px 2px;
+      font-size: 11px;  /* #4: デスクトップ最低11px */
+      font-weight: 600;
+      color: #7c3aed;
+      line-height: 1.25;
+    }
+    .mandala-col-header .mch-tri {
+      display: block;
+      font-size: 9px;
+      color: #7c3aed;
+      margin-bottom: 1px;
+    }
+    .mandala-col-header .mch-nums {
+      display: block;
+      font-size: 10px;  /* #3: 9px→10px、色濃く */
+      color: #4b5563;   /* #3: #a78bfa→#4b5563 AA確保 */
+      margin-top: 1px;
+    }
+
+    /* 行軸ラベル（左辺・右辺 — SPIRIT/SHARE/SELF） */
+    .mandala-row-header {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 3px 2px;
+      font-size: 11px;  /* #4: デスクトップ最低11px */
+      font-weight: 600;
+      line-height: 1.2;
+      text-align: center;
+      min-width: 40px;
+      max-width: 50px;
+    }
+    .mandala-row-header .mrh-tri {
+      font-size: 9px;
+      display: block;
+      margin-bottom: 1px;
+    }
+    .mandala-row-header .mrh-label {
+      display: block;  /* デスクトップは通常表示 */
+    }
+    .mandala-row-header .mrh-nums {
+      font-size: 10px;  /* #3: 9px→10px、色濃く */
+      color: #4b5563;   /* #3: opacity0.75除去→実色 */
+      display: block;
+      margin-top: 1px;
+    }
+    .mandala-row-header.rh-self   { color: #991b1b; background: rgba(220,38,38,0.07); border-radius: 8px; }
+    .mandala-row-header.rh-share  { color: #1e3a8a; background: rgba(37,99,235,0.07); border-radius: 8px; }
+    .mandala-row-header.rh-spirit { color: #92400e; background: rgba(217,119,6,0.09); border-radius: 8px; }
+    /* 転置後: 行=PLAN/ARRANGE/DEVELOP（紫系） */
+    .mandala-row-header.rh-plan    { color: #5b21b6; background: rgba(124,58,237,0.07); border-radius: 8px; }
+    .mandala-row-header.rh-arrange { color: #4c1d95; background: rgba(109,40,217,0.07); border-radius: 8px; }
+    .mandala-row-header.rh-develop { color: #3b0764; background: rgba(88,28,135,0.07); border-radius: 8px; }
+
+    /* 四隅の斜めラベル — #2: 10px 2段組み */
+    .mandala-corner-diag {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 3px 2px;
+      font-size: 10px;   /* #2: 9px→10px */
+      font-weight: 600;
+      color: #4b5563;    /* #2: 指定色 */
+      line-height: 1.35;
+      text-align: center;
+      border-radius: 6px;
+      min-width: 40px;
+    }
+    .mandala-corner-diag .cd-nums {
+      display: block;
+      font-size: 10px;
+      font-weight: 700;
+    }
+    .mandala-corner-diag .cd-label {
+      display: block;
+      font-size: 10px;
+    }
+    .mandala-corner-diag.diag-achiever  { background: rgba(217,119,6,0.07); }
+    .mandala-corner-diag.diag-philosopher { background: rgba(37,99,235,0.07); }
+
+    /* 3×3 データセル */
+    .mandala-cell {
+      position: relative;
+      border-radius: 8px;
+      border: 1.5px solid #e5e7eb;
+      background: #f3f4f6;
+      opacity: 0.5;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: transform 0.15s, box-shadow 0.15s;
+      aspect-ratio: 1 / 1;
+      min-height: 58px;
+      padding: 4px;
+      box-sizing: border-box;
+    }
+    .mandala-cell:hover, .mandala-cell:focus-visible {
+      transform: scale(1.06);
+      box-shadow: 0 3px 12px rgba(124,58,237,0.22);
+      z-index: 2;
+    }
+    .mandala-cell:focus-visible {
+      outline: 2px solid #7c3aed;
+      outline-offset: 2px;
+    }
+    .mandala-cell .mc-num {
+      font-family: 'Lora', serif;
+      font-weight: 700;
+      font-size: 1.1rem;
+      color: #581c87;
+      line-height: 1;
+    }
+    .mandala-cell .mc-char {
+      font-size: 12px;
+      color: #6b7280;
+      font-weight: 500;
+      text-align: center;
+      line-height: 1.2;
+      margin-top: 2px;
+    }
+    .mandala-cell .mc-dots {
+      position: absolute;
+      top: 3px;
+      right: 3px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1.5px;
+      max-width: 18px;
+    }
+    .mandala-cell .mc-dot {
+      width: 4px;
+      height: 4px;
+      border-radius: 50%;
+      background: #9ca3af;
+    }
+    /* lit cell: background/border/opacity は JS で直接設定 */
+    .mandala-cell.lit-self   .mc-num { color: #991b1b; }
+    .mandala-cell.lit-share  .mc-num { color: #1e3a8a; }
+    .mandala-cell.lit-spirit .mc-num { color: #92400e; }
+    .mandala-cell.lit-self   .mc-dot { background: #dc2626; }
+    .mandala-cell.lit-share  .mc-dot { background: #2563eb; }
+    .mandala-cell.lit-spirit .mc-dot { background: #d97706; }
+
+    /* モバイル: 下辺・右辺・四隅非表示 + 左辺を▲色のみ + セル最低48px */
+    @media (max-width: 480px) {
+      .mandala-grid {
+        /* #1: 左辺を20px固定（▲だけで幅十分）、gap詰め */
+        grid-template-columns: 20px 1fr 1fr 1fr;
+        grid-template-rows: auto 1fr 1fr 1fr;
+        gap: 3px;
+      }
+      .mandala-hide-mobile { display: none !important; }
+      /* #1: セル最低48px確保 */
+      .mandala-cell { min-height: 48px; }
+      .mandala-cell .mc-num { font-size: 1rem; }
+      .mandala-cell .mc-char { font-size: 11px; }
+      /* #1: 上辺ラベル — テキスト最小化（▲+数字のみ） */
+      .mandala-col-header { font-size: 9px; padding: 2px 1px; }
+      .mandala-col-header .mch-tri { margin-bottom: 0; }
+      .mandala-col-header .mch-nums { font-size: 9px; }
+      /* #1: 左辺を▲色のみ — テキスト・数字列を非表示 */
+      .mandala-row-header {
+        min-width: 20px;
+        max-width: 20px;
+        padding: 2px 1px;
+        background: transparent !important;
+        font-size: 14px;  /* ▲を大きく */
+      }
+      .mandala-row-header .mrh-label { display: none !important; }
+      .mandala-row-header .mrh-nums  { display: none !important; }
+      .mandala-row-header .mrh-mean  { display: none !important; }
+      /* 上辺ラベルの意味語も非表示（スペース節約） */
+      .mandala-col-header .mch-mean  { display: none !important; }
+      /* ▲の色だけ残す（rh-* クラスの color を継承） */
+    }
+    /* 凡例スタイル (#2) */
+    .mandala-legend {
+      display: flex;
+      gap: 12px;
+      justify-content: center;
+      flex-wrap: wrap;
+      margin: 12px 0;
+      padding: 8px;
+      background: rgba(243,238,255,0.5);
+      border-radius: 8px;
+      font-size: 11px;
+      color: #4b5563;
+    }
+    .mandala-legend-item {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      font-weight: 500;
+    }
+    .mandala-legend-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
     /* Scroll offset for sticky nav */
     #section-chart, #section-palm, #section-cycles { scroll-margin-top: 48px; }
 
@@ -536,6 +757,42 @@
           <p class="text-[11px] text-gray-500 mt-1">あなたの数字が示す3方向の本質</p>
         </div>
         <div class="p-4 grid grid-cols-1 sm:grid-cols-3 gap-4" id="axes-grid"></div>
+      </div>
+
+      <!-- 数秘マンダラ -->
+      <div id="card-mandala" class="hidden bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+        <div class="gradient-header p-4 text-center">
+          <h3 class="text-base font-bold text-gray-800">数秘マンダラ</h3>
+          <p class="text-[11px] text-gray-500 mt-1">あなたの数字が照らす9マスの羅針盤</p>
+        </div>
+        <div class="p-4">
+          <div id="mandala-grid-wrap" class="mandala-grid"></div>
+          <!-- 凡例 (#2) -->
+          <div class="mandala-legend" id="mandala-legend">
+            <div class="mandala-legend-item">
+              <span class="mandala-legend-dot" style="background:#dc2626;" aria-hidden="true"></span>
+              <span>自分軸（SELF）</span>
+            </div>
+            <div class="mandala-legend-item">
+              <span class="mandala-legend-dot" style="background:#2563eb;" aria-hidden="true"></span>
+              <span>他人軸（SHARE）</span>
+            </div>
+            <div class="mandala-legend-item">
+              <span class="mandala-legend-dot" style="background:#d97706;" aria-hidden="true"></span>
+              <span>導き軸（SPIRIT）</span>
+            </div>
+            <!-- 軸・斜めライン説明 -->
+            <div style="width:100%;text-align:center;font-size:10px;color:#6b7280;margin-top:4px;line-height:1.6;">
+              自分軸=自己・自我 / 他人軸=交流・欲求 / 導き軸=糾合・精神性<br>
+              斜め：達成数(1·5·9)=起動力・目標達成 / 哲学者(3·5·7)=探究心・洞察
+            </div>
+          </div>
+          <div id="mandala-lines-summary" class="mt-4 hidden">
+            <p class="text-[11px] font-semibold text-purple-700 mb-2">あなたの強調ライン</p>
+            <div id="mandala-lines-list" class="space-y-2"></div>
+          </div>
+          <p class="text-[10px] text-gray-400 mt-3 text-center">各マスをタップするとその数字の詳しい解説が表示されます</p>
+        </div>
       </div>
 
       <!-- PDF Download -->
@@ -1412,6 +1669,7 @@
       renderDatasetSections(r);
       // ② and ④ are independent of DATASET; always render
       renderThreeAxes(r);
+      renderMandala(r);
       renderPersonalYearForecast(r.pYear);
 
       // Update personal cycles display
@@ -1598,6 +1856,9 @@
     const detailModal = document.createElement('div');
     detailModal.id = 'detail-modal';
     detailModal.className = 'hidden fixed inset-0 z-50 modal-overlay flex items-end sm:items-center justify-center';
+    detailModal.setAttribute('role', 'dialog');
+    detailModal.setAttribute('aria-modal', 'true');
+    detailModal.setAttribute('aria-label', '数秘の詳細');
     detailModal.innerHTML = '<div class="bg-white rounded-t-2xl sm:rounded-2xl w-full max-w-md max-h-[80vh] overflow-y-auto p-5 fade-in" id="detail-content"></div>';
     document.body.appendChild(detailModal);
     detailModal.addEventListener('click', (e) => {
@@ -2896,6 +3157,282 @@ ${numContext}
 
         grid.appendChild(div);
       });
+      card.classList.remove('hidden');
+    }
+
+    // =========================================================
+    // ⑤ 数秘マンダラ
+    // =========================================================
+
+    // 盤面配置（転置後）: row0=PLAN[1,2,3], row1=ARRANGE[4,5,6], row2=DEVELOP[7,8,9]
+    // 列: col0=SELF(1,4,7), col1=SHARE(2,5,8), col2=SPIRIT(3,6,9)
+    const MANDALA_GRID = [
+      [1, 2, 3], // row 0: PLAN   企画
+      [4, 5, 6], // row 1: ARRANGE 調整
+      [7, 8, 9], // row 2: DEVELOP 展開
+    ];
+
+    const MANDALA_CHARS = {
+      1: '開拓者', 2: '八情家', 3: '翻造者',
+      4: '建設者', 5: '回顧家', 6: '奉仕者',
+      7: '探究者', 8: '統治者', 9: '理想家',
+    };
+
+    // 転置後: 行軸=PLAN/ARRANGE/DEVELOP（紫▲）
+    const ROW_AXES = [
+      { key: 'PLAN',    label: '企画軸', sub: '指針', mean: '方向性を見極める', cls: 'rh-plan',    rowLabel: 'PLAN\n企画' },
+      { key: 'ARRANGE', label: '調整軸', sub: '実益', mean: '枠組みを構築する', cls: 'rh-arrange', rowLabel: 'ARRANGE\n調整' },
+      { key: 'DEVELOP', label: '展開軸', sub: '繁栄', mean: '応用展開・実現する', cls: 'rh-develop', rowLabel: 'DEVELOP\n展開' },
+    ];
+
+    // 転置後: 列軸=SELF/SHARE/SPIRIT（各色▲）
+    // litCls: セルの点灯色。triColor: 列ヘッダー▲の色。mean: 意味語
+    const COL_AXES = [
+      { key: 'SELF',   label: '自分軸', eng: 'SELF',   mean: '自己・自我',   triColor: '#dc2626', litCls: 'lit-self',   colNums: [1,4,7] },
+      { key: 'SHARE',  label: '他人軸', eng: 'SHARE',  mean: '交流・欲求',   triColor: '#2563eb', litCls: 'lit-share',  colNums: [2,5,8] },
+      { key: 'SPIRIT', label: '導き軸', eng: 'SPIRIT', mean: '糾合・精神性', triColor: '#d97706', litCls: 'lit-spirit', colNums: [3,6,9] },
+    ];
+
+    // 数字→所属列のlitClsマップ（転置後はSELF列=1,4,7 / SHARE列=2,5,8 / SPIRIT列=3,6,9）
+    const NUM_LIT_CLS = {
+      1: 'lit-self',   4: 'lit-self',   7: 'lit-self',
+      2: 'lit-share',  5: 'lit-share',  8: 'lit-share',
+      3: 'lit-spirit', 6: 'lit-spirit', 9: 'lit-spirit',
+    };
+
+    const LINE_MEANINGS = {
+      // 転置後: 行=PLAN/ARRANGE/DEVELOP、列=SELF/SHARE/SPIRIT
+      'ROW_PLAN':    'PLAN（企画行）が強い → 構想・計画・方向性を設定する力。ビジョンを生み出す能力が高い。',
+      'ROW_ARRANGE': 'ARRANGE（調整行）が強い → 安定させ仕組みを整える力。現実に着地させる実務的な才能がある。',
+      'ROW_DEVELOP': 'DEVELOP（展開行）が強い → 応用・繁栄・潜在力の開花が得意。物事を広げていく力がある。',
+      'COL_SELF':    'SELF（自分軸列）が強い → 自主的・独立的に行動する力。自己完結力が高く、自分の信念で動く。',
+      'COL_SHARE':   'SHARE（他人軸列）が強い → 対人関係・交流・協力のエネルギーが豊富。つながりで力を発揮する。',
+      'COL_SPIRIT':  'SPIRIT（導き軸列）が強い → 精神性・哲学・使命感で動く。本質的なものを見抜き、人を導く力。',
+      'DIAG_ACHIEVER': '達成者ライン（1·5·9）が強い → 開拓→変容→完成へと統合する力。人生の節目を自力で突破する。',
+      'DIAG_PHILOSOPHER': '哲学者ライン（3·5·7）が強い → 創造→変容→探究の知的サイクル。真理を問い続ける思索者。',
+    };
+
+    // マスター数 → 1桁化（0は無効値としてそのまま返す）
+    function normalizeTo9(n) {
+      if (!n || n <= 0) return 0;          // 0 / null / undefined は無効
+      if (n === 11) return 2;
+      if (n === 22) return 4;
+      if (n === 33) return 6;
+      if (n > 9) return ((n - 1) % 9) + 1;
+      return n;
+    }
+
+    // r から保有数マップ { 1: [{label,key},...], 2: [...], ... } を生成
+    function buildOwnershipMap(r) {
+      const sources = [
+        { label: '運命数', key: 'lifePath' },
+        { label: '誕生数', key: 'destiny' },
+        { label: '成熟数', key: 'maturity' },
+        { label: '成長数', key: 'spirit' },
+        { label: '人格数', key: 'persona' },
+        { label: '社会数', key: 'ground' },
+        { label: '第2目標', key: 'target2' },
+        { label: '第3目標', key: 'target3' },
+        { label: '克服数', key: 'ch1' },
+        { label: '第2挑戦', key: 'ch2' },
+        { label: '第3挑戦', key: 'ch3' },
+        { label: '第4挑戦', key: 'ch4' },
+      ];
+      const map = {};
+      for (let i = 1; i <= 9; i++) map[i] = [];
+      sources.forEach(s => {
+        const raw = r[s.key];
+        if (raw == null) return;
+        const n = normalizeTo9(raw);
+        if (n >= 1 && n <= 9) map[n].push(s.label);
+      });
+      return map;
+    }
+
+    function renderMandala(r) {
+      const wrap = document.getElementById('mandala-grid-wrap');
+      const card = document.getElementById('card-mandala');
+      if (!wrap || !card) return;
+      wrap.innerHTML = '';
+
+      const ownerMap = buildOwnershipMap(r);
+
+      // 軸色定義
+      const axisColors = {
+        'lit-self':   { base: '220,38,38',  border: '#ef4444' },
+        'lit-share':  { base: '37,99,235',  border: '#3b82f6' },
+        'lit-spirit': { base: '217,119,6',  border: '#f59e0b' },
+      };
+
+      // 詳細モーダル表示
+      function showMandalaDetail(n) {
+        const nd = numDB[n] || numDB[Math.min(n, 9)];
+        const charName = MANDALA_CHARS[n] || '';
+        const ownersStr = ownerMap[n]?.length
+          ? `<p style="font-size:11px;color:#6b7280;margin-top:6px;">あなたの保有数: <strong>${esc(ownerMap[n].join('・'))}</strong></p>`
+          : '<p style="font-size:11px;color:#9ca3af;margin-top:6px;">この数はあなたのチャートに含まれていません</p>';
+        const content = document.getElementById('detail-content');
+        if (!content) return;
+        content.innerHTML = `
+          <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;">
+            <span style="font-family:'Lora',serif;font-size:2rem;font-weight:700;color:#581c87;">${n}</span>
+            <div>
+              <p style="font-size:15px;font-weight:700;color:#3b0764;">${n} ${esc(charName)}</p>
+              <p style="font-size:11px;color:#9ca3af;">数秘マンダラ</p>
+            </div>
+          </div>
+          <p style="font-size:13px;color:#374151;line-height:1.65;">${nd ? esc(nd.core) : ''}</p>
+          ${ownersStr}
+          ${nd ? `<div style="margin-top:10px;background:#faf5ff;border-radius:10px;padding:10px;"><p style="font-size:11px;font-weight:600;color:#6d28d9;margin-bottom:4px;">特性</p><p style="font-size:12px;color:#4b5563;line-height:1.55;white-space:pre-line;">${esc(nd.traits)}</p></div>` : ''}
+          <button onclick="document.getElementById('detail-modal').classList.add('hidden');document.body.style.overflow='';" style="margin-top:14px;width:100%;background:#7c3aed;color:#fff;border:none;border-radius:9999px;padding:10px;font-size:13px;font-weight:600;cursor:pointer;">閉じる</button>
+        `;
+        detailModal.classList.remove('hidden');
+        document.body.style.overflow = 'hidden';
+      }
+
+      // セル作成ヘルパー（転置後: litClsは数字が属する列=SELF/SHARE/SPIRITで決まる）
+      function makeCell(num) {
+        const owners = ownerMap[num] || [];
+        const count = owners.length;
+        const litCls = NUM_LIT_CLS[num] || 'lit-self';
+        const cell = document.createElement('div');
+        cell.className = 'mandala-cell';
+        cell.setAttribute('role', 'button');
+        cell.setAttribute('tabindex', '0');
+        cell.setAttribute('aria-label', count > 0
+          ? `${num} ${MANDALA_CHARS[num]}、${owners.join('と')}が該当`
+          : `${num} ${MANDALA_CHARS[num]}、該当なし`);
+        cell.dataset.num = num;
+
+        if (count > 0) {
+          cell.classList.add(litCls);
+          const ac = axisColors[litCls];
+          const alpha = count >= 3 ? 0.60 : count >= 2 ? 0.35 : 0.15;
+          cell.style.background  = `rgba(${ac.base}, ${alpha})`;
+          cell.style.borderColor = ac.border;
+          cell.style.opacity     = '1';
+          if (count >= 3) cell.classList.add('lit-3');
+          else if (count >= 2) cell.classList.add('lit-2');
+        } else {
+          cell.style.background  = '#f3f4f6';
+          cell.style.borderColor = '#e5e7eb';
+          cell.style.opacity     = '0.5';
+        }
+
+        const numEl = document.createElement('span');
+        numEl.className = 'mc-num';
+        numEl.textContent = num;
+        cell.appendChild(numEl);
+
+        const charEl = document.createElement('span');
+        charEl.className = 'mc-char';
+        charEl.textContent = MANDALA_CHARS[num] || '';
+        cell.appendChild(charEl);
+
+        if (count > 0) {
+          const dotsWrap = document.createElement('div');
+          dotsWrap.className = 'mc-dots';
+          const showDots = Math.min(count, 4);
+          for (let d = 0; d < showDots; d++) {
+            const dot = document.createElement('span');
+            dot.className = 'mc-dot';
+            dot.title = owners[d] || '';
+            dotsWrap.appendChild(dot);
+          }
+          cell.appendChild(dotsWrap);
+        }
+
+        cell.addEventListener('click', () => showMandalaDetail(num));
+        cell.addEventListener('keydown', e => {
+          if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); showMandalaDetail(num); }
+        });
+        return cell;
+      }
+
+      // 列ヘッダー作成ヘルパー（上辺 or 下辺）— 転置後は列=SELF/SHARE/SPIRIT（各色▲）
+      function makeColHeader(col, hideOnMobile) {
+        const h = document.createElement('div');
+        h.className = 'mandala-col-header' + (hideOnMobile ? ' mandala-hide-mobile' : '');
+        const triStyle = `color:${esc(col.triColor)}`;
+        h.innerHTML = `<span class="mch-tri" style="${triStyle}">▲</span><span style="font-weight:700;color:${esc(col.triColor)}">${esc(col.label)}</span><br><span style="font-size:10px;color:#6b7280">${esc(col.eng)}</span><span class="mch-nums">${col.colNums.join('·')}</span><span class="mch-mean" style="display:block;font-size:10px;color:#6b7280;margin-top:1px;">${esc(col.mean)}</span>`;
+        return h;
+      }
+
+      // 行ヘッダー作成ヘルパー（左辺 or 右辺）— 転置後は行=PLAN/ARRANGE/DEVELOP（紫▲）
+      function makeRowHeader(rowDef, rowNums, hideOnMobile) {
+        const rh = document.createElement('div');
+        rh.className = `mandala-row-header ${rowDef.cls}` + (hideOnMobile ? ' mandala-hide-mobile' : '');
+        const [eng, jpn] = rowDef.rowLabel.split('\n');
+        rh.innerHTML = `<span class="mrh-tri">▲</span><span class="mrh-label" style="font-weight:700">${esc(eng)}</span><span class="mrh-label" style="font-size:9px">${esc(jpn)}</span><span class="mrh-nums">${rowNums.join('·')}</span><span class="mrh-mean" style="font-size:9px;opacity:0.75;display:block;margin-top:1px;">${esc(rowDef.mean)}</span>`;
+        return rh;
+      }
+
+      // 斜めコーナーセル作成ヘルパー
+      function makeCorner(nums, label, cls, hideOnMobile) {
+        const d = document.createElement('div');
+        d.className = 'mandala-corner-diag ' + cls + (hideOnMobile ? ' mandala-hide-mobile' : '');
+        d.innerHTML = `<span class="cd-nums">${esc(nums)}</span><span class="cd-label">${esc(label)}</span>`;
+        return d;
+      }
+
+      // ==== 5×5 DOM構築（転置後）====
+      // 転置後の対角: 達成(1·5·9) = 左上→右下、哲学(3·5·7) = 右上→左下
+      // ROW 0: [左上隅:達成数] [上辺:SELF] [上辺:SHARE] [上辺:SPIRIT] [右上隅:哲学者]
+      wrap.appendChild(makeCorner('1·5·9', '達成数', 'diag-achiever', false));
+      COL_AXES.forEach(col => wrap.appendChild(makeColHeader(col, false)));
+      wrap.appendChild(makeCorner('3·5·7', '哲学者', 'diag-philosopher', true));
+
+      // ROWS 1–3: [左辺] [3セル] [右辺]
+      MANDALA_GRID.forEach((rowNums, rowIdx) => {
+        const rowDef = ROW_AXES[rowIdx];
+        wrap.appendChild(makeRowHeader(rowDef, rowNums, false));
+        rowNums.forEach(num => wrap.appendChild(makeCell(num)));
+        wrap.appendChild(makeRowHeader(rowDef, rowNums, true));
+      });
+
+      // ROW 4（下辺）: [左下隅:哲学者] [下辺:SELF] [下辺:SHARE] [下辺:SPIRIT] [右下隅:達成数]
+      wrap.appendChild(makeCorner('3·5·7', '哲学者', 'diag-philosopher', true));
+      COL_AXES.forEach(col => wrap.appendChild(makeColHeader(col, true)));
+      wrap.appendChild(makeCorner('1·5·9', '達成数', 'diag-achiever', true));
+
+      // -- 強調ライン判定 --
+      const lineSummaryEl = document.getElementById('mandala-lines-summary');
+      const linesListEl = document.getElementById('mandala-lines-list');
+      if (!lineSummaryEl || !linesListEl) { card.classList.remove('hidden'); return; }
+      linesListEl.innerHTML = '';
+
+      // 転置後: 行=PLAN[1,2,3]/ARRANGE[4,5,6]/DEVELOP[7,8,9]、列=SELF[1,4,7]/SHARE[2,5,8]/SPIRIT[3,6,9]
+      const lineChecks = [
+        // rows（転置後）
+        { key: 'ROW_PLAN',    nums: [1,2,3] },
+        { key: 'ROW_ARRANGE', nums: [4,5,6] },
+        { key: 'ROW_DEVELOP', nums: [7,8,9] },
+        // cols（転置後）
+        { key: 'COL_SELF',   nums: [1,4,7] },
+        { key: 'COL_SHARE',  nums: [2,5,8] },
+        { key: 'COL_SPIRIT', nums: [3,6,9] },
+        // diagonals（不変）
+        { key: 'DIAG_ACHIEVER',    nums: [1,5,9] },
+        { key: 'DIAG_PHILOSOPHER', nums: [3,5,7] },
+      ];
+
+      const hitLines = lineChecks.filter(lc =>
+        lc.nums.filter(n => (ownerMap[n] || []).length > 0).length >= 2
+      );
+
+      if (hitLines.length > 0) {
+        hitLines.forEach(lc => {
+          const meaning = LINE_MEANINGS[lc.key] || lc.key;
+          const item = document.createElement('div');
+          item.className = 'bg-purple-50 rounded-lg px-3 py-2 border border-purple-100';
+          item.innerHTML = `<p style="font-size:11px;color:#4b5563;line-height:1.55;">${esc(meaning)}</p>`;
+          linesListEl.appendChild(item);
+        });
+        lineSummaryEl.classList.remove('hidden');
+      } else {
+        lineSummaryEl.classList.add('hidden');
+      }
+
       card.classList.remove('hidden');
     }
 
