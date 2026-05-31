@@ -22,6 +22,28 @@
     .gradient-cta { background: linear-gradient(to right, #ec4899, #f43f5e); }
     .gradient-cta:hover { background: linear-gradient(to right, #db2777, #e11d48); }
 
+    /* ===== Precision Report ===== */
+    .pr-chapter { background: #fff; border-radius: 16px; border: 1px solid #e9d5ff; padding: 20px 18px; margin-bottom: 12px; box-shadow: 0 1px 4px rgba(124,58,237,0.06); }
+    .pr-chapter h2 { font-family: 'Lora', serif; font-size: 1.05rem; font-weight: 700; color: #6b21a8; margin: 0 0 10px; border-left: 3px solid #a855f7; padding-left: 10px; line-height: 1.4; }
+    .pr-chapter h3 { font-family: 'Lora', serif; font-size: 0.92rem; font-weight: 600; color: #7c3aed; margin: 14px 0 6px; }
+    .pr-chapter p { font-size: 0.84rem; line-height: 1.9; color: #374151; margin-bottom: 8px; }
+    .pr-chapter p:last-child { margin-bottom: 0; }
+    .pr-num-badge { display: inline-flex; align-items: center; justify-content: center; font-family: 'Lora', serif; font-size: 1.3rem; font-weight: 700; color: #7c3aed; background: #f3e8ff; border-radius: 50%; width: 2.2rem; height: 2.2rem; flex-shrink: 0; }
+    .pr-num-header { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
+    .pr-num-label { font-size: 0.78rem; font-weight: 600; color: #9ca3af; text-transform: uppercase; letter-spacing: 0.04em; }
+    .pr-infl-bar { height: 4px; border-radius: 2px; background: #e9d5ff; margin: 6px 0 10px; overflow: hidden; }
+    .pr-infl-fill { height: 100%; border-radius: 2px; background: linear-gradient(90deg, #a855f7, #ec4899); }
+    .pr-tag { display: inline-block; font-size: 0.68rem; font-weight: 600; border-radius: 99px; padding: 1px 8px; margin-right: 4px; margin-bottom: 4px; }
+    .pr-tag-strength { background: #dcfce7; color: #166534; }
+    .pr-tag-shadow { background: #fef2f2; color: #991b1b; }
+    .pr-tag-action { background: #eff6ff; color: #1e40af; }
+    .pr-divider { border: none; border-top: 1px solid #f3e8ff; margin: 14px 0; }
+    .pr-highlight { background: linear-gradient(135deg, #fdf4ff, #fce7f3); border-radius: 12px; padding: 14px 16px; border: 1px solid #f0abfc; margin-top: 10px; }
+    .pr-highlight p { color: #6b21a8; font-weight: 500; }
+    .pr-mode-badge { display: inline-block; font-size: 0.65rem; font-weight: 600; border-radius: 99px; padding: 2px 8px; margin-left: 6px; vertical-align: middle; }
+    .pr-mode-ai { background: #fef3c7; color: #92400e; }
+    .pr-mode-template { background: #f0f9ff; color: #0369a1; }
+
     /* ===== Numerology Chart ===== */
 
     /* Outer two-column wrapper — diamond left, info-column right */
@@ -623,6 +645,63 @@
       #infl-legend { max-width: 100%; gap: 4px 8px; padding: 5px 8px; }
       #infl-legend .lg-item { font-size: 9px; }
     }
+
+    /* ===== ポジション固有色 (6色) — 上品なミュート/ダスティトーン ===== */
+    /* 運命数: ダスティパープル (藤色寄り) */
+    .chart-box.pos-lifepath {
+      border-left: 4px solid #9b7ec8 !important;
+      border-top: 1.5px solid #c4aee3 !important;
+      border-right: 1.5px solid #c4aee3 !important;
+      border-bottom: 1.5px solid #c4aee3 !important;
+      background: rgba(242,238,252,0.85) !important;
+    }
+    /* 成熟数: くすみゴールド/ベージュゴールド */
+    .chart-box.pos-maturity {
+      border-left: 4px solid #b8964a !important;
+      border-top: 1.5px solid #d4b87a !important;
+      border-right: 1.5px solid #d4b87a !important;
+      border-bottom: 1.5px solid #d4b87a !important;
+      background: rgba(252,246,228,0.85) !important;
+    }
+    /* 成長数: セージグリーン (くすみ緑) */
+    .chart-box.pos-spirit {
+      border-left: 4px solid #6a9e82 !important;
+      border-top: 1.5px solid #96bfa8 !important;
+      border-right: 1.5px solid #96bfa8 !important;
+      border-bottom: 1.5px solid #96bfa8 !important;
+      background: rgba(232,244,237,0.85) !important;
+    }
+    /* 誕生数: ダスティブルー (青磁寄り) */
+    .chart-box.pos-destiny {
+      border-left: 4px solid #6b8ec4 !important;
+      border-top: 1.5px solid #9db4d9 !important;
+      border-right: 1.5px solid #9db4d9 !important;
+      border-bottom: 1.5px solid #9db4d9 !important;
+      background: rgba(232,240,252,0.85) !important;
+    }
+    /* 社会数: くすみティール (青緑グレー) */
+    .chart-box.pos-ground {
+      border-left: 4px solid #5a9a92 !important;
+      border-top: 1.5px solid #88bcb5 !important;
+      border-right: 1.5px solid #88bcb5 !important;
+      border-bottom: 1.5px solid #88bcb5 !important;
+      background: rgba(229,243,242,0.85) !important;
+    }
+    /* 克服数: ダスティローズ (くすみ赤) */
+    .chart-box.pos-overcome {
+      border-left: 4px solid #b87878 !important;
+      border-top: 1.5px solid #d4a0a0 !important;
+      border-right: 1.5px solid #d4a0a0 !important;
+      border-bottom: 1.5px solid #d4a0a0 !important;
+      background: rgba(252,238,238,0.85) !important;
+    }
+    /* ポジションバッジ色 (★の色) — pos-* クラスに対して上書き */
+    .chart-box.pos-lifepath .infl-badge { color: #7c5aad; }
+    .chart-box.pos-maturity .infl-badge { color: #8a6c28; }
+    .chart-box.pos-spirit   .infl-badge { color: #4a7a5e; }
+    .chart-box.pos-destiny  .infl-badge { color: #4a6ea0; }
+    .chart-box.pos-ground   .infl-badge { color: #3a7870; }
+    .chart-box.pos-overcome .infl-badge { color: #8a4848; }
   </style>
 </head>
 <body class="bg-gray-50 min-h-screen">
@@ -861,27 +940,37 @@
       </div><!-- /chart-outer -->
 
       <!-- 影響力ティア凡例 -->
-      <div id="infl-legend" aria-label="チャート色凡例: 枠の色は各ポジションの影響力の強さを表します">
-        <span class="lg-title">色 = 影響力の強さ</span>
+      <div id="infl-legend" aria-label="チャート色凡例: 枠色は各ポジション、★は影響力の強さを表します">
+        <span class="lg-title">枠色 = 各ポジション／★ = 影響力の強さ</span>
         <span class="lg-item">
-          <span class="lg-swatch" style="background:#7c3aed;" aria-hidden="true"></span>
-          <span>最強 (運命数・成熟数)</span>
+          <span class="lg-swatch" style="background:#9b7ec8;border-radius:3px;" aria-hidden="true"></span>
+          <span>運命数</span>
         </span>
         <span class="lg-item">
-          <span class="lg-swatch" style="background:#a855f7;" aria-hidden="true"></span>
-          <span>強 (成長数・誕生数)</span>
+          <span class="lg-swatch" style="background:#b8964a;border-radius:3px;" aria-hidden="true"></span>
+          <span>成熟数</span>
         </span>
         <span class="lg-item">
-          <span class="lg-swatch" style="background:#c084fc;" aria-hidden="true"></span>
-          <span>中 (社会数)</span>
+          <span class="lg-swatch" style="background:#6a9e82;border-radius:3px;" aria-hidden="true"></span>
+          <span>成長数</span>
         </span>
         <span class="lg-item">
-          <span class="lg-swatch" style="background:#ddd6fe;" aria-hidden="true"></span>
-          <span>小 (人格数・目標数)</span>
+          <span class="lg-swatch" style="background:#6b8ec4;border-radius:3px;" aria-hidden="true"></span>
+          <span>誕生数</span>
         </span>
         <span class="lg-item">
-          <span class="lg-swatch" style="background:#d1d5db;" aria-hidden="true"></span>
-          <span>克服・挑戦数</span>
+          <span class="lg-swatch" style="background:#5a9a92;border-radius:3px;" aria-hidden="true"></span>
+          <span>社会数</span>
+        </span>
+        <span class="lg-item">
+          <span class="lg-swatch" style="background:#b87878;border-radius:3px;" aria-hidden="true"></span>
+          <span>克服数</span>
+        </span>
+        <span class="lg-item" style="width:100%;justify-content:center;margin-top:2px;">
+          <span style="color:#6d28d9;font-size:10px;">★★</span>&thinsp;<span style="font-size:10px;color:#6b7280;">= 影響力最強　</span>
+          <span style="color:#9333ea;font-size:10px;">★</span>&thinsp;<span style="font-size:10px;color:#6b7280;">= 強　</span>
+          <span style="color:#a855f7;font-size:10px;">◆</span>&thinsp;<span style="font-size:10px;color:#6b7280;">= 中　</span>
+          <span style="color:#c4b5fd;font-size:10px;">·</span>&thinsp;<span style="font-size:10px;color:#6b7280;">= 小</span>
         </span>
       </div>
 
@@ -957,6 +1046,37 @@
         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
         数秘レポートPDFをダウンロード
       </button>
+
+      <!-- Precision Report Trigger -->
+      <button id="btn-precision-report"
+        style="background:linear-gradient(135deg,#7c3aed,#db2777)"
+        class="w-full text-white rounded-xl py-3 text-sm font-bold hover:opacity-90 transition-all flex items-center justify-center gap-2 shadow-lg mt-2">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+        精密レポートを発行
+      </button>
+
+      <!-- Precision Report Display Section -->
+      <div id="section-precision-report" class="hidden mt-4 space-y-1" aria-live="polite">
+        <!-- Loading state -->
+        <div id="precision-report-loading" class="hidden bg-white rounded-xl border border-purple-100 p-6 text-center">
+          <div class="flex flex-col items-center gap-3">
+            <svg class="w-8 h-8 animate-spin text-purple-500" fill="none" viewBox="0 0 24 24">
+              <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+              <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path>
+            </svg>
+            <p class="text-sm text-purple-600 font-medium">精密レポートを生成中...</p>
+            <p class="text-xs text-gray-400" id="precision-report-loading-msg">あなただけの物語を紡いでいます</p>
+          </div>
+        </div>
+        <!-- Report content -->
+        <div id="precision-report-content" class="hidden"></div>
+        <!-- PDF save button -->
+        <button id="btn-precision-report-pdf" class="hidden w-full mt-3 rounded-xl py-2.5 text-sm font-semibold text-white flex items-center justify-center gap-2 shadow-md"
+          style="background:linear-gradient(135deg,#4c1d95,#7c3aed)">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+          このレポートをPDFで保存
+        </button>
+      </div>
 
       </div><!-- /section-chart -->
 
@@ -1827,6 +1947,24 @@
         } else {
           el.setAttribute('aria-label', `${lbl ? lbl.textContent : ''} ${val}。タップで詳しい解説を表示`);
         }
+      }
+
+      // ポジション固有色クラスを付与 (影響力ティア色を上書き)
+      // 6ポジション固定マッピング
+      const POS_CLS_MAP = {
+        'cell-lifepath': 'pos-lifepath',
+        'cell-maturity': 'pos-maturity',
+        'cell-spirit':   'pos-spirit',
+        'cell-destiny':  'pos-destiny',
+        'cell-ground':   'pos-ground',
+        'cell-ch1':      'pos-overcome',
+      };
+      const ALL_POS_CLS = Object.values(POS_CLS_MAP);
+      for (const [id, posCls] of Object.entries(POS_CLS_MAP)) {
+        const el = document.getElementById(id);
+        if (!el) continue;
+        el.classList.remove(...ALL_POS_CLS);
+        el.classList.add(posCls);
       }
 
       // Update right-column info cells
@@ -4423,6 +4561,588 @@ ${numContext}
     // Kick off dataset load immediately (non-blocking)
     // =========================================================
     initDataset();
+
+    // =========================================================
+    // PRECISION REPORT — Deep Integrated Numerology Report
+    // =========================================================
+
+    // --- Template DB: deep narratives per number (1-9, 11, 22, 33) ---
+    const PR_TEMPLATE_DB = {
+      // [number]: { core, strength, shadow, action, direction }
+      1: {
+        core: 'あなたの中には、誰も踏み入れたことのない荒野を切り拓く力が宿っています。1という数は、宇宙の最初の一歩そのもの。誰かの後ろを歩くことで安心を得るのではなく、あなた自身の足跡を地に刻んでいくことに、魂の喜びがあります。',
+        strength: '強い意志と独創性、パイオニア精神。決断のあと実行に移す速さ。リーダーとして旗を立て、周囲を引っ張っていく力。あなたが一歩踏み出すと、世界が変わります。',
+        shadow: '一方で、「一人で全部やらなければ」という思い込みが、あなたを孤独に追い込むことがあります。助けを求めることは弱さではなく、もう一段上のリーダーシップです。頑固さが視野を狭めるとき、立ち止まって問い直してみてください。',
+        action: '「今日、一つだけ誰かを信頼して任せてみる」という小さな実験が、あなたの世界を広げます。主導権は手放さなくていい。ただ、共に作ることの豊かさを知ってください。',
+        direction: '自分という旗を信じ、孤高の英雄から信頼される創始者へ。あなたの先駆けは、必ず誰かの道しるべになります。'
+      },
+      2: {
+        core: '2という数は、触れ合いと共鳴の数。あなたは人の心の微細な動きを感じ取る、類まれな感受性を持っています。あなたがそこにいるだけで、空間がやわらかくなります。',
+        strength: '共感力、調和をもたらす外交力、パートナーシップを育てる忍耐。細部への細やかな気配り。あなたが橋渡しすることで、バラバラだったものが一つになります。',
+        shadow: '他者への配慮が深すぎるあまり、自分の気持ちを後回しにしてしまうことがあります。「NOと言えない」ことが蓄積されると、静かな消耗が忍び込みます。あなたの感情も、同じように大切にされる価値があります。',
+        action: '今日、自分の本音を一つ、信頼できる人に伝えてみてください。それはわがままではなく、深い関係への招待です。',
+        direction: '受け取り上手になることが、あなたの次のステージ。与えるだけでなく、愛を受け取れる自分へ。'
+      },
+      3: {
+        core: '3は創造と喜びの数。あなたの中には、世界に色を与えようとする衝動が宿っています。言葉、笑い、表現—あなたが放つエネルギーは人の心を明るくし、可能性を広げます。',
+        strength: '創造性、表現力、社交性、ユーモア。あなたの発する言葉やアイデアには、人を動かす力があります。明るさは才能です。',
+        shadow: 'エネルギーを分散させすぎて、何一つ完成しないまま終わることがあります。また、傷つくことを恐れて表面的な楽しさに留まり、深い感情を見せないことも。',
+        action: '一つのプロジェクトを「完成させるまで手放さない」と決めてみてください。あなたの創造物が世に出たとき、誰かの人生が変わります。',
+        direction: '表現を楽しみながら、深みへ。軽やかさと誠実さを両立させたとき、あなたは本当の意味で輝き始めます。'
+      },
+      4: {
+        core: '4という数は、大地の数。あなたには物事を着実に積み上げ、揺るぎない基盤を築く力があります。継続することの美しさを、あなたは体で知っています。',
+        strength: '忍耐力、規律、誠実さ、組織力。約束を守り、地道に努力を重ねる力。あなたが丁寧に作ったものは、長く人の役に立ちます。',
+        shadow: '「こうあるべき」という枠が厳しすぎると、変化への抵抗が大きくなります。想定外の出来事を「失敗」と捉えず、「別の道が開いた」と見ることができれば、もっと楽になれます。',
+        action: '一つ、自分への「ルール」を意識的に緩めてみてください。予期しない喜びが待っています。',
+        direction: '堅実さを軸に、しなやかさを纏う。完璧主義から「十分に良い」への転換が、あなたに自由をもたらします。'
+      },
+      5: {
+        core: '5は変化と自由の数。あなたの魂は、常に新しい地平を求めています。好奇心はあなたの羅針盤であり、変化を恐れないその姿勢が、人生をドラマチックに彩ります。',
+        strength: '適応力、冒険心、多才、コミュニケーション力。新しい環境でも素早く力を発揮できる柔軟性。あなたが動くところに風が生まれます。',
+        shadow: '変化を求めすぎて、根を張る前に次へ移ってしまうことがあります。逃げるための変化と、成長のための変化を見分けることが、あなたへの問いかけです。',
+        action: '今いる場所で、一つだけ「やり遂げたと言えること」を作ってみてください。変化の中に、あなたの芯を育てましょう。',
+        direction: '自由を生きながら、一本の軸を持つ。旅する人が家を持つように、どこにいても「自分」でいられる強さへ。'
+      },
+      6: {
+        core: '6は愛と調和の数。あなたには人の心の痛みを敏感に感じ取り、そこに光をもたらそうとする美しい本能があります。責任感と慈愛が、あなたの行動の根底にあります。',
+        strength: '深い共感力、癒しの力、責任感、美意識。あなたのいる空間には温もりが生まれます。家族や仲間を守る強さ。',
+        shadow: '「もっとできるはず」という自己への高い基準が、完璧主義として現れることがあります。また、人のために尽くしすぎて、自分の夢を後回しにしていないでしょうか。',
+        action: '今日、自分の美しいと思うものを一つ、ただ楽しんでください。誰かのためでなく、あなた自身のために。',
+        direction: '奉仕の中に喜びを見つけながら、自分をも愛する練習を。他者への愛は、まず自分への愛から育ちます。'
+      },
+      7: {
+        core: '7は探求と内省の数。あなたの魂は、表面の向こうにある真実を見ようとしています。一人で静かに考える時間の中に、あなたの最大の知恵が眠っています。',
+        strength: '分析力、洞察力、専門性、精神的な深さ。物事の本質を見抜く力。あなたの問いは、世界を一歩前に進めます。',
+        shadow: '内側に引きこもりすぎると、他者との繋がりが薄くなります。「完全に理解してからでないと動けない」という思考が、行動を止めることも。',
+        action: '「まだ準備不足」という声を一度脇に置いて、今の理解で一歩踏み出してみてください。動く中で得る叡智があります。',
+        direction: '孤高の探求者から、叡智を世界と分かち合う案内人へ。あなたの内なる光は、外に出てこそ輝きます。'
+      },
+      8: {
+        core: '8は達成と豊かさの数。あなたには物事を大きく動かし、現実に結果を生み出す力があります。夢を語るだけでなく、それを実際の形にする力があなたにはあります。',
+        strength: '統率力、実行力、ビジネス感覚、決断力。目標を定めたら最後まで追う意志。あなたが本気になったとき、組織が動きます。',
+        shadow: '結果への執着が強すぎると、プロセスや人間関係を犠牲にしてしまうことがあります。「何のために」という問いを忘れないでいてください。',
+        action: '今日の成功体験を、誰か一人に感謝の言葉として伝えてみてください。豊かさは人と共に流れます。',
+        direction: '力を得ることから、力を善のために使うことへ。あなたの影響力は、人を豊かにするために使われるとき、最も輝きます。'
+      },
+      9: {
+        core: '9は完成と博愛の数。あなたの中には、個人を超えた大きな愛の流れが宿っています。一つのことへの執着を手放すほど、より大きな何かがあなたを通して世界へ届いていきます。',
+        strength: '包容力、人道主義、芸術性、普遍的な愛。多様な人を受け入れる寛容さ。あなたの存在が、誰かにとっての安全地帯になります。',
+        shadow: '完璧な愛情を求めるあまり、現実の不完全な関係に傷つきやすい面があります。また、「もっと手放さなければ」という義務感が、疲弊を生むことも。',
+        action: '今日、何か一つ「執着していたもの」を意識して解放してみてください。手放した先に、新しい流れが来ます。',
+        direction: '宇宙的な愛を体現しながら、自分の地に足をつけたまま生きる。普遍を生きながら、今ここにいる。'
+      },
+      11: {
+        core: '11はマスターナンバー。高い直感と霊性を持つ啓示者の数です。あなたには、見えないものを感じ取り、それを言葉や行動に変えて人々を照らす力があります。その感受性は、ギフトであると同時に、扱い方を学ぶ必要のある力です。',
+        strength: '直感力、インスピレーション、霊性、理想主義。あなたのビジョンは、普通の人が見えないものを映し出します。',
+        shadow: '過剰な感受性が神経の消耗につながることがあります。理想と現実のギャップに苦しみ、自己批判が強くなる局面も。グランドリングが大切です。',
+        action: '毎日、体を大地に繋ぎ直す時間を持ちましょう。自然の中を歩く、深呼吸する、その一つで十分です。',
+        direction: '天と地の橋渡し人として、インスピレーションを現実の一歩に変えていく。'
+      },
+      22: {
+        core: '22はマスタービルダーの数。壮大なビジョンを現実に変える力を持ちます。あなたの夢は、個人を超えた規模を持ち、多くの人の未来に影響を与えます。',
+        strength: '実現力、グローバルな視野、組織構築力、実務的霊性。大きなことを着実に形にしていく力。',
+        shadow: '責任の重さが圧迫感になり、消耗することがあります。「全てを一人でやらなければ」という思い込みを手放してください。',
+        action: '今取り組んでいることを、五年後どんな形で残したいか書き出してみてください。方向が定まると力が湧きます。',
+        direction: 'ビジョンを仲間と共に形にする。あなたの建設は、一人の夢を超えた贈り物になります。'
+      },
+      33: {
+        core: '33はマスターティーチャーの数。深い共感と無条件の愛で、人々を癒し導きます。あなたの生き様そのものが、誰かの光になっています。',
+        strength: '究極の奉仕、無条件の愛、深い共感、霊的な教師としての力。存在するだけで癒しを届ける。',
+        shadow: '人のために生きすぎて、自分の人生を後回しにするリスクがあります。まず自分の心を満たすことが、より深い奉仕への道です。',
+        action: '今日、誰かのためではなく、純粋に自分が喜ぶことを一つしてください。それが全ての奉仕の源です。',
+        direction: '自分を愛することと、世界を愛することを同時に生きる。あなたの癒しは、まずあなた自身から。'
+      },
+    };
+
+    // Normalize number for template lookup
+    function prNormNum(n) {
+      if (n === 11 || n === 22 || n === 33) return n;
+      return ((n - 1) % 9) + 1; // reduce to 1-9
+    }
+
+    function prGetTemplate(n) {
+      const key = prNormNum(n);
+      return PR_TEMPLATE_DB[key] || PR_TEMPLATE_DB[1];
+    }
+
+    // Influence weights (mirror INFL_WEIGHT from chart section)
+    const PR_INFL_WEIGHT = {
+      lifePath: 5, maturity: 5,
+      spirit: 4, destiny: 3.5,
+      ground: 3,
+      persona: 1, target2: 1, target3: 1,
+      ch1: -4, ch2: -1, ch3: -1, ch4: -1,
+    };
+
+    // Build sorted positive positions by influence weight
+    function prGetSortedPositions(r) {
+      const positions = [
+        { key: 'lifePath',  label: '運命数',  weight: 5 },
+        { key: 'maturity',  label: '成熟数',  weight: 5 },
+        { key: 'spirit',    label: '成長数',  weight: 4 },
+        { key: 'destiny',   label: '誕生数',  weight: 3.5 },
+        { key: 'ground',    label: '社会数',  weight: 3 },
+        { key: 'persona',   label: '人格数',  weight: 1 },
+      ];
+      return positions;
+    }
+
+    function prInflBar(weight, maxW = 5) {
+      const pct = Math.max(0, Math.min(100, (weight / maxW) * 100));
+      return `<div class="pr-infl-bar"><div class="pr-infl-fill" style="width:${pct}%"></div></div>`;
+    }
+
+    // escape helper (reuse existing esc if available, else define)
+    function prEsc(s) {
+      return typeof esc === 'function' ? esc(String(s || '')) : String(s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+    }
+
+    // Build the mandala completed lines summary
+    function prGetMandalaLines(r) {
+      const ownerMap = buildOwnershipMap(r);
+      const LINE_DEFS = [
+        { key: 'COL_SELF',         name: '自分軸（1・4・7）',  nums: [1,4,7] },
+        { key: 'COL_SHARE',        name: '他人軸（2・5・8）',  nums: [2,5,8] },
+        { key: 'COL_SPIRIT',       name: '導き軸（3・6・9）',  nums: [3,6,9] },
+        { key: 'ROW_PLAN',         name: 'PLANライン（1・2・3）', nums: [1,2,3] },
+        { key: 'ROW_ARRANGE',      name: 'ARRANGEライン（4・5・6）', nums: [4,5,6] },
+        { key: 'ROW_DEVELOP',      name: 'DEVELOPライン（7・8・9）', nums: [7,8,9] },
+        { key: 'DIAG_ACHIEVER',    name: '達成数ライン（1・5・9）', nums: [1,5,9] },
+        { key: 'DIAG_PHILOSOPHER', name: '哲学者ライン（3・5・7）', nums: [3,5,7] },
+      ];
+      return LINE_DEFS.filter(ld => ld.nums.every(n => (ownerMap[n]?.scoreSum ?? 0) > 0));
+    }
+
+    // Get compat info for partner if available
+    function prGetCompatInfo() {
+      const py = (document.getElementById('compat-year') || {}).value || '';
+      const pm = (document.getElementById('compat-month') || {}).value || '';
+      const pd = (document.getElementById('compat-day') || {}).value || '';
+      if (!py || !pm || !pd) return null;
+      const partnerDate = new Date(parseInt(py), parseInt(pm)-1, parseInt(pd));
+      if (isNaN(partnerDate.getTime())) return null;
+      const partnerLP = Numerology.lifePath(partnerDate);
+      return { year: py, month: pm, day: pd, lifePath: partnerLP, date: partnerDate };
+    }
+
+    // ------- TEMPLATE-BASED REPORT BUILDER -------
+    function buildTemplateReport(r, name) {
+      const positions = prGetSortedPositions(r);
+      const completedLines = prGetMandalaLines(r);
+      const compatInfo = prGetCompatInfo();
+      const pyBase = (r.pYear > 9) ? (r.pYear === 11 ? 2 : r.pYear === 22 ? 4 : r.pYear === 33 ? 6 : r.pYear % 9 || 9) : r.pYear;
+      const pyDB = PERSONAL_YEAR_DB[pyBase] || PERSONAL_YEAR_DB[1];
+
+      // Axis balance text
+      const selfNums = [r.destiny, r.lifePath];
+      const otherNums = [r.persona, r.ground];
+      const guideNums = [r.spirit, r.target2, r.target3, r.maturity];
+      const selfAvg = selfNums.reduce((a,b)=>a+b,0)/selfNums.length;
+      const otherAvg = otherNums.reduce((a,b)=>a+b,0)/otherNums.length;
+      const guideAvg = guideNums.reduce((a,b)=>a+b,0)/guideNums.length;
+      const dominantAxis = selfAvg >= otherAvg && selfAvg >= guideAvg ? '自分軸' : otherAvg >= guideAvg ? '他人軸' : '導き軸';
+
+      let html = '';
+
+      // ── 序章
+      html += `<div class="pr-chapter" id="pr-ch-intro">
+        <h2>序章 — ${prEsc(name)}さんという存在</h2>
+        <p>${prEsc(name)}さん。あなたは ${prEsc(String(r.lifePath))} という運命数を軸に、${prEsc(String(r.destiny))} の誕生数、${prEsc(String(r.maturity))} の成熟数が絡み合う、固有の星座の中に生きています。</p>
+        <p>この精密レポートは、あなたの数秘チャートに刻まれたすべての数を一つずつ丁寧に読み解き、最後にそれらを一つの物語として束ねたものです。読み進めるにつれ、あなた自身への理解が深まり、これからの歩みが少し、明るく見えてくることを願っています。</p>
+      </div>`;
+
+      // ── 各数を一つずつ語る
+      html += `<div class="pr-chapter" id="pr-ch-numbers">
+        <h2>各数が語るあなたの姿</h2>`;
+
+      for (const pos of positions) {
+        const val = r[pos.key];
+        const t = prGetTemplate(val);
+        const nd = numDB[val] || numDB[Math.min(val, 9)];
+        const inflPct = Math.max(0, Math.min(100, (pos.weight / 5) * 100));
+        const starCount = pos.weight >= 5 ? '★★' : pos.weight >= 3.5 ? '★' : pos.weight >= 3 ? '◆' : '·';
+        html += `
+        <div style="border-left:3px solid #e9d5ff;padding-left:12px;margin-bottom:18px;" id="pr-num-${pos.key}">
+          <div class="pr-num-header">
+            <span class="pr-num-badge">${prEsc(String(val))}</span>
+            <div>
+              <div style="font-size:0.82rem;font-weight:700;color:#7c3aed;">${prEsc(pos.label)} <span style="font-size:0.7rem;color:#c084fc;">${starCount}</span></div>
+              <div class="pr-num-label">影響力 ${prEsc(String(pos.weight))}</div>
+            </div>
+          </div>
+          ${prInflBar(pos.weight)}
+          <h3>この数が示すもの</h3>
+          <p>${prEsc(t.core)}</p>
+          <div style="display:flex;flex-wrap:wrap;gap:4px;margin-bottom:8px;">
+            <span class="pr-tag pr-tag-strength">強み</span>
+            <span class="pr-tag pr-tag-shadow">課題</span>
+            <span class="pr-tag pr-tag-action">行動</span>
+          </div>
+          <h3>輝く面（強み）</h3>
+          <p>${prEsc(t.strength)}</p>
+          <h3>影として出る面（課題）</h3>
+          <p>${prEsc(t.shadow)}</p>
+          <h3>日常での活かし方</h3>
+          <p>${prEsc(t.action)}</p>
+          <hr class="pr-divider">
+        </div>`;
+      }
+      html += `</div>`;
+
+      // ── 強みの構造（マンダラ）
+      html += `<div class="pr-chapter" id="pr-ch-mandala">
+        <h2>強みの構造 — あなたのマンダラが語るもの</h2>`;
+      if (completedLines.length > 0) {
+        html += `<p>あなたの数秘マンダラでは、<strong>${prEsc(String(completedLines.length))}本のライン</strong>が揃っています。これは、複数の数が連携してあなたの中で強く共鳴していることを意味します。</p>`;
+        completedLines.forEach(ld => {
+          html += `<div class="pr-highlight"><p><strong>${prEsc(ld.name)}</strong>が揃っています。このラインが示すエネルギーは、あなたの中で特に力強く働いており、自然と発揮できる才能の型を形成しています。</p></div>`;
+        });
+      } else {
+        html += `<p>現在のチャートでは、特定のラインが強く揃うというよりも、様々な方向に力が分散しています。これは多様性と柔軟性の象徴でもあり、特定の枠にはまらないあなたの個性を表しています。</p>`;
+      }
+      html += `<p style="margin-top:10px;">最も影響力の強い数は<strong>${prEsc(String(r.lifePath))}（運命数）</strong>と<strong>${prEsc(String(r.maturity))}（成熟数）</strong>。この二つの数があなたの人生の基調音として響き続けます。</p>
+      </div>`;
+
+      // ── 3つの軸
+      html += `<div class="pr-chapter" id="pr-ch-axes">
+        <h2>3つの軸 — エネルギーの向き方</h2>
+        <p>あなたの数秘チャートを「自分軸・他人軸・導き軸」の三方向から見ると、<strong>${prEsc(dominantAxis)}</strong>のエネルギーが相対的に強く現れています。</p>
+        <p><strong>自分軸（誕生数${prEsc(String(r.destiny))} × 運命数${prEsc(String(r.lifePath))}）:</strong> ${prEsc(prGetTemplate(r.lifePath).core.substring(0,60))}という核を持ちながら、誕生数${prEsc(String(r.destiny))}の内なる衝動がその土台を作っています。</p>
+        <p><strong>他人軸（人格数${prEsc(String(r.persona))} × 社会数${prEsc(String(r.ground))}）:</strong> 外から見たあなたは${prEsc(String(r.persona))}のエネルギーを放ち、社会数${prEsc(String(r.ground))}が時代の流れとの接続点になっています。</p>
+        <p><strong>導き軸（成長数${prEsc(String(r.spirit))} × 成熟数${prEsc(String(r.maturity))}）:</strong> 成長数${prEsc(String(r.spirit))}は幼少期から育まれた資質であり、成熟数${prEsc(String(r.maturity))}はこれからあなたが向かう統合のテーマです。</p>
+      </div>`;
+
+      // ── 職業適性
+      html += `<div class="pr-chapter" id="pr-ch-career">
+        <h2>才能の発揮先 — 職業適性の可能性</h2>
+        <p>あなたの運命数${prEsc(String(r.lifePath))}と誕生数${prEsc(String(r.destiny))}の組み合わせが示す才能の方向性を、決めつけではなく可能性として受け取ってください。</p>
+        <p>${prEsc(prGetTemplate(r.lifePath).direction)}</p>
+        <p>成長数${prEsc(String(r.spirit))}が示す資質は、幼少期から自然と磨かれてきた能力です。それを活かせる場に身を置くとき、あなたは「頑張っている」というよりも「自然にできる」という感覚を得られます。</p>
+      </div>`;
+
+      // ── 相性
+      html += `<div class="pr-chapter" id="pr-ch-compat">
+        <h2>縁と関係性 — 相性が語るもの</h2>`;
+      if (compatInfo) {
+        const partnerT = prGetTemplate(compatInfo.lifePath);
+        html += `<p>相手の生年月日（${prEsc(compatInfo.year)}/${prEsc(compatInfo.month)}/${prEsc(compatInfo.day)}）から導かれる運命数は<strong>${prEsc(String(compatInfo.lifePath))}</strong>。</p>
+        <p>${prEsc(partnerT.core.substring(0, 80))}という性質を持つ相手と、あなたの${prEsc(String(r.lifePath))}のエネルギーが出会うとき、互いの異なる強みが補い合い、一方が苦手なことをもう一方が自然に補えるダイナミクスが生まれます。</p>
+        <p>どんな相性であっても、それは優劣ではなく「組み合わせ」の問題。あなたが相手のどこに惹かれ、どこに摩擦を感じるかを知ることが、関係を深める第一歩です。</p>`;
+      } else {
+        html += `<p>相手の生年月日を「相性診断」欄に入力すると、二人の数字の組み合わせが示す関係性の可能性をこのレポートに統合してお届けできます。</p>
+        <p>人との縁は、数秘の視点から見ると「偶然の出会い」ではなく、何かを学び合うために引き寄せられた必然のように映ります。</p>`;
+      }
+      html += `</div>`;
+
+      // ── 個人年予報
+      html += `<div class="pr-chapter" id="pr-ch-forecast">
+        <h2>今の流れ — 個人年${prEsc(String(r.pYear))}が語るテーマ</h2>
+        <p>今年はあなたにとって<strong>個人年${prEsc(String(r.pYear))}「${prEsc(pyDB.theme)}」</strong>の年です。</p>
+        <p>${prEsc(pyDB.recommend.join('、'))}といったことが、このサイクルであなたの流れに乗った行動です。一方で${prEsc(pyDB.avoid.join('、'))}は避けるべきエネルギーの使い方。</p>
+        <p>個人月${prEsc(String(r.pMonth))}・個人日${prEsc(String(r.pDay))}という細かい流れも、大きなテーマの中での「今日のタイミング」を教えてくれます。流れに逆らうより、流れを読んで動くことが、この時期を豊かにします。</p>
+      </div>`;
+
+      // ── 統合章
+      html += `<div class="pr-chapter" id="pr-ch-integration" style="background:linear-gradient(135deg,#fdf4ff,#fce7f3);border-color:#f0abfc;">
+        <h2>統合章 — ${prEsc(name)}さんという物語</h2>
+        <p>ここまで一つずつ数字を紐解いてきました。今度はそれらをバラバラにせず、一つの物語として束ねましょう。</p>
+        <p>あなたの核心には、運命数<strong>${prEsc(String(r.lifePath))}</strong>が流れています。${prEsc(prGetTemplate(r.lifePath).core)} そこに誕生数<strong>${prEsc(String(r.destiny))}</strong>の内なる衝動が加わり、人格数<strong>${prEsc(String(r.persona))}</strong>として外に表現されます。</p>
+        <p>成長数<strong>${prEsc(String(r.spirit))}</strong>が土台を作り、社会数<strong>${prEsc(String(r.ground))}</strong>が時代との接点を生みます。そしてこれら全てが、成熟数<strong>${prEsc(String(r.maturity))}</strong>という目標地点へ向かって統合されていきます。</p>
+        ${r.ch1 !== 0 ? `<p>克服数<strong>${prEsc(String(r.ch1))}</strong>は、あなたが最初に向き合う課題を示しています。しかしこれは「弱点」ではなく、「磨かれ続ける砥石」です。この数のエネルギーと上手に付き合うことが、あなたの成長の大きな軸になります。</p>` : ''}
+        <p>矛盾に見える数同士も、実はあなたの中で必然の役割を担っています。全ての数があなたという存在を作るピースであり、どれ一つ余分なものはありません。</p>
+      </div>`;
+
+      // ── 方向性
+      html += `<div class="pr-chapter" id="pr-ch-direction">
+        <h2>方向性 — これから歩む道</h2>
+        <p>今、あなたは${prEsc(String(r.age))}歳。${prEsc(r.age <= r.periods.first ? '第1期（成長期）' : r.age <= r.periods.second ? '第2期（発展期）' : r.age <= r.periods.third ? '第3期（成熟期）' : '第4期（完成期）')}の中にいます。このステージが求めるものと、あなたの数秘が持つエネルギーを合わせると、今取り組むべきテーマが見えてきます。</p>
+        <p>${prEsc(prGetTemplate(r.lifePath).direction)}</p>
+        <p>次の一歩は大きくなくていいのです。「今日、自分の数のエネルギーを意識して一つ行動してみる」——その小さな積み重ねが、あなたという物語の次の章を書いていきます。</p>
+      </div>`;
+
+      // ── 結び
+      html += `<div class="pr-chapter" id="pr-ch-closing" style="text-align:center;background:linear-gradient(135deg,#f3e8ff,#fce7f3,#e0e7ff);">
+        <h2 style="text-align:center;border-left:none;padding-left:0;">結び</h2>
+        <p style="text-align:center;">数は、あなたを縛るものではありません。<br>あなた自身をより深く知るための、光の地図です。</p>
+        <p style="text-align:center;font-weight:600;color:#7c3aed;">${prEsc(name)}さんの旅が、これからも豊かであることを願っています。</p>
+      </div>`;
+
+      return html;
+    }
+
+    // ------- AI-BASED REPORT BUILDER (Gemini) -------
+    async function buildAIReport(r, name, apiKey) {
+      const compatInfo = prGetCompatInfo();
+      const completedLines = prGetMandalaLines(r);
+      const pyBase = (r.pYear > 9) ? (r.pYear === 11 ? 2 : r.pYear === 22 ? 4 : r.pYear === 33 ? 6 : r.pYear % 9 || 9) : r.pYear;
+      const pyDB = PERSONAL_YEAR_DB[pyBase] || PERSONAL_YEAR_DB[1];
+
+      const prompt = `あなたは数秘術の深い洞察を持つプロフェッショナルです。以下のデータに基づき、${name}さんへの「精密統合数秘レポート」を日本語で生成してください。
+
+【数秘データ】
+- 運命数（最重要）: ${r.lifePath}
+- 成熟数（最重要）: ${r.maturity}
+- 成長数（重要）: ${r.spirit}
+- 誕生数（重要）: ${r.destiny}
+- 社会数: ${r.ground}
+- 人格数: ${r.persona}
+- 克服数: ${r.ch1}
+- 個人年: ${r.pYear}（テーマ: ${pyDB.theme}）
+- 年齢: ${r.age}歳
+${compatInfo ? `- 相手の運命数: ${compatInfo.lifePath}` : '- 相手生年月日: 未入力'}
+${completedLines.length > 0 ? `- 揃いライン: ${completedLines.map(l => l.name).join('、')}` : '- 揃いライン: なし'}
+
+【生成指示】
+以下の10章を**必ず全て**生成してください。各章は見出し「## 章タイトル」で始め、300〜500字の地の文（箇条書き禁止）で書いてください。二人称「あなた」、温かく上質な日本語、スピリチュアルに偏らず現実の行動への橋渡しも入れること。
+
+## 序章 — ${name}さんという存在
+## 運命数${r.lifePath}が語るもの
+## 成熟数${r.maturity}が語るもの
+## 成長数${r.spirit}が語るもの
+## 誕生数${r.destiny}が語るもの
+## 社会数${r.ground}と人格数${r.persona}が語るもの
+## 強みの構造 — マンダラが示すあなたの型
+## 3つの軸 — エネルギーの向き方
+## 才能の発揮先 — 職業適性の可能性
+## 縁と関係性
+## 今の流れ — 個人年${r.pYear}のテーマ
+## 統合章 — ${name}さんという物語
+## 方向性 — これから歩む道
+## 結び
+
+各章は独立した地の文で、前の章の内容を受けながら自然につながるように書いてください。最後の「結び」は短く、心に残る言葉で締めてください。`;
+
+      const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`;
+      const resp = await fetchWithRetry(url, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          contents: [{ parts: [{ text: prompt }] }],
+          generationConfig: { temperature: 0.82, maxOutputTokens: 8192 }
+        })
+      }, 1, 60000);
+
+      const result = await resp.json();
+      const c0 = result.candidates && result.candidates[0];
+      const rawText = (c0 && c0.content && c0.content.parts && c0.content.parts[0] && c0.content.parts[0].text) || '';
+      if (!rawText) throw new Error('AI応答が空でした');
+
+      // Convert ## headings → pr-chapter divs
+      const sections = rawText.split(/\n(?=##\s)/);
+      let html = '';
+      const chapterIds = [
+        'intro','lifepath','maturity','spirit','destiny','persona-ground',
+        'mandala','axes','career','compat','forecast','integration','direction','closing'
+      ];
+      let chapIdx = 0;
+      for (const sec of sections) {
+        const trimmed = sec.trim();
+        if (!trimmed) continue;
+        const headMatch = trimmed.match(/^##\s+(.+)/);
+        if (!headMatch) { html += `<div class="pr-chapter"><p>${prEsc(trimmed)}</p></div>`; continue; }
+        const title = headMatch[1];
+        const body = trimmed.slice(headMatch[0].length).trim();
+        const cid = chapterIds[chapIdx] ? `pr-ch-${chapterIds[chapIdx]}` : `pr-ch-${chapIdx}`;
+        chapIdx++;
+        const isClosing = chapIdx >= chapterIds.length;
+        const chStyle = isClosing ? ' style="text-align:center;background:linear-gradient(135deg,#f3e8ff,#fce7f3,#e0e7ff);"' : '';
+        const h2Style = isClosing ? ' style="text-align:center;border-left:none;padding-left:0;"' : '';
+        // Split body into paragraphs
+        const paras = body.split(/\n+/).filter(p => p.trim()).map(p => `<p>${prEsc(p.trim())}</p>`).join('\n');
+        html += `<div class="pr-chapter" id="${cid}"${chStyle}><h2${h2Style}>${prEsc(title)}</h2>${paras}</div>`;
+      }
+      return html;
+    }
+
+    // ------- MAIN REPORT ORCHESTRATOR -------
+    async function generatePrecisionReport() {
+      if (!lastResults) return;
+      const r = lastResults;
+      const name = document.getElementById('result-name').textContent || 'あなた';
+      const apiKey = ((document.getElementById('geminiApiKey') || {}).value || '').trim();
+
+      const section = document.getElementById('section-precision-report');
+      const loading = document.getElementById('precision-report-loading');
+      const content = document.getElementById('precision-report-content');
+      const pdfBtn = document.getElementById('btn-precision-report-pdf');
+      const loadingMsg = document.getElementById('precision-report-loading-msg');
+
+      section.classList.remove('hidden');
+      loading.classList.remove('hidden');
+      content.classList.add('hidden');
+      pdfBtn.classList.add('hidden');
+
+      // Scroll into view
+      section.scrollIntoView({ behavior: 'smooth', block: 'start' });
+
+      let reportHtml = '';
+      let isAI = false;
+
+      if (apiKey) {
+        try {
+          loadingMsg.textContent = 'Gemini AIがあなたの物語を紡いでいます...';
+          reportHtml = await buildAIReport(r, name, apiKey);
+          isAI = true;
+        } catch(e) {
+          console.warn('AI report generation failed, falling back to template:', e.message);
+          loadingMsg.textContent = 'テンプレートで生成中...';
+          reportHtml = buildTemplateReport(r, name);
+        }
+      } else {
+        reportHtml = buildTemplateReport(r, name);
+      }
+
+      // Inject mode badge after first h2
+      const modeBadge = isAI
+        ? '<span class="pr-mode-badge pr-mode-ai">AI生成</span>'
+        : '<span class="pr-mode-badge pr-mode-template">標準版</span>';
+      reportHtml = reportHtml.replace(/(<h2[^>]*>)/, `$1${modeBadge} `);
+
+      content.innerHTML = reportHtml;
+
+      loading.classList.add('hidden');
+      content.classList.remove('hidden');
+      pdfBtn.classList.remove('hidden');
+    }
+
+    // ------- PDF SAVE FOR PRECISION REPORT -------
+    async function savePrecisionReportPdf() {
+      const name = document.getElementById('result-name').textContent || 'あなた';
+      const content = document.getElementById('precision-report-content');
+      if (!content || content.classList.contains('hidden')) return;
+
+      const btn = document.getElementById('btn-precision-report-pdf');
+      const origText = btn.innerHTML;
+      btn.innerHTML = '<svg class="w-4 h-4 animate-spin inline-block" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path></svg> PDF生成中...';
+      btn.disabled = true;
+
+      try {
+        // Clone content into a print-ready container
+        const pdfRoot = document.createElement('div');
+        pdfRoot.style.cssText = 'position:absolute;left:-9999px;top:0;width:760px;background:#fff;font-family:Inter,system-ui,sans-serif;font-size:13px;color:#1f2937;padding:20px;';
+
+        // Title
+        pdfRoot.innerHTML = `<div style="text-align:center;padding:24px 0 16px;border-bottom:1px solid #e9d5ff;margin-bottom:16px;">
+          <div style="font-family:Lora,serif;font-size:22px;font-weight:700;color:#6b21a8;margin-bottom:4px;">精密統合数秘レポート</div>
+          <div style="font-size:13px;color:#9ca3af;">${name} さん — 作成日: ${new Date().toLocaleDateString('ja-JP')}</div>
+        </div>`;
+
+        // Clone chapters
+        const chapters = content.querySelectorAll('.pr-chapter');
+        chapters.forEach(ch => {
+          const clone = ch.cloneNode(true);
+          clone.style.cssText = 'background:#fff;border:1px solid #e9d5ff;border-radius:10px;padding:16px;margin-bottom:12px;page-break-inside:avoid;';
+          const h2s = clone.querySelectorAll('h2');
+          h2s.forEach(h => { h.style.cssText = 'font-family:Lora,serif;font-size:14px;font-weight:700;color:#6b21a8;border-left:3px solid #a855f7;padding-left:8px;margin-bottom:8px;'; });
+          const h3s = clone.querySelectorAll('h3');
+          h3s.forEach(h => { h.style.cssText = 'font-size:12px;font-weight:600;color:#7c3aed;margin:10px 0 4px;'; });
+          const ps = clone.querySelectorAll('p');
+          ps.forEach(p => { p.style.cssText = 'font-size:11px;line-height:1.8;color:#374151;margin-bottom:6px;'; });
+          // Remove badges from print
+          clone.querySelectorAll('.pr-mode-badge,.pr-tag,.pr-infl-bar').forEach(el => el.remove());
+          pdfRoot.appendChild(clone);
+        });
+
+        document.body.appendChild(pdfRoot);
+        await new Promise(res => setTimeout(res, 300));
+
+        const pdfRootRect = pdfRoot.getBoundingClientRect();
+        const candidateEls = pdfRoot.querySelectorAll('.pr-chapter');
+        const candidateYsPx = [];
+        candidateEls.forEach(el => {
+          const y = el.getBoundingClientRect().top - pdfRootRect.top;
+          candidateYsPx.push(Math.round(y));
+        });
+
+        const isMobile = window.innerWidth < 768;
+        const canvas = await html2canvas(pdfRoot, {
+          scale: isMobile ? 1.0 : 1.4,
+          useCORS: true,
+          backgroundColor: '#ffffff',
+          windowWidth: 760
+        });
+
+        const pdfRootH = pdfRootRect.height || pdfRoot.scrollHeight || 1;
+        document.body.removeChild(pdfRoot);
+
+        const { jsPDF } = window.jspdf;
+        const pdf = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
+        const pw = 210, ph = 297, marginX = 8, marginTop = 10, marginBottom = 10;
+        const contentW = pw - marginX * 2;
+        const canvasH = canvas.height, canvasW = canvas.width;
+        const scaleFactor = canvasH / pdfRootH;
+        const imgW = contentW;
+        const imgH = (canvasH / canvasW) * imgW;
+        const pageContentH = ph - marginTop - marginBottom;
+        const pageContentPx = Math.round((pageContentH / imgH) * canvasH);
+
+        const candidatesPx = [...new Set(candidateYsPx)].sort((a,b)=>a-b)
+          .map(py => Math.round(py * scaleFactor))
+          .filter(p => p > 10);
+
+        const slicesPx = [];
+        let cursorPx = 0;
+        while (cursorPx < canvasH - 5) {
+          const remaining = canvasH - cursorPx;
+          if (remaining <= pageContentPx + 5) { slicesPx.push({ startPx: cursorPx, heightPx: remaining }); break; }
+          const pageEndPx = cursorPx + pageContentPx;
+          let bestBreak = -1;
+          for (const cp of candidatesPx) {
+            if (cp <= cursorPx + 5) continue;
+            if (cp > pageEndPx + 5) break;
+            if (cp - cursorPx >= Math.round(pageContentPx * 0.25)) bestBreak = cp;
+          }
+          if (bestBreak > 0) { slicesPx.push({ startPx: cursorPx, heightPx: bestBreak - cursorPx }); cursorPx = bestBreak; }
+          else { slicesPx.push({ startPx: cursorPx, heightPx: pageContentPx }); cursorPx += pageContentPx; }
+        }
+
+        const pxToMm = px => (px / canvasH) * imgH;
+        slicesPx.forEach((slice, idx) => {
+          if (idx > 0) pdf.addPage();
+          const sc = document.createElement('canvas');
+          sc.width = canvasW; sc.height = slice.heightPx;
+          sc.getContext('2d').drawImage(canvas, 0, slice.startPx, canvasW, slice.heightPx, 0, 0, canvasW, slice.heightPx);
+          pdf.addImage(sc.toDataURL('image/jpeg', 0.85), 'JPEG', marginX, marginTop, contentW, pxToMm(slice.heightPx));
+          sc.width = 0; sc.height = 0;
+        });
+        canvas.width = 0; canvas.height = 0;
+
+        const blob = pdf.output('blob');
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url; a.download = name + '_統合数秘レポート.pdf'; a.style.display = 'none';
+        document.body.appendChild(a); a.click(); document.body.removeChild(a);
+        setTimeout(() => URL.revokeObjectURL(url), 60000);
+
+      } catch(e) {
+        console.error('Precision report PDF error:', e);
+        alert('PDF生成中にエラーが発生しました: ' + (e.message || '不明なエラー'));
+      } finally {
+        const leftover = document.getElementById('pdf-render');
+        if (leftover) leftover.remove();
+        btn.innerHTML = origText;
+        btn.disabled = false;
+      }
+    }
+
+    // ------- EVENT LISTENERS -------
+    document.getElementById('btn-precision-report').addEventListener('click', () => {
+      generatePrecisionReport().catch(e => {
+        console.error('Precision report error:', e);
+        const loading = document.getElementById('precision-report-loading');
+        const content = document.getElementById('precision-report-content');
+        if (loading) loading.classList.add('hidden');
+        if (content) {
+          content.innerHTML = `<div class="pr-chapter"><p style="color:#dc2626;">レポートの生成中にエラーが発生しました: ${prEsc(e.message || '不明なエラー')}</p></div>`;
+          content.classList.remove('hidden');
+        }
+      });
+    });
+
+    document.getElementById('btn-precision-report-pdf').addEventListener('click', () => {
+      savePrecisionReportPdf();
+    });
 
     // =========================================================
     // PDF Report Generation (jsPDF + html2canvas)
