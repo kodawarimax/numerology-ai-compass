@@ -384,7 +384,7 @@
     .chart-box .cb-num {
       font-family: 'Lora', serif;
       font-weight: 700;
-      font-size: 1.5rem;
+      font-size: 1.2rem;
       color: #581c87;
       line-height: 1.2;
     }
@@ -496,6 +496,10 @@
 
     .fade-in { animation: fadeIn 0.3s ease; }
     @keyframes fadeIn { from { opacity:0; transform:translateY(6px); } to { opacity:1; transform:translateY(0); } }
+
+    /* ===== Tab Panel Switching ===== */
+    .tab-panel { display: none; }
+    .tab-panel.active { display: block; animation: fadeIn 0.22s ease; }
 
     /* ===== 数秘マンダラ — 5×5 Grid (正典レイアウト) ===== */
     .mandala-grid {
@@ -939,7 +943,9 @@
       box-shadow: 0 3px 10px rgba(168,85,247,0.22), 0 0 8px rgba(106,158,130,0.50);
     }
     /* 地面線: 幹ゾーン(center row)と根ゾーン(克服・挑戦数)の境界 */
+    /* 地面線: gridアイテムではなくposition:absoluteのオーバーレイ。grid行構造を侵さない */
     .chart-ground-line {
+      /* grid フロー内: gr-8 で center row と challenge row の境界に配置 */
       grid-column: 1 / -1;
       width: 100%;
       height: 0;
@@ -1005,6 +1011,42 @@
     .chart-box.pos-destiny  .infl-badge { color: #2d5f9c; }
     .chart-box.pos-ground   .infl-badge { color: #1f5c42; }
     .chart-box.pos-overcome .infl-badge { color: #8a3838; }
+
+    /* ===== Accordion (section-dataset cards) ===== */
+    .ds-accordion-header {
+      cursor: pointer;
+      user-select: none;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 1rem;
+      background: inherit;
+      border: none;
+      width: 100%;
+      text-align: left;
+    }
+    .ds-accordion-header:hover { filter: brightness(0.97); }
+    .ds-accordion-header .ds-acc-title { flex: 1; }
+    .ds-accordion-indicator {
+      width: 20px;
+      height: 20px;
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: transform 0.25s ease;
+      color: #7c3aed;
+    }
+    .ds-accordion-indicator svg { width: 14px; height: 14px; }
+    .ds-accordion-body {
+      overflow: hidden;
+      max-height: 0;
+      transition: max-height 0.3s ease;
+    }
+    .ds-accordion-body.ds-acc-open {
+      max-height: 4000px; /* large enough for any card content */
+    }
+    .ds-acc-open-indicator .ds-accordion-indicator { transform: rotate(90deg); }
   </style>
 </head>
 <body class="bg-gray-50 min-h-screen">
@@ -1177,7 +1219,7 @@
     <div class="max-w-3xl mx-auto px-4 py-4 space-y-5">
 
       <!-- ===== SECTION: 数秘チャート ===== -->
-      <div id="section-chart">
+      <div id="section-chart" class="tab-panel active">
       <!-- Chart Title -->
       <div class="text-center mb-4">
         <h2 class="text-base font-bold text-purple-700" id="chart-title">太郎さんの命の木</h2>
@@ -1234,8 +1276,8 @@
             </div>
 
             <!-- ========== CHALLENGES (下半分) — 列アンカー配置 ========== -->
-            <!-- 案C 地面線: 幹ゾーン(center row)と根ゾーン(克服・挑戦数)の境界 -->
-            <div class="chart-ground-line gr-8" style="grid-column:1/7;"></div>
+            <!-- 地面線: gr-8 でグリッドフロー内に配置。幹ゾーンと根ゾーンの境界線 -->
+            <div class="chart-ground-line gr-8" id="chart-ground-line" style="grid-column:1/7;"></div>
             <div class="period-lbl gr-8 gc-B" id="cp1-label">第1挑戦期間<br><span id="cp1-age"></span></div>
             <div class="period-lbl gr-8 gc-D" id="cp2-label">第2挑戦期間<br><span id="cp2-age"></span></div>
 
@@ -1362,13 +1404,100 @@
             <!-- 軸・斜めライン説明 -->
             <div style="width:100%;text-align:center;font-size:10px;color:#6b7280;margin-top:4px;line-height:1.6;">
               自分軸=自己・自我 / 他人軸=交流・欲求 / 導き軸=糾合・精神性<br>
-              斜め：達成数(1·5·9)=起動力・目標達成 / 哲学者(3·5·7)=探究心・洞察
+              斜め：革命家(1·5·9)=開拓心・起動力・決断力 / 哲学者(3·5·7)=理解力・直感力・探究心
             </div>
           </div>
           <div id="mandala-lines-summary" class="mt-4 hidden">
             <p class="text-[11px] font-semibold text-purple-700 mb-2">あなたの強調ライン</p>
             <div id="mandala-lines-list" class="space-y-2"></div>
           </div>
+
+          <!-- 6ライン解説アコーディオン（デフォルト閉じ） -->
+          <div class="mt-4 border border-purple-100 rounded-xl overflow-hidden" id="mandala-line-accordion">
+            <button class="ds-accordion-header gradient-header w-full flex items-center justify-between px-4 py-2" data-acc-target="mandala-line-acc-body" aria-expanded="false" style="font-size:12px;font-weight:700;color:#6b21a8;">
+              <span>マンダラ8ライン解説（縦カラム・横ロウ・斜め対角）</span>
+              <span class="ds-accordion-indicator" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+              </span>
+            </button>
+            <div class="ds-accordion-body" id="mandala-line-acc-body">
+              <div class="p-3 space-y-3">
+                <p style="font-size:10px;color:#6b7280;line-height:1.5;margin-bottom:4px;">縦カラム（横行）= PLAN/ARRANGE/DEVELOP は物事へのアプローチの型。横ロウ（縦列）= SELF/SHARE/SPIRIT はエネルギーの向き先。</p>
+
+                <!-- 縦カラム 3本 -->
+                <p style="font-size:10px;font-weight:700;color:#5b21b6;text-transform:uppercase;letter-spacing:0.06em;">縦カラム（横行） — 数字 1-2-3 / 4-5-6 / 7-8-9</p>
+                <div id="ml-col-PLAN" class="rounded-lg border border-purple-100 px-3 py-2" style="background:#faf5ff;">
+                  <div style="display:flex;align-items:baseline;gap:6px;margin-bottom:3px;">
+                    <span style="font-size:11px;font-weight:700;color:#5b21b6;">PLAN（企画）</span>
+                    <span style="font-size:10px;color:#7c3aed;">1 · 2 · 3</span>
+                  </div>
+                  <p style="font-size:11px;color:#374151;line-height:1.55;margin:0 0 3px;">物事の方向性を見極め、計画やプランを立てる能力が優れています。斬新な発想や新たなアイディアを活かし、未知の領域を追求します。</p>
+                  <p style="font-size:10px;color:#7c3aed;margin:0;">企画力 / 発想力 / 方向性 / 独創性 / インスピレーション</p>
+                </div>
+                <div id="ml-col-ARRANGE" class="rounded-lg border border-purple-100 px-3 py-2" style="background:#faf5ff;">
+                  <div style="display:flex;align-items:baseline;gap:6px;margin-bottom:3px;">
+                    <span style="font-size:11px;font-weight:700;color:#4c1d95;">ARRANGE（調整）</span>
+                    <span style="font-size:10px;color:#7c3aed;">4 · 5 · 6</span>
+                  </div>
+                  <p style="font-size:11px;color:#374151;line-height:1.55;margin:0 0 3px;">物事の枠組みを見極め、社会のニーズを反映する能力が優れています。様々な要素やアイディアを調整しながら、現実的な視点で組み立てます。</p>
+                  <p style="font-size:10px;color:#7c3aed;margin:0;">調整力 / 推進力 / 実利性 / 現実性 / マーケティング</p>
+                </div>
+                <div id="ml-col-DEVELOP" class="rounded-lg border border-purple-100 px-3 py-2" style="background:#faf5ff;">
+                  <div style="display:flex;align-items:baseline;gap:6px;margin-bottom:3px;">
+                    <span style="font-size:11px;font-weight:700;color:#3b0764;">DEVELOP（展開）</span>
+                    <span style="font-size:10px;color:#7c3aed;">7 · 8 · 9</span>
+                  </div>
+                  <p style="font-size:11px;color:#374151;line-height:1.55;margin:0 0 3px;">物事の発展性を見極め、社会の中で応用展開させる能力が優れています。様々な分野への拡張を試み、質の向上や権威性などを見定めます。</p>
+                  <p style="font-size:10px;color:#7c3aed;margin:0;">応用展開 / 洞察力 / 実現力 / 権威性 / クオリティー</p>
+                </div>
+
+                <!-- 横ロウ 3本 -->
+                <p style="font-size:10px;font-weight:700;color:#5b21b6;text-transform:uppercase;letter-spacing:0.06em;margin-top:6px;">横ロウ（縦列） — 数字 1-4-7 / 2-5-8 / 3-6-9</p>
+                <div id="ml-row-SELF" class="rounded-lg border px-3 py-2" style="background:rgba(220,38,38,0.05);border-color:rgba(220,38,38,0.2);">
+                  <div style="display:flex;align-items:baseline;gap:6px;margin-bottom:3px;">
+                    <span style="font-size:11px;font-weight:700;color:#991b1b;">自分軸（SELF）</span>
+                    <span style="font-size:10px;color:#991b1b;">1 · 4 · 7</span>
+                  </div>
+                  <p style="font-size:11px;color:#374151;line-height:1.55;margin:0 0 3px;">革新的で実利的・合理的。職人気質で几帳面、本物志向、問題解決能力が高いタイプ。生真面目で責任感が強く、独自のやり方にこだわるマイペース型です。</p>
+                  <p style="font-size:10px;color:#991b1b;margin:0;">革新的 / 実利的 / 合理的 / 職人気質 / 責任感</p>
+                </div>
+                <div id="ml-row-SHARE" class="rounded-lg border px-3 py-2" style="background:rgba(37,99,235,0.05);border-color:rgba(37,99,235,0.2);">
+                  <div style="display:flex;align-items:baseline;gap:6px;margin-bottom:3px;">
+                    <span style="font-size:11px;font-weight:700;color:#1e3a8a;">他人軸（SHARE）</span>
+                    <span style="font-size:10px;color:#1e3a8a;">2 · 5 · 8</span>
+                  </div>
+                  <p style="font-size:11px;color:#374151;line-height:1.55;margin:0 0 3px;">人情的で交流を好み、適応性が高く歩調を合わせて目的を果たします。外交的・活動的で状況判断に優れ、相手を察する力を持つタイプです。</p>
+                  <p style="font-size:10px;color:#1e3a8a;margin:0;">人情的 / 交流 / 適応性 / 外交的 / パートナーシップ</p>
+                </div>
+                <div id="ml-row-SPIRIT" class="rounded-lg border px-3 py-2" style="background:rgba(217,119,6,0.05);border-color:rgba(217,119,6,0.2);">
+                  <div style="display:flex;align-items:baseline;gap:6px;margin-bottom:3px;">
+                    <span style="font-size:11px;font-weight:700;color:#92400e;">導き軸（SPIRIT）</span>
+                    <span style="font-size:10px;color:#92400e;">3 · 6 · 9</span>
+                  </div>
+                  <p style="font-size:11px;color:#374151;line-height:1.55;margin:0 0 3px;">夢想的で美意識が高く、美と調和を愛し芸術的センスを表現する力を持ちます。知的・精神的で、インスピレーションを元に創作に励むインスパイアー型です。</p>
+                  <p style="font-size:10px;color:#92400e;margin:0;">夢想的 / 美意識 / 芸術的センス / 知的 / 精神性</p>
+                </div>
+
+                <!-- 斜め対角 2本 -->
+                <p style="font-size:10px;font-weight:700;color:#5b21b6;text-transform:uppercase;letter-spacing:0.06em;margin-top:6px;">斜め対角 — 革命家（1·5·9）/ 哲学者（3·5·7）</p>
+                <div id="ml-diag-ACHIEVER" class="rounded-lg border px-3 py-2" style="background:rgba(124,58,237,0.06);border-color:rgba(124,58,237,0.25);">
+                  <div style="display:flex;align-items:baseline;gap:6px;margin-bottom:3px;">
+                    <span style="font-size:11px;font-weight:700;color:#5b21b6;">革命家ライン（1·5·9）</span>
+                  </div>
+                  <p style="font-size:11px;color:#374151;line-height:1.55;margin:0 0 3px;">新しい方向性を打ち出しながら、より良い状況へと全体をシフトさせます。強い意志と揺るぎない信念の持ち主で、目標を必ず成し遂げる能力を持ちます。挫折や試練を繰り返し乗り越えることで、世界に貢献します。</p>
+                  <p style="font-size:10px;color:#5b21b6;margin:0;">開拓心 / 起動力 / 決断力 / 説得力</p>
+                </div>
+                <div id="ml-diag-PHILOSOPHER" class="rounded-lg border px-3 py-2" style="background:rgba(124,58,237,0.04);border-color:rgba(124,58,237,0.18);">
+                  <div style="display:flex;align-items:baseline;gap:6px;margin-bottom:3px;">
+                    <span style="font-size:11px;font-weight:700;color:#4c1d95;">哲学者ライン（3·5·7）</span>
+                  </div>
+                  <p style="font-size:11px;color:#374151;line-height:1.55;margin:0 0 3px;">多くの人に思想的・宗教的・精神的な教えをもたらしながら、真実を探究します。霊的な力を発揮し、他者への共感や理解を示します。精神的なリーダーの資質を持ち、深遠なる智を学び体験し探究することで世界に貢献します。</p>
+                  <p style="font-size:10px;color:#4c1d95;margin:0;">理解力 / 直感力 / 探究心 / 洞察力 / 霊力</p>
+                </div>
+              </div>
+            </div>
+          </div>
+
           <p class="text-[10px] text-gray-400 mt-3 text-center">各マスをタップするとその数字の詳しい解説が表示されます</p>
         </div>
       </div>
@@ -1425,7 +1554,7 @@
       </div><!-- /section-chart -->
 
       <!-- ===== SECTION: 手相占い ===== -->
-      <div id="section-palm" class="space-y-5">
+      <div id="section-palm" class="tab-panel space-y-5">
       <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
         <div class="gradient-header p-4 text-center">
           <h3 class="text-base font-bold text-gray-800 flex items-center justify-center gap-2">
@@ -1697,7 +1826,7 @@
       </div><!-- /section-palm -->
 
       <!-- ===== SECTION: パーソナルサイクル ===== -->
-      <div id="section-cycles" class="space-y-5">
+      <div id="section-cycles" class="tab-panel space-y-5">
 
       <!-- 個人年/月/日 -->
       <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
@@ -1779,134 +1908,204 @@
       </div><!-- /section-cycles -->
 
       <!-- ===== SECTION: 詳細鑑定 (dataset-driven) ===== -->
-      <div id="section-dataset" class="space-y-5">
+      <div id="section-dataset" class="tab-panel space-y-5">
 
-        <!-- ① 職業適性 -->
+        <!-- ① 職業適性 — accordion, initially OPEN -->
         <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden" id="card-career-aptitude" style="display:none">
-          <div class="gradient-header p-4 text-center">
-            <h3 class="text-base font-bold text-gray-800">あなたの天職</h3>
-            <p class="text-[11px] text-gray-500 mt-1">数秘が示す職業適性と後半生の適職</p>
-          </div>
-          <div class="p-5 space-y-4" id="ds-career"></div>
-        </div>
-
-        <!-- ③ 相性診断 -->
-        <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
-          <div class="gradient-header p-4 text-center">
-            <h3 class="text-base font-bold text-gray-800">他人との相性診断</h3>
-            <p style="font-size:11px" class="text-gray-500 mt-1">相手の生年月日を入力して相性を確かめる</p>
-          </div>
-          <div class="p-5 space-y-3">
-            <div class="grid grid-cols-3 gap-2">
-              <div>
-                <label for="compat-year" style="font-size:11px" class="block text-gray-500 mb-1">年</label>
-                <input type="number" id="compat-year" min="1900" max="2100" placeholder="1990"
-                  aria-label="相手の生まれた年（例: 1990）"
-                  style="min-height:44px"
-                  class="w-full border border-gray-200 rounded-lg px-2 py-2.5 text-sm text-center focus:ring-2 focus:ring-purple-300 outline-none">
-              </div>
-              <div>
-                <label for="compat-month" style="font-size:11px" class="block text-gray-500 mb-1">月</label>
-                <input type="number" id="compat-month" min="1" max="12" placeholder="3"
-                  aria-label="相手の生まれた月（1〜12）"
-                  style="min-height:44px"
-                  class="w-full border border-gray-200 rounded-lg px-2 py-2.5 text-sm text-center focus:ring-2 focus:ring-purple-300 outline-none">
-              </div>
-              <div>
-                <label for="compat-day" style="font-size:11px" class="block text-gray-500 mb-1">日</label>
-                <input type="number" id="compat-day" min="1" max="31" placeholder="3"
-                  aria-label="相手の生まれた日（1〜31）"
-                  style="min-height:44px"
-                  class="w-full border border-gray-200 rounded-lg px-2 py-2.5 text-sm text-center focus:ring-2 focus:ring-purple-300 outline-none">
-              </div>
+          <button class="ds-accordion-header gradient-header ds-acc-open-indicator" data-acc-target="acc-body-career" aria-expanded="true">
+            <div class="ds-acc-title text-center">
+              <h3 class="text-base font-bold text-gray-800">あなたの天職</h3>
+              <p class="text-[11px] text-gray-500 mt-1">数秘が示す職業適性と後半生の適職</p>
             </div>
-            <!-- 優先1: 固定エラー要素 role=alert -->
-            <div id="compat-error-msg" role="alert" aria-live="polite" tabindex="-1" class="hidden text-xs text-red-500 mt-1">生年月日を正しく入力してください。</div>
-            <button id="btn-compat-check"
-              style="min-height:48px"
-              class="w-full bg-purple-600 hover:bg-purple-700 text-white rounded-full py-3 text-sm font-semibold transition-all">
-              相性をみる
-            </button>
-            <div id="compat-result" class="hidden" aria-live="polite" aria-atomic="true"></div>
+            <span class="ds-accordion-indicator" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+            </span>
+          </button>
+          <div class="ds-accordion-body ds-acc-open" id="acc-body-career">
+            <div class="p-5 space-y-4" id="ds-career"></div>
           </div>
         </div>
 
-        <!-- 色彩 & 宝石 -->
+        <!-- ③ 相性診断 — accordion, initially OPEN (interactive form) -->
         <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
-          <div class="gradient-header p-4 text-center">
-            <h3 class="text-base font-bold text-gray-800">数と色彩・宝石</h3>
-            <p class="text-[10px] text-gray-500 mt-1">あなたの数字に対応するカラーとクリスタル</p>
+          <button class="ds-accordion-header gradient-header ds-acc-open-indicator" data-acc-target="acc-body-compat" aria-expanded="true">
+            <div class="ds-acc-title text-center">
+              <h3 class="text-base font-bold text-gray-800">他人との相性診断</h3>
+              <p style="font-size:11px" class="text-gray-500 mt-1">相手の生年月日を入力して相性を確かめる</p>
+            </div>
+            <span class="ds-accordion-indicator" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+            </span>
+          </button>
+          <div class="ds-accordion-body ds-acc-open" id="acc-body-compat">
+            <div class="p-5 space-y-3">
+              <div class="grid grid-cols-3 gap-2">
+                <div>
+                  <label for="compat-year" style="font-size:11px" class="block text-gray-500 mb-1">年</label>
+                  <input type="number" id="compat-year" min="1900" max="2100" placeholder="1990"
+                    aria-label="相手の生まれた年（例: 1990）"
+                    style="min-height:44px"
+                    class="w-full border border-gray-200 rounded-lg px-2 py-2.5 text-sm text-center focus:ring-2 focus:ring-purple-300 outline-none">
+                </div>
+                <div>
+                  <label for="compat-month" style="font-size:11px" class="block text-gray-500 mb-1">月</label>
+                  <input type="number" id="compat-month" min="1" max="12" placeholder="3"
+                    aria-label="相手の生まれた月（1〜12）"
+                    style="min-height:44px"
+                    class="w-full border border-gray-200 rounded-lg px-2 py-2.5 text-sm text-center focus:ring-2 focus:ring-purple-300 outline-none">
+                </div>
+                <div>
+                  <label for="compat-day" style="font-size:11px" class="block text-gray-500 mb-1">日</label>
+                  <input type="number" id="compat-day" min="1" max="31" placeholder="3"
+                    aria-label="相手の生まれた日（1〜31）"
+                    style="min-height:44px"
+                    class="w-full border border-gray-200 rounded-lg px-2 py-2.5 text-sm text-center focus:ring-2 focus:ring-purple-300 outline-none">
+                </div>
+              </div>
+              <!-- 優先1: 固定エラー要素 role=alert -->
+              <div id="compat-error-msg" role="alert" aria-live="polite" tabindex="-1" class="hidden text-xs text-red-500 mt-1">生年月日を正しく入力してください。</div>
+              <button id="btn-compat-check"
+                style="min-height:48px"
+                class="w-full bg-purple-600 hover:bg-purple-700 text-white rounded-full py-3 text-sm font-semibold transition-all">
+                相性をみる
+              </button>
+              <div id="compat-result" class="hidden" aria-live="polite" aria-atomic="true"></div>
+            </div>
           </div>
-          <div class="p-5 space-y-3" id="ds-color-gems"></div>
         </div>
 
-        <!-- 相性 -->
+        <!-- 色彩 & 宝石 — accordion, initially CLOSED -->
         <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
-          <div class="gradient-header p-4 text-center">
-            <h3 class="text-base font-bold text-gray-800">相性</h3>
-            <p class="text-[10px] text-gray-500 mt-1">あなたの運命数が示す対人傾向</p>
+          <button class="ds-accordion-header gradient-header" data-acc-target="acc-body-color-gems" aria-expanded="false">
+            <div class="ds-acc-title text-center">
+              <h3 class="text-base font-bold text-gray-800">数と色彩・宝石</h3>
+              <p class="text-[10px] text-gray-500 mt-1">あなたの数字に対応するカラーとクリスタル</p>
+            </div>
+            <span class="ds-accordion-indicator" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+            </span>
+          </button>
+          <div class="ds-accordion-body" id="acc-body-color-gems">
+            <div class="p-5 space-y-3" id="ds-color-gems"></div>
           </div>
-          <div class="p-5 space-y-2" id="ds-compatibility"></div>
         </div>
 
-        <!-- 9つの関係性 -->
+        <!-- 相性 — accordion, initially CLOSED -->
         <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
-          <div class="gradient-header p-4 text-center">
-            <h3 class="text-base font-bold text-gray-800">9つの関係性パターン</h3>
-            <p class="text-[10px] text-gray-500 mt-1">数秘が示す人間関係の9種類</p>
+          <button class="ds-accordion-header gradient-header" data-acc-target="acc-body-compatibility" aria-expanded="false">
+            <div class="ds-acc-title text-center">
+              <h3 class="text-base font-bold text-gray-800">相性</h3>
+              <p class="text-[10px] text-gray-500 mt-1">あなたの運命数が示す対人傾向</p>
+            </div>
+            <span class="ds-accordion-indicator" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+            </span>
+          </button>
+          <div class="ds-accordion-body" id="acc-body-compatibility">
+            <div class="p-5 space-y-2" id="ds-compatibility"></div>
           </div>
-          <div class="p-5 space-y-3" id="ds-relations"></div>
         </div>
 
-        <!-- 挑戦数 -->
+        <!-- 9つの関係性 — accordion, initially CLOSED -->
         <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
-          <div class="gradient-header p-4 text-center">
-            <h3 class="text-base font-bold text-gray-800">挑戦数の詳細</h3>
-            <p class="text-[10px] text-gray-500 mt-1">あなたの課題と乗り越え方</p>
+          <button class="ds-accordion-header gradient-header" data-acc-target="acc-body-relations" aria-expanded="false">
+            <div class="ds-acc-title text-center">
+              <h3 class="text-base font-bold text-gray-800">9つの関係性パターン</h3>
+              <p class="text-[10px] text-gray-500 mt-1">数秘が示す人間関係の9種類</p>
+            </div>
+            <span class="ds-accordion-indicator" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+            </span>
+          </button>
+          <div class="ds-accordion-body" id="acc-body-relations">
+            <div class="p-5 space-y-3" id="ds-relations"></div>
           </div>
-          <div class="p-5 space-y-4" id="ds-challenges"></div>
         </div>
 
-        <!-- 時のサイクル -->
+        <!-- 挑戦数 — accordion, initially CLOSED -->
         <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
-          <div class="gradient-header p-4 text-center">
-            <h3 class="text-base font-bold text-gray-800">時のサイクル（個人年詳細）</h3>
-            <p class="text-[11px] text-gray-500 mt-1">今の個人年が示す行動指針</p>
+          <button class="ds-accordion-header gradient-header" data-acc-target="acc-body-challenges" aria-expanded="false">
+            <div class="ds-acc-title text-center">
+              <h3 class="text-base font-bold text-gray-800">挑戦数の詳細</h3>
+              <p class="text-[10px] text-gray-500 mt-1">あなたの課題と乗り越え方</p>
+            </div>
+            <span class="ds-accordion-indicator" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+            </span>
+          </button>
+          <div class="ds-accordion-body" id="acc-body-challenges">
+            <div class="p-5 space-y-4" id="ds-challenges"></div>
           </div>
-          <div class="p-5 space-y-3" id="ds-time-cycle"></div>
         </div>
 
-        <!-- 周期循環 -->
+        <!-- 時のサイクル — accordion, initially CLOSED -->
         <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
-          <div class="gradient-header p-4 text-center">
-            <h3 class="text-base font-bold text-gray-800">周期循環 9年サイクル</h3>
-            <p class="text-[10px] text-gray-500 mt-1">人生を動かす9年間のリズム</p>
+          <button class="ds-accordion-header gradient-header" data-acc-target="acc-body-time-cycle" aria-expanded="false">
+            <div class="ds-acc-title text-center">
+              <h3 class="text-base font-bold text-gray-800">時のサイクル（個人年詳細）</h3>
+              <p class="text-[11px] text-gray-500 mt-1">今の個人年が示す行動指針</p>
+            </div>
+            <span class="ds-accordion-indicator" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+            </span>
+          </button>
+          <div class="ds-accordion-body" id="acc-body-time-cycle">
+            <div class="p-5 space-y-3" id="ds-time-cycle"></div>
           </div>
-          <div class="p-5 space-y-2" id="ds-period-cycle"></div>
         </div>
 
-        <!-- 羅針盤キーワード -->
+        <!-- 周期循環 — accordion, initially CLOSED -->
         <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
-          <div class="gradient-header p-4 text-center">
-            <h3 class="text-base font-bold text-gray-800">羅針盤キーワード</h3>
-            <p class="text-[10px] text-gray-500 mt-1">あなたの数字のコアキーワード</p>
+          <button class="ds-accordion-header gradient-header" data-acc-target="acc-body-period-cycle" aria-expanded="false">
+            <div class="ds-acc-title text-center">
+              <h3 class="text-base font-bold text-gray-800">周期循環 9年サイクル</h3>
+              <p class="text-[10px] text-gray-500 mt-1">人生を動かす9年間のリズム</p>
+            </div>
+            <span class="ds-accordion-indicator" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+            </span>
+          </button>
+          <div class="ds-accordion-body" id="acc-body-period-cycle">
+            <div class="p-5 space-y-2" id="ds-period-cycle"></div>
           </div>
-          <div class="p-5 space-y-3" id="ds-compass"></div>
         </div>
 
-        <!-- セフィロト -->
+        <!-- 羅針盤キーワード — accordion, initially CLOSED -->
         <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
-          <div class="gradient-header p-4 text-center">
-            <h3 class="text-base font-bold text-gray-800">セフィロト / THE MASTER KEY</h3>
-            <p class="text-[10px] text-gray-500 mt-1">カバラ生命の樹との対応</p>
+          <button class="ds-accordion-header gradient-header" data-acc-target="acc-body-compass" aria-expanded="false">
+            <div class="ds-acc-title text-center">
+              <h3 class="text-base font-bold text-gray-800">羅針盤キーワード</h3>
+              <p class="text-[10px] text-gray-500 mt-1">あなたの数字のコアキーワード</p>
+            </div>
+            <span class="ds-accordion-indicator" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+            </span>
+          </button>
+          <div class="ds-accordion-body" id="acc-body-compass">
+            <div class="p-5 space-y-3" id="ds-compass"></div>
           </div>
-          <div class="p-5 space-y-3" id="ds-sephirot"></div>
+        </div>
+
+        <!-- セフィロト — accordion, initially CLOSED -->
+        <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+          <button class="ds-accordion-header gradient-header" data-acc-target="acc-body-sephirot" aria-expanded="false">
+            <div class="ds-acc-title text-center">
+              <h3 class="text-base font-bold text-gray-800">セフィロト / THE MASTER KEY</h3>
+              <p class="text-[10px] text-gray-500 mt-1">カバラ生命の樹との対応</p>
+            </div>
+            <span class="ds-accordion-indicator" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+            </span>
+          </button>
+          <div class="ds-accordion-body" id="acc-body-sephirot">
+            <div class="p-5 space-y-3" id="ds-sephirot"></div>
+          </div>
         </div>
 
       </div><!-- /section-dataset -->
 
       <!-- ===== SECTION: 強み診断 ===== -->
-      <div id="section-strengths" class="space-y-5">
+      <div id="section-strengths" class="tab-panel space-y-5">
 
         <!-- Intro / Start State -->
         <div id="str-intro" class="bg-white shadow-sm border border-gray-100 rounded-xl p-5 space-y-4">
@@ -2413,7 +2612,7 @@
       </div>
 
       <!-- ===== SECTION: ブランド設計 ===== -->
-      <div id="section-brandkit" class="space-y-5">
+      <div id="section-brandkit" class="tab-panel space-y-5">
 
         <!-- Intro / Header -->
         <div class="bg-white shadow-sm border border-gray-100 rounded-xl p-5 space-y-4">
@@ -2482,7 +2681,7 @@
 
 
       <!-- ===== Course: 自分ブランド設計コース (name-neutral guided flow) ===== -->
-      <div id="section-course" class="space-y-5">
+      <div id="section-course" class="tab-panel space-y-5">
         <div class="bg-gradient-to-br from-purple-50 to-white shadow-sm border border-purple-100 rounded-xl p-5 space-y-2.5">
           <div class="flex items-center justify-between">
             <h2 class="text-base font-bold text-purple-700">自分ブランド設計コース</h2>
@@ -2802,6 +3001,8 @@
       const areaRect = areaEl.getBoundingClientRect();
       if (areaRect.height < 10) return; // not rendered yet
 
+      // -- (chart-ground-line is positioned by grid row gr-8, no JS needed) --
+
       // -- Align info column (年齢/個人年/個人月/個人日) vertically centered on the center row --
       const centerRect = centerRow.getBoundingClientRect();
       const infoBlockH = infoCol.offsetHeight;
@@ -3103,10 +3304,12 @@
         if (apiKey) localStorage.setItem('gemini_api_key', apiKey);
       } catch(e) {}
 
-      // Switch views
+      // Switch views — reset to first panel (数秘チャート)
       viewForm.classList.add('hidden');
       viewResult.classList.remove('hidden');
       window.scrollTo(0, 0);
+      // Ensure section-chart panel is active, reset any previously active panel
+      switchToPanel('section-chart');
       setTimeout(() => document.getElementById('cell-destiny')?.classList.add('hint'), 350);
     });
 
@@ -3146,24 +3349,83 @@
       window.scrollTo(0, 0);
     });
 
+    // Tab panel switcher — shows only the clicked panel, hides all others
+    function switchToPanel(targetId) {
+      // Update tab highlight styles
+      document.querySelectorAll('.nav-tab').forEach(t => {
+        const isActive = t.dataset.target === targetId;
+        t.classList.toggle('text-purple-600', isActive);
+        t.classList.toggle('border-purple-500', isActive);
+        t.classList.toggle('text-gray-400', !isActive);
+        t.classList.toggle('border-transparent', !isActive);
+      });
+      // Show target panel, hide others
+      document.querySelectorAll('.tab-panel').forEach(p => {
+        p.classList.toggle('active', p.id === targetId);
+      });
+      // Scroll result area to top so panel header is visible
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+      // Per-panel refresh hooks
+      if (targetId === 'section-chart')    { requestAnimationFrame(() => { requestAnimationFrame(updateChartLayout); }); }
+      if (targetId === 'section-strengths') { window.__refreshStrengthsNumCross && window.__refreshStrengthsNumCross(); }
+      if (targetId === 'section-brandkit')  { window.__refreshBrandKitGate && window.__refreshBrandKitGate(); }
+      if (targetId === 'section-course')    { window.__refreshCourse && window.__refreshCourse(); }
+    }
+
     // Navigation tabs
     document.querySelectorAll('.nav-tab').forEach(tab => {
       tab.addEventListener('click', () => {
-        // Update tab styles
-        document.querySelectorAll('.nav-tab').forEach(t => {
-          t.classList.remove('text-purple-600', 'border-purple-500');
-          t.classList.add('text-gray-400', 'border-transparent');
-        });
-        tab.classList.remove('text-gray-400', 'border-transparent');
-        tab.classList.add('text-purple-600', 'border-purple-500');
-        // Scroll to section
-        const target = document.getElementById(tab.dataset.target);
-        if (target) target.scrollIntoView({ behavior: 'smooth', block: 'start' });
-        if (tab.dataset.target === 'section-strengths') { window.__refreshStrengthsNumCross && window.__refreshStrengthsNumCross(); }
-        if (tab.dataset.target === 'section-brandkit') { window.__refreshBrandKitGate && window.__refreshBrandKitGate(); }
-        if (tab.dataset.target === 'section-course') { window.__refreshCourse && window.__refreshCourse(); }
+        switchToPanel(tab.dataset.target);
       });
     });
+
+    // Accordion init — section-dataset cards
+    (function initDatasetAccordion() {
+      document.querySelectorAll('#section-dataset .ds-accordion-header').forEach(btn => {
+        btn.addEventListener('click', function(e) {
+          // Prevent clicks on input/button children from toggling accordion
+          if (e.target !== btn && btn.contains(e.target) &&
+              (e.target.tagName === 'INPUT' || e.target.tagName === 'BUTTON' ||
+               e.target.tagName === 'LABEL' || e.target.closest('input,button,label'))) {
+            return;
+          }
+          const targetId = btn.dataset.accTarget;
+          const body = document.getElementById(targetId);
+          if (!body) return;
+          const isOpen = body.classList.contains('ds-acc-open');
+          if (isOpen) {
+            body.classList.remove('ds-acc-open');
+            btn.classList.remove('ds-acc-open-indicator');
+            btn.setAttribute('aria-expanded', 'false');
+          } else {
+            body.classList.add('ds-acc-open');
+            btn.classList.add('ds-acc-open-indicator');
+            btn.setAttribute('aria-expanded', 'true');
+          }
+        });
+      });
+    })();
+
+    // Accordion init — mandala line explanation accordion
+    (function initMandalaLineAccordion() {
+      const btn = document.querySelector('#mandala-line-accordion .ds-accordion-header');
+      if (!btn) return;
+      btn.addEventListener('click', function() {
+        const targetId = btn.dataset.accTarget;
+        const body = document.getElementById(targetId);
+        if (!body) return;
+        const isOpen = body.classList.contains('ds-acc-open');
+        if (isOpen) {
+          body.classList.remove('ds-acc-open');
+          btn.classList.remove('ds-acc-open-indicator');
+          btn.setAttribute('aria-expanded', 'false');
+        } else {
+          body.classList.add('ds-acc-open');
+          btn.classList.add('ds-acc-open-indicator');
+          btn.setAttribute('aria-expanded', 'true');
+        }
+      });
+    })();
 
     // -- F2: Brand-kit UI (name-neutral; consumes dp_v1 via window.__generateBrandKit) --
     (function () {
@@ -3431,6 +3693,40 @@
       31: '大雑把なようで、真面目で几帳面。独創的で破天荒な面と穏和でゆったりした面を合わせ持ちます。安定志向で型にはまりがちですが、確固とした基盤を欲し、安心して暮らしたいと願います。何事にも誠実で揺るぎない信念と忍耐力を持っています。職人気質で本物志向。仕事熱心で実利的、無駄を嫌い、安定した人生を強く望むマイペース型です。',
     };
 
+    // 誕生日の数(1-31) 補完特性データ（data/birthday-numbers.json 由来）
+    const BIRTHDAY_NUMBERS = {"1":{"characteristics":"自立心溢れる絶対的リーダー","personality":"明るいエネルギーを放つ人気者。開拓者精神があり自らトップに立って人を率いる","strengths":"高い行動力、抜群の計画力、人を惹きつける強烈なカリスマ性","weaknesses":"プライドが高く他人の指示を嫌う。やや飽きっぽい一面","love_tendency":"情熱的で一途だが、感情優先で危険な恋に走ることも。サプライズ好き","suitable_jobs":"起業家、官僚、ベンチャー経営、研究職、営業職","financial_fortune":"開拓精神で道を切り開き、自らの行動量に比例して大きな貯蓄を手にする"},"2":{"characteristics":"調和を重んじる縁の下の力持ち","personality":"人を支えることに喜びを感じる秘書タイプ。一歩引いて周囲を優しくサポートする","strengths":"優れた気配りと高い協調性、地道な作業をやり遂げる粘り強さ","weaknesses":"受け身すぎて本音が言えず、ストレスを溜め込んで大爆発しがち","love_tendency":"相手にとことん尽くす。常に声をかけて安心させてくれる相手を好む","suitable_jobs":"秘書、保育士、介護士、芸能関係、アートセラピスト","financial_fortune":"人脈を通じて豊かな財が流れ込む。ストレスによる出費に注意すれば安定"},"3":{"characteristics":"天真爛漫なエンターテイナー","personality":"好奇心旺盛で人が大好き。無邪気で常に輪の中心にいる楽天家","strengths":"抜群の社交性、人を楽しませるユーモア、フットワークの軽さ","weaknesses":"飽きっぽく長続きしない。独自のこだわりが強すぎて無謀に見えることも","love_tendency":"好きな気持ちを最優先するロマンチスト。個性的で刺激的な相手に惹かれる","suitable_jobs":"クリエイティブ職、芸能、企画、旅行、エンタメ業界","financial_fortune":"稼ぐ才能があるが、好奇心のままに散財する傾向が強い"},"4":{"characteristics":"信頼感抜群の誠実な努力家","personality":"常識やルールを重んじるしっかり者。嘘や手抜きを極端に嫌う","strengths":"抜群の几帳面さ、高い責任感、どんな困難も乗り越える忍耐力","weaknesses":"変化を嫌い頑固になりがち。目標達成直前で急に迷いが生じることがある","love_tendency":"非常に真面目で慎重。信頼関係を時間をかけて築き、一途に愛する","suitable_jobs":"事務、公務員、経理、技術職、不動産業、インフラ系","financial_fortune":"投資やギャンブルを嫌い、着実な貯蓄と計画的な運用で安定した財を成す"},"5":{"characteristics":"好奇心旺盛な自由主義者","personality":"フットワークが軽く知性的。新しい場所や体験、刺激を常に求める自由人","strengths":"高いコミュニケーション能力、柔軟な思考、優れた情報発信力","weaknesses":"束縛を激しく嫌い、変化がないとすぐにモチベーションを失う","love_tendency":"友達感覚で楽しめる知的な恋を好む。束縛されると逃げ出す","suitable_jobs":"編集者、旅行業界、ジャーナリスト、営業、IT関連","financial_fortune":"変化に富むキャリアから一時的に大金を稼ぐが、趣味への出費も多い"},"6":{"characteristics":"慈愛に満ちた博愛主義者","personality":"人に対して親切で愛情深く優しい。ドラマや本にも深く感情移入する","strengths":"高い共感力、誰に対しても親切な人当たりの良さ、芸術的感性","weaknesses":"不正や曲がったことを許せず過敏になる。お節介になりすぎることも","love_tendency":"恋をすると一途に尽くし、家族のような深い絆と安定を望む","suitable_jobs":"医療、カウンセラー、教育関係、芸術、接客業","financial_fortune":"人に尽くすことで金運が巡る。お祝い事や人助けでの出費が多い"},"7":{"characteristics":"独自の美学を持つ孤高の探求者","personality":"個性の塊で、自分のやりたいことを貫く。一人の時間を愛する哲学者タイプ","strengths":"優れた分析力、高い集中力、ブレない独自の信念と直感","weaknesses":"他者と交わろうとせず孤立しやすい。疑い深く理屈っぽくなることも","love_tendency":"精神的な繋がりを重視し、お互いのプライベートを尊重する静かな恋を好む","suitable_jobs":"研究職、技術者、専門家、作家、占い師、哲学者","financial_fortune":"お金に執着はないが、独自の専門技術を極めることで高い報酬を得る"},"8":{"characteristics":"不屈の闘志を持つタフな統率者","personality":"体力も精神力も非常にタフな実力派。大きな目標に向かって情熱的に進む","strengths":"圧倒的な実行力、負けず嫌いな精神、逆境に負けない強い意志","weaknesses":"支配欲やコントロール欲が強まり、周囲に威圧感を与えることがある","love_tendency":"自分が主導権を握りリードする。家族ができると子煩悩になる","suitable_jobs":"経営者、政治家、スポーツ選手、金融業、管理職","financial_fortune":"ビジネスセンスに優れ、大胆な投資や事業拡大で巨万の富を築く強い財運"},"9":{"characteristics":"ひらめきと慈悲のロマンチスト","personality":"センス抜群でひらめきに溢れる。困っている人には無償の愛を注ぐ優しい人","strengths":"高い直感力、人の心を察する力、偏見のない温かい人柄","weaknesses":"感情の起伏が激しい。理想が高すぎて現実逃避に走ることがある","love_tendency":"ドラマチックで純粋な恋を好む。お互いに深く理解し合える安心感を求める","suitable_jobs":"芸術家、ボランティア、医療、心理カウンセラー","financial_fortune":"利他的な行動が回り回ってお金を呼び込む。投資や社会還元を好む"},"10":{"characteristics":"有能でテキパキこなす実務家","personality":"実務能力に優れ、頭の回転が速い。どんな仕事も迅速かつ完璧に片付ける","strengths":"即断即決の行動力、優れた事務処理能力、責任感の強さ","weaknesses":"他人の仕事の遅さにイライラしやすく、独断専行になりがち","love_tendency":"自立した関係を好む。リードしてくれるが、互いの自由を認める相手がベスト","suitable_jobs":"管理職、コンサルタント、起業家、実務担当者、プロジェクトマネージャー","financial_fortune":"自身の卓越した実務スキルによって高収入を維持し、スマートに管理する"},"11":{"characteristics":"天性の直感を持つピュアなメッセンジャー","personality":"正直で人を信じすぎるロマンチスト。高い身体能力と神秘的な直感力を備える","strengths":"鋭い第六感、高い感受性、人々にインスピレーションを与える表現力","weaknesses":"他人の負の感情を吸い込みやすく精神的に疲弊しやすい。騙されやすい","love_tendency":"運命的な出会いを信じる。一途でピュア、精神的な純粋さを重視する","suitable_jobs":"セラピスト、芸術家、スポーツ選手、占い師、表現者","financial_fortune":"お金の管理は苦手だが、直感に頼ったチャンス掴みが得意で不思議とお金に困らない"},"12":{"characteristics":"多才で表現力豊かなクリエイター","personality":"ピュアな感性と強い集中力を持つ。趣味や自分の世界にのめり込みやすい","strengths":"優れた社交性、豊かなアイデア、物事を分かりやすく伝える言語センス","weaknesses":"優柔不断で周囲に流されやすい。忍耐力に欠け、途中で飽きることがある","love_tendency":"楽しくお喋りができる友達のような恋を好む。重い恋愛は避ける","suitable_jobs":"デザイナー、広告、クリエイティブ職、教育者、マスコミ","financial_fortune":"人脈とクリエイティブな成果からお金を稼ぎ出す。衝動買いでの支出に注意"},"13":{"characteristics":"華やかで堅実なスター","personality":"明るく愛嬌があり、意識せずとも目立つスター性を持つ。中身は極めて堅実","strengths":"強い自己流の感覚、堅実な努力を積み重ねる粘り強さ、人を惹きつける華","weaknesses":"プライドが高く頑固。ルールや常識よりも自分の感覚を押し通しがち","love_tendency":"一途で真面目。好きな人とはそのまま結婚を意識した深い絆を望む","suitable_jobs":"公務員、建設、金融業、芸能関係、手堅い専門職","financial_fortune":"安定して稼いで着実に貯める。ギャンブルには手を出さず、手堅い資産形成"},"14":{"characteristics":"フットワークの軽い社交の達人","personality":"人付き合いが大好きで、顔が広い。常に楽しそうなお誘いに乗る自由人","strengths":"優れたコミュニケーション力、適応力の高さ、他者を巻き込む企画力","weaknesses":"誘惑に弱く、優柔不断。リスクを考えずに行動してトラブルを招くことも","love_tendency":"恋愛経験が豊富でモテる。縛られるのを嫌い、常に楽しい刺激を求める","suitable_jobs":"旅行、飲食業、PR・広報、イベントプランナー、フリーランス","financial_fortune":"人脈からお金が入るが、交際費やレジャーでの出費が激しく貯蓄は苦手"},"15":{"characteristics":"天恵に恵まれた幸福のカリスマ","personality":"生まれながらの強運と直感力を持つ。おっとり温和で誰からも好かれる","strengths":"抜群の引き寄せ力、周囲を惹きつける愛嬌、優れたビジネスセンス","weaknesses":"人が良すぎて騙されやすく、自分の意見を押し殺してしまいがち","love_tendency":"理想の相手と巡り会いやすい。言葉を交わさずとも心を満たす補完関係を望む","suitable_jobs":"自営業、コンサルタント、ブライダル、飲食、美術・芸術関係","financial_fortune":"抜群の金運を持ち、不思議と人助けやお祝い事でお金が巡ってくる"},"16":{"characteristics":"冷静沈着な実務家","personality":"強い信念と責任感を持ち、他人に頼らず最後までやり遂げる努力家","strengths":"高い集中力、リスク予測能力、一切妥協せず突き詰める姿勢","weaknesses":"プライドが高く頑固。納得しないと動かないため協調性に欠ける","love_tendency":"慎重で内面重視。交際＝将来の結婚相手であり、一度付き合うと一途","suitable_jobs":"専門職、独自のペースを保てる技術職や実務職","financial_fortune":"お金を使う喜びを知ることで金運が高まり、着実に安定した財を成す"},"17":{"characteristics":"猪突猛進型ファイター","personality":"チャレンジ精神旺盛で、思い立ったら即行動するポジティブな行動派","strengths":"行動力、前向きさ、ライバルがいると燃え上がって能力を高める性質","weaknesses":"人の指示を嫌う。負けず嫌いがすぎて衝突。失恋を長く引きずりやすい","love_tendency":"好きになると猛アプローチする情熱派。交際後はリードし家族最優先","suitable_jobs":"リーダー、経営者、独自の意思決定で進められる実力主義の仕事","financial_fortune":"自身の知性と熱意で生涯をデザインし、闘争心を糧に自ら成功を掴む"},"18":{"characteristics":"クールな知性の戦略家","personality":"冷静沈着かつマイペースで、強い意志とカリスマ性を備える","strengths":"リスク予測能力、交渉力、人の適性や本質を見抜く深い分析力","weaknesses":"クールすぎて「ドライ」「冷淡」と誤解されがち。警戒心が強い","love_tendency":"理想が極めて高く、相手の条件を冷静に見極める。結婚後は安定","suitable_jobs":"組織のリーダーや参謀。評論家、プロデューサー、金融系","financial_fortune":"財産管理能力が非常に高く、貯蓄やスマートな資産運用で生涯安泰"},"19":{"characteristics":"芯が強く知性あふれるリーダー","personality":"芯が強く温厚。視野が広く責任感が強い。努力する姿を人に見せない陰の努力家","strengths":"状況判断力、知的好奇心の高さ、人の気持ちを汲む巧みな調整力","weaknesses":"案外プライドが高く頑固。他人に主導権を握られるのを嫌う","love_tendency":"恋をしても冷静。相手を尊重しつつ、じっくりと信頼を築く","suitable_jobs":"組織のまとめ役、チームリーダー、教育指導者、プランナー","financial_fortune":"管理や運用が極めて得意。一獲千金ではなく着実に大財を成す貯蓄型"},"20":{"characteristics":"誠実で思慮深いサポーター","personality":"生真面目で誠実な平和主義者。誰かの役に立つことを最上の喜びとする","strengths":"優れたサポート力、争いを避けるバランス感覚、高い実務能力","weaknesses":"優柔不断で周囲に振り回されやすい。ノーと言えないお人好し","love_tendency":"非常に慎重で受け身。自分をしっかりとリードしてくれる人を好む","suitable_jobs":"公務員、事務、サポート職、カスタマーサービス、アシスタント","financial_fortune":"堅実に働き、手堅く貯める。無駄遣いをせず計画的に家計を回す"},"21":{"characteristics":"時代を先取るビジネスセンス","personality":"感受性が豊かで、時流を読み取る力に長ける。内面は甘えん坊で愛される","strengths":"高い社交性、ビジネスでの成功を引き寄せるセンス、鋭い直感","weaknesses":"気分屋で子供っぽいワガママが出ることがある。傷つきやすい","love_tendency":"表向きは甘え上手でモテるが、内面は寂しがり屋で深く愛されたい","suitable_jobs":"経営、マーケティング、マスコミ、企画、販売","financial_fortune":"ビジネスの成功により多額の収入を得るチャンスが多い。投資運も良好"},"22":{"characteristics":"クールな完璧主義者","personality":"自分にも他人にも厳しい完璧主義者。一度決めたら妥協しない芯の強さ","strengths":"高い実務遂行力、強い意志、失敗からの見事な切り替えの早さ","weaknesses":"理想が高すぎて、妥協を許さない頑固さが時に周囲を圧倒する","love_tendency":"信頼第一。自分のルールを守り合える誠実なパートナーと安定した恋を望む","suitable_jobs":"専門技術職、会計士、プロジェクト管理者、エンジニア","financial_fortune":"高いマネーリテラシーを持ち、規律ある貯蓄と管理で莫大な財を成す"},"23":{"characteristics":"話題豊富な多才な事業家","personality":"コミュニケーション能力が抜群で、誰とでもすぐに仲良くなれる。逆境に強い","strengths":"臨機応変な対応力、優れた知的好奇心、困難を乗り越える精神力","weaknesses":"飽きっぽく、次々と新しい興味に移ってしまう。お喋りが過ぎることも","love_tendency":"束縛のない自由で楽しい交際を求める。お互いに高め合える関係が理想","suitable_jobs":"事業家、営業、販売、マスコミ、ジャーナリスト、旅行業","financial_fortune":"アイデアを形にすることで大きく稼ぐ。マルチな収入源を築く才能あり"},"24":{"characteristics":"富を引き寄せる幸運児","personality":"金運と仕事運が生まれつき非常に高い。温和で思いやりがあり、周囲から愛される","strengths":"高い直感力、バランスの取れた社交性、引き寄せの強さ","weaknesses":"恵まれすぎているために、ハングリー精神に欠けることがある","love_tendency":"玉の輿など、経済的・社会的に安定した理想の相手と恵まれた関係を築く","suitable_jobs":"経営、金融、投資、マスコミ、ラグジュアリー関連、飲食","financial_fortune":"抜群の金運。遺産相続や出世、良好な運用で、お金に一切困らない人生を送る"},"25":{"characteristics":"私利私欲のない母性的人格","personality":"誰に対しても愛情深く、自分の欲を捨てて尽くすことができる慈悲深い人","strengths":"高い洞察力、優れた忍耐力、他者を深く癒やすヒーリング能力","weaknesses":"恋に慎重すぎてチャンスを逃しがち。心配性で取り越し苦労が多い","love_tendency":"非常に一途。一度好きになると全身全霊で相手を愛し、尽くし抜く","suitable_jobs":"カウンセラー、福祉・医療、教育、セラピスト、芸術関係","financial_fortune":"お金への執着はないが、誠実な働きぶりと良好な人望から豊かな財を得る"},"26":{"characteristics":"感受性豊かで真っ直ぐな誠実者","personality":"正直で曲がったことが大嫌い。裏表がなく、自分の直感と信念で生きる","strengths":"高い実行力、他者をうまくリードする統率力、一途で誠実な対応","weaknesses":"気分屋で感情が顔に出やすい。正直すぎて他者を傷つけることも","love_tendency":"誠実で一途。相手にリードしてもらう、または自分がしっかり支える関係を望む","suitable_jobs":"指導者、営業、カウンセラー、企画、プロデューサー","financial_fortune":"自身の情熱に比例して収入が伸びる。直感を信じた投資で財を築く"},"27":{"characteristics":"高い知性と慈悲の分析家","personality":"クールで知的なリアリストだが、内面は非常に人情味あふれ、社会貢献に強い関心を持つ","strengths":"優れた客観性、鋭い分析力、困難に屈しない強い忍耐力","weaknesses":"考えすぎて行動が遅れる。プライドが高く頑固で、他人に本心を明かさない","love_tendency":"精神的なパートナーシップを重視。互いを尊重し、切磋琢磨できる知的な関係を望む","suitable_jobs":"専門家、アナリスト、研究職、医療、心理療法、コンサルタント","financial_fortune":"高度な専門技術を活かし高収入を得る。管理もスマート"},"28":{"characteristics":"情熱的で独立心旺盛なリーダー","personality":"強い意志を持ち、独自の道を突き進む。何事も自分で決めたいという強い独立心を持つ","strengths":"高い決断力、優れたオリジナリティ、人を動かすカリスマ性","weaknesses":"支配的になりがちで、他人の意見を聞くのが苦手。独断で進めて失敗することも","love_tendency":"ドラマチックな恋を好む。交際後は自分が主導権を握り、お相手をしっかりと守る","suitable_jobs":"起業家、プロジェクトリーダー、ディレクター、営業職、フリーランス","financial_fortune":"自らビジネスを立ち上げて大きな財を成す。野心に見合った富を手に入れる"},"29":{"characteristics":"鋭い直感とインスピレーションの持ち主","personality":"高い精神性と鋭い直感を備え、言葉にしなくても他者の感情を敏感に察知するピュアな人","strengths":"ひらめき力、他者を刺激する表現力、逆境をアイデアで乗り越える力","weaknesses":"他人の感情に影響されやすく情緒が不安定になりがち。傷つきやすい","love_tendency":"精神的な深い結びつきを求める。お互いに支え合い切磋琢磨できる相性を重視する","suitable_jobs":"芸術家、カウンセラー、福祉関係、クリエイティブ、占い師","financial_fortune":"自身の感性とひらめきをビジネスに活かすことで、予想外の大金を手にしやすい"},"30":{"characteristics":"愛されるクリエイティブな楽観主義者","personality":"誰からも好かれる温和で明るい性格。おしゃべりで社交的、クリエイティブなセンスを持つ","strengths":"優れた表現力、無邪気でポジティブなエネルギー、高い芸術的センス","weaknesses":"責任を回避しがちで、地味な作業やルーティンワークを嫌う","love_tendency":"ぐいぐい引っ張ってくれるお相手に魅力を覚え、付いていきたいと望む","suitable_jobs":"芸術、デザイン、広告、PR・広報、エンタメ、接客","financial_fortune":"人脈と才能が豊かでお金を惹きつける。楽しむために浪費する傾向に注意"},"31":{"characteristics":"誠実で温厚なサポートリーダー","personality":"裏表のない温和で礼儀正しいタイプ。謙虚で責任感があり、目上から好かれる","strengths":"抜群の安定感、確実な実務処理、周囲に安心感を与える人当たりの良さ","weaknesses":"完璧を求めすぎて自信を失ったり、他者と自分を比べて深く悩んだりする","love_tendency":"非常に慎重で控えめ。信頼関係を第一とし、一途に尽くす","suitable_jobs":"経理、事務、人事、料理人、職人、指導係、裏方職","financial_fortune":"非常に堅実。浪費を嫌い、コツコツ長期的な努力と貯蓄によって財を殖やす"}};
+    const BIRTHDAY_NUMBERS_LABELS = {"characteristics":"ひとことで言うと","personality":"性格","strengths":"長所","weaknesses":"短所・注意点","love_tendency":"恋愛傾向","suitable_jobs":"適職","financial_fortune":"金運"};
+
+    // 誕生日の数の構造化ブロック（スクリーン用・Tailwindクラス）
+    function buildBirthdayBlockScreen(day) {
+      const d = BIRTHDAY_NUMBERS[String(day)];
+      if (!day || !d) return '';
+      const order = ['characteristics','personality','strengths','weaknesses','love_tendency','suitable_jobs','financial_fortune'];
+      const rows = order.filter(k => k !== 'characteristics').map(k =>
+        `<div class="flex gap-1 text-xs mb-0.5"><span class="font-semibold text-indigo-600 shrink-0">${esc(BIRTHDAY_NUMBERS_LABELS[k] || k)}:</span><span class="text-gray-600">${esc(d[k] || '')}</span></div>`
+      ).join('');
+      return `<div class="bg-gradient-to-br from-violet-50 to-indigo-50 rounded-xl p-4 mb-3 border border-indigo-100">
+        <p class="text-[11px] font-semibold text-indigo-700 mb-1">${esc(String(day))}日生まれの特性</p>
+        <p class="text-xs font-bold text-indigo-800 mb-2">${esc(d.characteristics || '')}</p>
+        ${rows}
+      </div>`;
+    }
+
+    // 誕生日の数の構造化ブロック（PDF用・inline style）
+    function buildBirthdayBlockPdf(day) {
+      const d = BIRTHDAY_NUMBERS[String(day)];
+      if (!day || !d) return '';
+      const order = ['characteristics','personality','strengths','weaknesses','love_tendency','suitable_jobs','financial_fortune'];
+      const rows = order.filter(k => k !== 'characteristics').map(k =>
+        `<div style="font-size:11px;color:#4b5563;margin-bottom:3px;"><span style="font-weight:600;color:#4338ca;">${BIRTHDAY_NUMBERS_LABELS[k] || k}:</span> ${d[k] || ''}</div>`
+      ).join('');
+      return `<div style="background:linear-gradient(135deg,#eef2ff,#f5f3ff);border:1px solid #c7d2fe;border-radius:8px;padding:12px 14px;margin-top:8px;margin-bottom:4px;">
+        <div style="font-size:11px;font-weight:600;color:#4338ca;margin-bottom:4px;">${day}日生まれの特性</div>
+        <div style="font-size:12px;font-weight:700;color:#3730a3;margin-bottom:6px;">${d.characteristics || ''}</div>
+        ${rows}
+      </div>`;
+    }
+
     // Detail modal
     const detailModal = document.createElement('div');
     detailModal.id = 'detail-modal';
@@ -3533,6 +3829,7 @@
           </div>
           <p class="text-xs text-gray-500 mb-4">【この数字が示すテーマ】${esc(pos.theme)}</p>
           ${birthDaySection}
+          ${(cellId === 'cell-destiny' && lastResults.birthDay && BIRTHDAY_NUMBERS[String(lastResults.birthDay)]) ? `<details class="mt-2 mb-3 rounded-xl border border-indigo-100 bg-indigo-50/40"><summary class="cursor-pointer select-none px-4 py-2 text-[11px] font-semibold text-indigo-700">▸ ${esc(String(lastResults.birthDay))}日生まれの特性をもっと詳しく見る</summary><div class="px-4 pb-3">${buildBirthdayBlockScreen(lastResults.birthDay)}</div></details>` : ''}
           ${dsBlock}
           <div class="bg-fuchsia-50 rounded-xl p-4 mb-3">
             <p class="text-[11px] font-semibold text-purple-700 mb-1">核となる意味:</p>
@@ -4529,7 +4826,8 @@ ${numContext}
 - 成長数: ${r.spirit}
 - 克服数: ${r.ch1}
 - 個人年: ${r.pYear || '不明'}
-- 個人月: ${r.pMonth || '不明'}${dsContext}
+- 個人月: ${r.pMonth || '不明'}
+${r.birthDay && BIRTHDAY_NUMBERS[String(r.birthDay)] ? `- 誕生日の数(${r.birthDay}日)の特性: ${BIRTHDAY_NUMBERS[String(r.birthDay)].characteristics}。性格=${BIRTHDAY_NUMBERS[String(r.birthDay)].personality}／長所=${BIRTHDAY_NUMBERS[String(r.birthDay)].strengths}／短所=${BIRTHDAY_NUMBERS[String(r.birthDay)].weaknesses}／恋愛=${BIRTHDAY_NUMBERS[String(r.birthDay)].love_tendency}／適職=${BIRTHDAY_NUMBERS[String(r.birthDay)].suitable_jobs}／金運=${BIRTHDAY_NUMBERS[String(r.birthDay)].financial_fortune}` : ''}${dsContext}
 
 具体的でパーソナルな回答を200〜300文字で答えてください。一般論ではなく、この人の数字の組み合わせに基づいた独自のアドバイスにしてください。`;
 
@@ -4744,6 +5042,56 @@ ${numContext}
     // ⑤ 数秘マンダラ
     // =========================================================
 
+    // マンダラ6ラインデータ（縦カラム=PLAN/ARRANGE/DEVELOP、横ロウ=SELF/SHARE/SPIRIT）
+    const MANDALA_LINES = {
+      columns_plan_arrange_develop: {
+        PLAN: {
+          name: 'PLAN（企画）',
+          subtitle: '物事の方向性を見極める「指針」のグループ',
+          nums: [1, 2, 3],
+          description: '物事の方向性を見極め、計画やプランを立てる能力が優れています。斬新な発想や新たなアイディアを活かし、未知の領域を追求します。閃きを持って最善の道を見出し、将来の指針となる方向性を定めます。',
+          keywords: ['企画力', '発想力', '方向性', '独創性', 'インスピレーション', 'プランニング']
+        },
+        ARRANGE: {
+          name: 'ARRANGE（調整）',
+          subtitle: '物事の枠組みを見極める「実益」のグループ',
+          nums: [4, 5, 6],
+          description: '物事の枠組みを見極め、社会のニーズを反映する能力が優れています。様々な要素やアイディアを調整しながら、現実的な視点で組み立てます。人々の必要性や収益性を考慮し、実質的な計画を練り実益をもたらします。',
+          keywords: ['調整力', '推進力', '実利性', '現実性', '調査リサーチ', 'マーケティング']
+        },
+        DEVELOP: {
+          name: 'DEVELOP（展開）',
+          subtitle: '物事の発展性を見極める「繁栄」のグループ',
+          nums: [7, 8, 9],
+          description: '物事の発展性を見極め、社会の中で応用展開させる能力が優れています。様々な分野への展開や拡張を試み、質の向上や権威性などを見定めます。物事の発展と熱意ある実現力により、さらなる発展と繁栄をもたらします。',
+          keywords: ['応用展開', '洞察力', '実現力', '権威性', 'クオリティー', 'ステイタス']
+        }
+      },
+      rows_self_share_spirit: {
+        SELF: {
+          name: '自分軸（SELF）',
+          subtitle: '自己の三角形 — 主体性を重視するグループ',
+          nums: [1, 4, 7],
+          description: '革新的で実利的・合理的。一歩一歩着実に進めて最後までやり遂げます。職人気質で几帳面、本物志向、問題解決能力が高いタイプ。生真面目で責任感が強く、独自のやり方にこだわるマイペース型です。',
+          keywords: ['革新的', '実利的', '合理的', '職人気質', '本物志向', '問題解決力', '責任感', 'マイペース']
+        },
+        SHARE: {
+          name: '他人軸（SHARE）',
+          subtitle: '交流の三角形 — 関係性を重視するグループ',
+          nums: [2, 5, 8],
+          description: '人情的で交流を好み、適応性が高く歩調を合わせて目的を果たします。外交的・活動的で状況判断に優れ、相手を察する力を持つタイプ。相手への関心が高く、励まし支援する役回りで、人と人を繋ぐ力があります。',
+          keywords: ['人情的', '交流', '適応性', '外交的', '活動的', '状況判断', '支援', 'パートナーシップ']
+        },
+        SPIRIT: {
+          name: '導き軸（SPIRIT）',
+          subtitle: '精神の三角形 — 精神性を重視するグループ',
+          nums: [3, 6, 9],
+          description: '夢想的で美意識が高く、美と調和を愛し芸術的センスを表現する力を持ちます。知的・精神的で、インスピレーションを元に創作に励むタイプ。頭脳明晰で学びの精神を持ち、閃きやときめきが指針となるインスパイアー型です。',
+          keywords: ['夢想的', '美意識', '美と調和', '芸術的センス', '知的', 'インスピレーション', '頭脳明晰', '精神性']
+        }
+      }
+    };
+
     // 盤面配置（転置後）: row0=PLAN[1,2,3], row1=ARRANGE[4,5,6], row2=DEVELOP[7,8,9]
     // 列: col0=SELF(1,4,7), col1=SHARE(2,5,8), col2=SPIRIT(3,6,9)
     const MANDALA_GRID = [
@@ -4788,9 +5136,52 @@ ${numContext}
       'COL_SELF':    'SELF（自分軸列）が強い → 自主的・独立的に行動する力。自己完結力が高く、自分の信念で動く。',
       'COL_SHARE':   'SHARE（他人軸列）が強い → 対人関係・交流・協力のエネルギーが豊富。つながりで力を発揮する。',
       'COL_SPIRIT':  'SPIRIT（導き軸列）が強い → 精神性・哲学・使命感で動く。本質的なものを見抜き、人を導く力。',
-      'DIAG_ACHIEVER': '達成者ライン（1·5·9）が強い → 開拓→変容→完成へと統合する力。人生の節目を自力で突破する。',
-      'DIAG_PHILOSOPHER': '哲学者ライン（3·5·7）が強い → 創造→変容→探究の知的サイクル。真理を問い続ける思索者。',
+      'DIAG_ACHIEVER': '革命家ライン（1·5·9）が強い → 開拓心・起動力・決断力・説得力。新しい方向性を打ち出し、より良い状況へと全体をシフトさせる。強い意志と揺るぎない信念で目標を必ず成し遂げる。',
+      'DIAG_PHILOSOPHER': '哲学者ライン（3·5·7）が強い → 理解力・直感力・探究心・洞察力・霊力。多くの人に思想的・精神的な教えをもたらしながら真実を探究する。霊的な力を発揮し、深遠なる智を学び体験し探究する。',
     };
+
+    // =========================================================
+    // 相性9タイプ体系 (compatibility-9types.json から JS定数化)
+    // =========================================================
+    const COMPAT_9TYPES = {
+      byOffset: {
+        0: { key: 'mirror',    name: '鏡',   relation: '兄弟・姉妹／ライバル',           tagline: 'お互いの我がままは控えて',                          tone: 'neutral', description: '同じ資質を持つ似た者同士。良い面も悪い面も共通し、もう一人の自分を映す鏡のような関係。磨き合い励まし合う生涯の友になりやすいが、歯車がずれると大げんかに。刺激は少なめ。' },
+        1: { key: 'bow',       name: '弓',   relation: '教師・師弟',                     tagline: '影響されすぎないように',                             tone: 'growth',  description: '違う性質の者同士。色々な影響を受け切磋琢磨できる。自分にないものを多く持ち惹かれるが違和感も。違いを理解し本音で付き合うと大きく成長する。' },
+        2: { key: 'jewel',     name: '宝石', relation: '恋人・親友',                     tagline: '美しい宝石に魅せられるスウィートな関係',             tone: 'good',    description: '惹かれ合う性質同士。出会った瞬間から強く惹かれ違和感なく心地よい。一緒に過ごすうち絆が深まり、親しみと愛おしさを感じる。幸せと豊かさを享受する関係。' },
+        3: { key: 'chalice',   name: '聖杯', relation: '同士・仲間',                     tagline: '共同創造で力を発揮し幸運を引き寄せる',               tone: 'best',    description: '響き合う性質同士。意気投合し多くを語らずわかり合う。夢を語り喜びを分かち合い絆が深まる。共感共鳴で物事が大きく発展・成功する、最高のビジネスパートナー。' },
+        4: { key: 'lightning', name: '稲妻', relation: '運命・因縁',                     tagline: '翻弄されないように — 破壊力を持つデンジャラスな関係', tone: 'destiny', description: 'まったく違う性質同士。異質だが強烈に引き合う。相手を求め支配しようとする潜在力が働き破壊的状況にも。感謝と尊敬、適切な距離で認め合えば新しい可能性が開く。前世からの因縁、運命を翻弄する関係。' },
+        5: { key: 'flame',     name: '炎',   relation: '運命・因縁',                     tagline: '炎のように燃え尽きやすいデンジャラスな関係',         tone: 'destiny', description: '稲妻と対になる関係。異質だが強烈に惹かれ支配傾向を持つ。前世からの因縁、運命を感じる関係。' },
+        6: { key: 'crown',     name: '王冠', relation: '同士・仲間',                     tagline: '幸運を引き寄せチャンスを掴む',                       tone: 'best',    description: '聖杯と対になる関係。響き合い意気投合し共存共栄する、最高のビジネスパートナー。' },
+        7: { key: 'bee',       name: '蜜蜂', relation: '恋人・親友',                     tagline: '甘美な蜜蜂に魅せられるスウィートな関係',             tone: 'good',    description: '宝石と対になる関係。惹かれ合い心地よく、絆が深まる恋人・親友のような関係。' },
+        8: { key: 'sword',     name: '剣',   relation: '教師・師弟',                     tagline: 'スリリングに学び合う関係',                           tone: 'growth',  description: '弓と対になる関係。違う性質で切磋琢磨し、惹かれと違和感を併せ持つ。違いを認めれば学び合える。' }
+      },
+      // tone → 表示スタイル
+      toneStyle: {
+        neutral: { bg: 'bg-gray-50',   border: 'border-gray-200',   text: 'text-gray-700',   badge: 'bg-gray-100 text-gray-700',   barColor: '#9ca3af' },
+        growth:  { bg: 'bg-amber-50',  border: 'border-amber-200',  text: 'text-amber-700',  badge: 'bg-amber-100 text-amber-700', barColor: '#f59e0b' },
+        good:    { bg: 'bg-violet-50', border: 'border-violet-200', text: 'text-violet-700', badge: 'bg-violet-100 text-violet-700', barColor: '#7c3aed' },
+        best:    { bg: 'bg-purple-50', border: 'border-purple-200', text: 'text-purple-800', badge: 'bg-purple-100 text-purple-800', barColor: '#6d28d9' },
+        destiny: { bg: 'bg-rose-50',   border: 'border-rose-200',   text: 'text-rose-700',   badge: 'bg-rose-100 text-rose-700',   barColor: '#be185d' }
+      },
+      // reading_axis
+      loveMath: ['誕生数', '成長数', '運命数'],
+      workAxis: ['成熟数', '成長数', '運命数']
+    };
+
+    // 9タイプ判定: a, b は 1-9 正規化済みの数。d = ((b-a) mod 9) で offset を得る
+    function compat9TypeOffset(a, b) {
+      const na = ((a - 1 + 9) % 9); // 0-8 に変換 (1→0, 9→8)
+      const nb = ((b - 1 + 9) % 9);
+      return ((nb - na) + 9) % 9;   // 差分 mod 9 → 0-8
+    }
+
+    function compat9TypeInfo(myNum, partnerNum) {
+      const a = normalizeTo9(myNum)    || myNum;
+      const b = normalizeTo9(partnerNum) || partnerNum;
+      if (!a || !b) return null;
+      const offset = compat9TypeOffset(a, b);
+      return COMPAT_9TYPES.byOffset[offset] || null;
+    }
 
     // マスター数 → 1桁化（0は無効値としてそのまま返す）
     function normalizeTo9(n) {
@@ -4905,8 +5296,8 @@ ${numContext}
         { key: 'ROW_PLAN',          name: 'PLAN',     nums: [1,2,3] },
         { key: 'ROW_ARRANGE',       name: 'ARRANGE',  nums: [4,5,6] },
         { key: 'ROW_DEVELOP',       name: 'DEVELOP',  nums: [7,8,9] },
-        { key: 'DIAG_ACHIEVER',     name: '達成',     nums: [1,5,9] },
-        { key: 'DIAG_PHILOSOPHER',  name: '哲学',     nums: [3,5,7] },
+        { key: 'DIAG_ACHIEVER',     name: '革命家',   nums: [1,5,9] },
+        { key: 'DIAG_PHILOSOPHER',  name: '哲学者',   nums: [3,5,7] },
       ];
 
       // 揃い判定: 3マス全て baseScore > 0
@@ -5143,8 +5534,8 @@ ${numContext}
 
       // ==== 5×5 DOM構築（転置後）====
       // 転置後の対角: 達成(1·5·9) = 左上→右下、哲学(3·5·7) = 右上→左下
-      // ROW 0: [左上隅:達成数] [上辺:SELF] [上辺:SHARE] [上辺:SPIRIT] [右上隅:哲学者]
-      wrap.appendChild(makeCorner('1·5·9', '達成数', 'diag-achiever', false));
+      // ROW 0: [左上隅:革命家] [上辺:SELF] [上辺:SHARE] [上辺:SPIRIT] [右上隅:哲学者]
+      wrap.appendChild(makeCorner('1·5·9', '革命家', 'diag-achiever', false));
       COL_AXES.forEach(col => wrap.appendChild(makeColHeader(col, false)));
       wrap.appendChild(makeCorner('3·5·7', '哲学者', 'diag-philosopher', true));
 
@@ -5156,10 +5547,10 @@ ${numContext}
         wrap.appendChild(makeRowHeader(rowDef, rowNums, true));
       });
 
-      // ROW 4（下辺）: [左下隅:哲学者] [下辺:SELF] [下辺:SHARE] [下辺:SPIRIT] [右下隅:達成数]
+      // ROW 4（下辺）: [左下隅:哲学者] [下辺:SELF] [下辺:SHARE] [下辺:SPIRIT] [右下隅:革命家]
       wrap.appendChild(makeCorner('3·5·7', '哲学者', 'diag-philosopher', true));
       COL_AXES.forEach(col => wrap.appendChild(makeColHeader(col, true)));
-      wrap.appendChild(makeCorner('1·5·9', '達成数', 'diag-achiever', true));
+      wrap.appendChild(makeCorner('1·5·9', '革命家', 'diag-achiever', true));
 
       // -- 強調ライン判定 (LINE_DEFS を流用、hitLines = 2マス以上プラスのライン) --
       const lineSummaryEl = document.getElementById('mandala-lines-summary');
@@ -5313,100 +5704,73 @@ ${numContext}
       compatHideError();
 
       const partnerLP = Numerology.lifePath(partnerDate);
+      const partnerMaturity = Numerology.maturity(partnerDate);
+      const partnerSpirit = Numerology.spirit(partnerDate);
       const myLP = lastResults.lifePath;
+      const myMaturity = lastResults.maturity;
+      const mySpirit = lastResults.spirit;
+      const myDestiny = lastResults.destiny;
 
-      if (!DATASET) {
-        resultDiv.classList.remove('hidden');
-        resultDiv.innerHTML = '<p class="text-xs text-gray-400 text-center">データ読み込み中です。しばらくお待ちください。</p>';
-        return;
+      // --- 9タイプ体系で判定 ---
+      // 主要数: 運命数・成長数・成熟数 (reading_axis準拠)
+      const typeByLP   = compat9TypeInfo(myLP, partnerLP);
+      const typeBySp   = compat9TypeInfo(mySpirit, partnerSpirit);
+      const typeByMat  = compat9TypeInfo(myMaturity, partnerMaturity);
+      // 恋愛軸: 誕生数(destiny)/成長数(spirit)/運命数(lifePath)
+      const typeByDest = compat9TypeInfo(myDestiny, normalizeTo9(partnerLP) || partnerLP);
+
+      // 主軸: 運命数同士のタイプを基準
+      const mainType = typeByLP;
+      const style = mainType ? (COMPAT_9TYPES.toneStyle[mainType.tone] || COMPAT_9TYPES.toneStyle.neutral) : COMPAT_9TYPES.toneStyle.neutral;
+
+      // 相手の運命数の意味
+      let partnerMeaning = '';
+      if (DATASET) {
+        const coreKw = ((DATASET.tables || {})['羅針盤キーワード'] || {})['コアキーワード'] || {};
+        const partnerNorm = normalizeTo9(partnerLP) || partnerLP;
+        const partnerKw = coreKw[String(partnerNorm)];
+        partnerMeaning = partnerKw
+          ? (partnerKw['コアキーワード'] || '') + '：' + (partnerKw['ポジティブ表現'] || '')
+          : (numDB[partnerLP] || numDB[Math.min(partnerLP, 9)] || {}).core || '';
       }
 
-      const t = DATASET.tables || {};
-      const compatTable = (t['相性'] || {})['数字別テーブル'] || {};
-      const patterns = (t['相性'] || {})['関係パターン'] || {};
-      const coreKw = (t['羅針盤キーワード'] || {})['コアキーワード'] || {};
-
-      // Normalize myLP for lookup (master numbers → single digit for table)
-      const myLPStr = String(myLP > 9 ? (myLP === 11 ? 2 : myLP === 22 ? 4 : myLP === 33 ? 6 : myLP) : myLP);
-      const rec = compatTable[myLPStr];
-
-      // Fix2: 相手運命数の意味1行
-      const partnerNorm = (partnerLP > 9 && partnerLP !== 11 && partnerLP !== 22 && partnerLP !== 33) ? Math.min(partnerLP, 9) : partnerLP;
-      const partnerKw = coreKw[String(partnerNorm)];
-      const partnerMeaning = partnerKw
-        ? (partnerKw['コアキーワード'] || '') + '：' + (partnerKw['ポジティブ表現'] || '')
-        : (numDB[partnerLP] || numDB[Math.min(partnerLP, 9)] || {}).core || '';
-
-      let stars = '★★';
-      let typeName = '補完できる相性';
-      let patternKey = '';
-      let desc = '';
-      let advice = '互いの違いを尊重しながら、それぞれの強みを活かす場面を意識しましょう。';
-      let bgCls = 'bg-blue-50 border-blue-200';
-      let textCls = 'text-blue-700';
-      let badgeCls = 'bg-blue-100 text-blue-700';
-
-      if (rec) {
-        const parseNums = (s) => (s || '').split(',').map(x => parseInt(x.trim())).filter(n => !isNaN(n));
-        const good = parseNums(rec['相性が良い傾向']);
-        const stim = parseNums(rec['刺激し合う傾向']);
-        const chal = parseNums(rec['課題が生まれやすい傾向']);
-
-        if (good.includes(partnerLP)) {
-          stars = '★★★';
-          typeName = '自然な好相性';
-          patternKey = '共鳴型';
-          desc = (patterns['共鳴型'] || {})['説明'] || '';
-          advice = '同じ方向を向いて進める2人。焦らず深め合うことで関係がより豊かになります。';
-          bgCls = 'bg-green-50 border-green-200';
-          textCls = 'text-green-700';
-          badgeCls = 'bg-green-100 text-green-700';
-        } else if (stim.includes(partnerLP)) {
-          stars = '★★';
-          typeName = '高め合う刺激の相性';
-          patternKey = '刺激型';
-          const growDesc = (patterns['成長型'] || {})['説明'] || '';
-          const stimDesc = (patterns['刺激型'] || {})['説明'] || '';
-          desc = stimDesc || growDesc;
-          advice = '互いの違いがエネルギーになります。摩擦を恐れず対話を続けることで成長できます。';
-          bgCls = 'bg-amber-50 border-amber-200';
-          textCls = 'text-amber-700';
-          badgeCls = 'bg-amber-100 text-amber-700';
-        } else if (chal.includes(partnerLP)) {
-          stars = '★';
-          typeName = '学びの相性（乗り越えると最強）';
-          patternKey = '課題型';
-          desc = (patterns['課題型'] || {})['説明'] || '';
-          advice = '課題は成長のチャンス。お互いの価値観を言語化し、共通点を探すことが鍵です。';
-          bgCls = 'bg-rose-50 border-rose-200';
-          textCls = 'text-rose-700';
-          badgeCls = 'bg-rose-100 text-rose-700';
-        } else {
-          patternKey = '補完型';
-          desc = '互いに補い合い、それぞれが持つ異なる強みを合わせることで大きな力になります。';
-          advice = '違いを活かした役割分担が、2人の関係を豊かにしてくれます。';
-        }
+      function typeBlock(typeInfo, label) {
+        if (!typeInfo) return '';
+        const s = COMPAT_9TYPES.toneStyle[typeInfo.tone] || COMPAT_9TYPES.toneStyle.neutral;
+        return `<div class="rounded-lg px-3 py-2 border ${s.bg} ${s.border}" style="margin-top:6px;">
+          <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-bottom:3px;">
+            <span style="font-size:10px;color:#6b7280;">${esc(label)}</span>
+            <span style="font-family:'Lora',serif;font-size:13px;font-weight:700;" class="${s.text}">${esc(typeInfo.name)}</span>
+            <span style="font-size:10px;font-weight:600;border-radius:99px;padding:1px 7px;" class="${s.badge}">${esc(typeInfo.relation)}</span>
+          </div>
+          <p style="font-size:11px;line-height:1.5;margin:0 0 2px;" class="${s.text}">${esc(typeInfo.tagline)}</p>
+          <p style="font-size:11px;line-height:1.55;color:#374151;margin:0;">${esc(typeInfo.description)}</p>
+        </div>`;
       }
 
       resultDiv.classList.remove('hidden');
       resultDiv.innerHTML = `
-        <div class="rounded-xl p-4 border ${bgCls} space-y-3">
+        <div class="rounded-xl p-4 border ${style.bg} ${style.border} space-y-3">
           <div class="flex items-center gap-2 flex-wrap">
-            <span class="text-base font-bold ${textCls}">${esc(stars)} ${esc(typeName)}</span>
-            ${patternKey ? `<span class="inline-flex items-center text-[11px] font-semibold rounded-full px-2.5 py-1 ${badgeCls}">${esc(patternKey)}</span>` : ''}
+            ${mainType ? `<span style="font-family:'Lora',serif;font-size:17px;font-weight:700;" class="${style.text}">${esc(mainType.name)}</span>
+            <span style="font-size:11px;font-weight:600;border-radius:99px;padding:2px 9px;" class="${style.badge}">${esc(mainType.relation)}</span>` : '<span class="text-sm text-gray-500">相性タイプを算出中...</span>'}
           </div>
-          <p class="text-[11px] text-gray-500">相手の運命数: <strong class="${textCls}">${partnerLP}</strong>　あなたの運命数: <strong>${myLP}</strong></p>
+          ${mainType ? `<p style="font-size:12px;line-height:1.55;font-weight:500;" class="${style.text}">${esc(mainType.tagline)}</p>
+          <p style="font-size:12px;line-height:1.65;color:#374151;">${esc(mainType.description)}</p>` : ''}
+          <p style="font-size:11px;color:#6b7280;">相手の運命数: <strong class="${style.text}">${partnerLP}</strong>　あなたの運命数: <strong>${myLP}</strong>　オフセット: ${mainType ? compat9TypeOffset(normalizeTo9(myLP)||myLP, normalizeTo9(partnerLP)||partnerLP) : '-'}</p>
           ${partnerMeaning ? `<div class="bg-white/70 rounded-lg px-3 py-2 border border-gray-100">
-            <p style="font-size:11px;color:#6b7280;font-weight:600" class="mb-0.5">相手の運命数 ${partnerLP} の本質</p>
-            <p style="font-size:11px" class="text-gray-700 leading-snug">${esc(partnerMeaning)}</p>
+            <p style="font-size:11px;color:#6b7280;font-weight:600;margin-bottom:2px;">相手の運命数 ${partnerLP} の本質</p>
+            <p style="font-size:11px;line-height:1.55;color:#374151;">${esc(partnerMeaning)}</p>
           </div>` : ''}
-          ${desc ? `<div>
-            <p style="font-size:11px" class="font-semibold ${textCls} mb-0.5">関係パターン</p>
-            <p style="font-size:12px" class="text-gray-600 leading-relaxed">${esc(desc)}</p>
-          </div>` : ''}
-          <div class="bg-white/70 rounded-lg px-3 py-2 border border-gray-100">
-            <p style="font-size:11px" class="font-semibold text-purple-600 mb-0.5">◆ 一言アドバイス</p>
-            <p style="font-size:11px" class="text-gray-700 leading-snug">${esc(advice)}</p>
+          <div style="margin-top:4px;">
+            <p style="font-size:10px;font-weight:700;color:#5b21b6;text-transform:uppercase;letter-spacing:0.05em;margin-bottom:4px;">恋愛・結婚軸（誕生数 / 成長数 / 運命数）</p>
+            ${typeBlock(typeByLP,   '運命数同士')}
+            ${typeBlock(typeBySp,   '成長数同士')}
+          </div>
+          <div style="margin-top:4px;">
+            <p style="font-size:10px;font-weight:700;color:#5b21b6;text-transform:uppercase;letter-spacing:0.05em;margin-bottom:4px;">仕事・社会軸（成熟数 / 成長数 / 運命数）</p>
+            ${typeBlock(typeByMat,  '成熟数同士')}
+            ${typeBlock(typeBySp,   '成長数同士')}
           </div>
         </div>`;
     });
@@ -6430,7 +6794,7 @@ ${numContext}
         { key: 'ROW_PLAN',         name: 'PLANライン（1・2・3）', nums: [1,2,3] },
         { key: 'ROW_ARRANGE',      name: 'ARRANGEライン（4・5・6）', nums: [4,5,6] },
         { key: 'ROW_DEVELOP',      name: 'DEVELOPライン（7・8・9）', nums: [7,8,9] },
-        { key: 'DIAG_ACHIEVER',    name: '達成数ライン（1・5・9）', nums: [1,5,9] },
+        { key: 'DIAG_ACHIEVER',    name: '革命家ライン（1・5・9）', nums: [1,5,9] },
         { key: 'DIAG_PHILOSOPHER', name: '哲学者ライン（3・5・7）', nums: [3,5,7] },
       ];
       return LINE_DEFS.filter(ld => ld.nums.every(n => (ownerMap[n]?.scoreSum ?? 0) > 0));
@@ -6523,7 +6887,7 @@ ${numContext}
 
       // ── 章目次（全体像と現在地 / P1: RIOルーブリック / D4: アンカーリンク化）
       html += `<div class="pr-toc">
-        <div class="pr-toc__label">目次 — 全 11 章 ＋ 図</div>
+        <div class="pr-toc__label">目次 — 全 12 章 ＋ 図</div>
         <ul class="pr-toc__list">
           <li class="pr-toc__item"><a href="#pr-ch-intro" class="pr-toc__link"><span class="pr-toc__num">01</span>序章 — ${prEsc(name)}さんという存在</a></li>
           <li class="pr-toc__item"><a href="#pr-ch-numbers" class="pr-toc__link"><span class="pr-toc__num">02</span>各数が語るあなたの姿（6ポジション）</a></li>
@@ -6534,8 +6898,9 @@ ${numContext}
           <li class="pr-toc__item"><a href="#pr-ch-compat" class="pr-toc__link"><span class="pr-toc__num">07</span>相性 — 関係性の読み方（図付き）</a></li>
           <li class="pr-toc__item"><a href="#pr-ch-pyear" class="pr-toc__link"><span class="pr-toc__num">08</span>今の流れ — 個人年のテーマ（図付き）</a></li>
           <li class="pr-toc__item"><a href="#pr-ch-integration" class="pr-toc__link"><span class="pr-toc__num">09</span>統合章 — ${prEsc(name)}さんという物語</a></li>
-          <li class="pr-toc__item"><a href="#pr-ch-direction" class="pr-toc__link"><span class="pr-toc__num">10</span>方向性 — これから歩む道</a></li>
-          <li class="pr-toc__item"><a href="#pr-ch-closing" class="pr-toc__link"><span class="pr-toc__num">11</span>結び</a></li>
+          <li class="pr-toc__item"><a href="#pr-ch-overview" class="pr-toc__link"><span class="pr-toc__num">10</span>俯瞰 — 一つの物語としてのあなたの人生</a></li>
+          <li class="pr-toc__item"><a href="#pr-ch-direction" class="pr-toc__link"><span class="pr-toc__num">11</span>方向性 — これから歩む道</a></li>
+          <li class="pr-toc__item"><a href="#pr-ch-closing" class="pr-toc__link"><span class="pr-toc__num">12</span>結び</a></li>
         </ul>
       </div>`;
 
@@ -6591,6 +6956,16 @@ ${numContext}
             <div class="pr-action-block-label">行動提言</div>
             <p>${prEsc(t.action)}</p>
           </div>
+          ${pos.key === 'destiny' && r.birthDay && BIRTHDAY_NUMBERS[String(r.birthDay)] ? `
+          <details style="margin-top:8px;border:1px solid #c7d2fe;border-radius:8px;background:linear-gradient(135deg,#eef2ff,#f5f3ff);">
+            <summary style="cursor:pointer;user-select:none;padding:8px 14px;font-size:0.73rem;font-weight:600;color:#4338ca;">▸ ${prEsc(String(r.birthDay))}日生まれの特性を詳しく見る</summary>
+            <div style="padding:8px 14px 12px;">
+              <div style="font-size:0.8rem;font-weight:700;color:#3730a3;margin-bottom:6px;">${prEsc(BIRTHDAY_NUMBERS[String(r.birthDay)].characteristics || '')}</div>
+              ${['personality','strengths','weaknesses','love_tendency','suitable_jobs','financial_fortune'].map(k =>
+                `<div style="font-size:0.73rem;margin-bottom:2px;"><span style="font-weight:600;color:#4338ca;">${prEsc(BIRTHDAY_NUMBERS_LABELS[k] || k)}:</span> ${prEsc(BIRTHDAY_NUMBERS[String(r.birthDay)][k] || '')}</div>`
+              ).join('')}
+            </div>
+          </details>` : ''}
           <hr class="pr-divider">
         </div>`;
       }
@@ -6616,6 +6991,23 @@ ${numContext}
       </div>`;
 
       // ── 強みの構造（マンダラ）(Phase 2: 章番号)
+      // 6ライン情報: あなたの保有数がどのラインに属するか特定
+      const _allNums = [r.lifePath, r.destiny, r.maturity, r.spirit, r.ground, r.persona].map(n => normalizeTo9(n)).filter(n => n > 0);
+      function _numsInLine(lineNums) { return lineNums.filter(n => _allNums.includes(n)); }
+      const _planNums    = _numsInLine([1,2,3]);
+      const _arrangeNums = _numsInLine([4,5,6]);
+      const _developNums = _numsInLine([7,8,9]);
+      const _selfNums2   = _numsInLine([1,4,7]);
+      const _shareNums2  = _numsInLine([2,5,8]);
+      const _spiritNums2 = _numsInLine([3,6,9]);
+
+      function _lineStrength(matched) {
+        if (matched.length >= 3) return '（3数揃い・最強）';
+        if (matched.length === 2) return '（2数）';
+        if (matched.length === 1) return '（1数）';
+        return '（なし）';
+      }
+
       html += `<div class="pr-chapter" id="pr-ch-mandala">
         <span class="pr-chapter-num">${nextChNum()}</span>
         <h2>強みの構造 — あなたのマンダラが語るもの</h2>
@@ -6629,6 +7021,29 @@ ${numContext}
         html += `<p>現在のチャートでは、特定のラインが強く揃うというよりも、様々な方向に力が分散しています。これは多様性と柔軟性の象徴でもあり、特定の型にはまらないあなたの個性を表しています。単一の才能に特化するよりも、複数の視点や分野を横断することで真価を発揮するタイプです。</p>`;
       }
       html += `<p style="margin-top:10px;">最も影響力の強い数は<strong>${prEsc(String(r.lifePath))}（運命数）</strong>と<strong>${prEsc(String(r.maturity))}（成熟数）</strong>。この二つの数があなたの人生の基調音として響き続けます。マンダラの「根（克服数 ${prEsc(String(r.ch1))} / 挑戦数）」が整うほど、これらの枝葉のエネルギーはより豊かに花開いていきます。</p>
+
+        <hr class="pr-divider">
+        <h3>マンダラ6ライン — あなたの数はどのラインに乗っているか</h3>
+        <p>マンダラには<strong>縦カラム（PLAN / ARRANGE / DEVELOP）</strong>と<strong>横ロウ（自分軸 / 他人軸 / 導き軸）</strong>の合計6本のラインがあります。それぞれのラインはあなたの才能の「型」を示しています。</p>
+
+        <p><strong>PLAN（企画）— 数字 1・2・3${_planNums.length > 0 ? '　あなたの該当数: ' + _planNums.join('・') : ''}</strong>${prEsc(_lineStrength(_planNums))}<br>
+        物事の方向性を見極め、計画やプランを立てる能力が光るラインです。斬新な発想と閃きを活かして未知の領域を追求し、将来の指針となる方向性を定める力があります。キーワード: 企画力・発想力・独創性・インスピレーション。${_planNums.length >= 2 ? 'このラインに' + _planNums.join('と') + 'が乗っており、あなたの中で企画・構想の力が自然に発揮されます。' : ''}</p>
+
+        <p><strong>ARRANGE（調整）— 数字 4・5・6${_arrangeNums.length > 0 ? '　あなたの該当数: ' + _arrangeNums.join('・') : ''}</strong>${prEsc(_lineStrength(_arrangeNums))}<br>
+        物事の枠組みを見極め、社会のニーズを現実的な視点で組み立てるラインです。様々な要素を調整しながら人々の必要性や収益性を考慮し、実質的な計画を練って実益をもたらします。キーワード: 調整力・推進力・実利性・マーケティング。${_arrangeNums.length >= 2 ? 'このラインに' + _arrangeNums.join('と') + 'が乗っており、実務的な調整・推進力が強みです。' : ''}</p>
+
+        <p><strong>DEVELOP（展開）— 数字 7・8・9${_developNums.length > 0 ? '　あなたの該当数: ' + _developNums.join('・') : ''}</strong>${prEsc(_lineStrength(_developNums))}<br>
+        物事の発展性を見極め、社会の中で応用展開させる能力が光るラインです。質の向上や権威性を見定め、物事をさらなる高みへと引き上げる熱意ある実現力があります。キーワード: 応用展開・洞察力・実現力・クオリティー。${_developNums.length >= 2 ? 'このラインに' + _developNums.join('と') + 'が乗っており、発展・繁栄への推進力が強みです。' : ''}</p>
+
+        <p><strong>自分軸（SELF）— 数字 1・4・7${_selfNums2.length > 0 ? '　あなたの該当数: ' + _selfNums2.join('・') : ''}</strong>${prEsc(_lineStrength(_selfNums2))}<br>
+        革新的で実利的・合理的。職人気質で几帳面、本物志向、問題解決能力が高い軸です。生真面目で責任感が強く、独自のやり方にこだわる主体性のエネルギーが宿ります。キーワード: 革新的・実利的・合理的・自己完結力。${_selfNums2.length >= 2 ? 'あなたの数の中に' + _selfNums2.join('と') + 'があり、自分軸のエネルギーが自然と発揮されます。' : ''}</p>
+
+        <p><strong>他人軸（SHARE）— 数字 2・5・8${_shareNums2.length > 0 ? '　あなたの該当数: ' + _shareNums2.join('・') : ''}</strong>${prEsc(_lineStrength(_shareNums2))}<br>
+        人情的で交流を好み、適応性が高く歩調を合わせて目的を果たす軸です。外交的・活動的で状況判断に優れ、相手を察する力を持ち、人と人を繋ぐエネルギーが宿ります。キーワード: 人情的・交流・適応性・パートナーシップ。${_shareNums2.length >= 2 ? 'あなたの数の中に' + _shareNums2.join('と') + 'があり、他人軸の対人エネルギーが際立ちます。' : ''}</p>
+
+        <p><strong>導き軸（SPIRIT）— 数字 3・6・9${_spiritNums2.length > 0 ? '　あなたの該当数: ' + _spiritNums2.join('・') : ''}</strong>${prEsc(_lineStrength(_spiritNums2))}<br>
+        夢想的で美意識が高く、美と調和を愛し芸術的センスを表現する力を持つ軸です。知的・精神的で、インスピレーションを元に創作に励むインスパイアー型のエネルギーが宿ります。キーワード: 夢想的・美意識・芸術的センス・精神性。${_spiritNums2.length >= 2 ? 'あなたの数の中に' + _spiritNums2.join('と') + 'があり、導き軸の精神的エネルギーが強く表れます。' : ''}</p>
+
         <div class="pr-action-block" style="margin-top:12px;">
           <div class="pr-action-block-label">行動提言</div>
           <p><strong>今週試してほしいこと：</strong>あなたのマンダラのラインを一つ意識して、そのエネルギーを意図的に使う機会を一つ作ってみましょう。自然に動けると感じた瞬間を記録してみてください。</p>
@@ -6657,7 +7072,11 @@ ${numContext}
           const oaRaw = shareCount / maxCount;
           const gaRaw = spiritCount / maxCount;
 
-          const svgCx = 120, svgCy = 110, maxR = 78;
+          // viewBox 320x290: 上頂点ラベル・タイトル衝突を解消するため中心を(150,150)に移動
+          const svgCx = 150, svgCy = 150, maxR = 80;
+          // ラベルR=108(外側), 数値R=89(頂点近傍・ラベルと分離)
+          const labelR = maxR + 28;  // 108
+          const valR   = maxR + 9;   // 89
           // 最大目盛り = maxCount、グリッドは maxCount の 1/3 刻み
           const axisPts = [
             { angle: -Math.PI/2,                   label: '自分軸', val: saRaw, disp: saDisp },
@@ -6686,18 +7105,30 @@ ${numContext}
           // データポリゴン（val は 0〜1 の正規化済み比率）
           const dataPts = axisPts.map(function(p) { return ptAt(p.angle, p.val * maxR); });
           const polyStr = dataPts.map(function(p) { return p.x.toFixed(1)+','+p.y.toFixed(1); }).join(' ');
-          // ラベルと個数
+          // ラベルと個数: 各頂点でラベル(外側)と数値(頂点近傍)を完全分離して重なりを防ぐ
+          // i=0(自分軸/上): ラベルは頂点の上方向、数値は頂点の下(内側)
+          // i=1(他人軸/右下): ラベルはさらに下(anchor=start)、数値は頂点左寄り(anchor=end)
+          // i=2(導き軸/左下): ラベルはさらに下(anchor=end)、数値は頂点右寄り(anchor=start)
           let labelsStr = '';
-          const anchors = ['middle', 'end', 'start'];
-          const labelR = maxR + 22;
-          const valR = maxR + 12;
           axisPts.forEach(function(p, i) {
             const lp = ptAt(p.angle, labelR);
             const vp = ptAt(p.angle, valR);
-            const ly = i === 0 ? lp.y - 10 : lp.y + 12;
-            const vy = i === 0 ? vp.y + 0  : vp.y + 12;
-            labelsStr += '<text x="'+lp.x.toFixed(1)+'" y="'+ly.toFixed(1)+'" text-anchor="'+anchors[i]+'" font-family="sans-serif" font-size="12" fill="#7e22ce" font-weight="700">'+p.label+'</text>';
-            labelsStr += '<text x="'+vp.x.toFixed(1)+'" y="'+vy.toFixed(1)+'" text-anchor="'+anchors[i]+'" font-family="Lora,serif" font-size="13" fill="#6b21a8" font-weight="700">'+p.disp+'</text>';
+            var lx, ly, la, vx, vy, va;
+            if (i === 0) {
+              // 上頂点: ラベルを上、数値を内側下
+              lx = lp.x; ly = lp.y - 14; la = 'middle';
+              vx = vp.x; vy = vp.y + 12; va = 'middle';
+            } else if (i === 1) {
+              // 右下: ラベルを外下(anchor=start)、数値を頂点左(anchor=end)で分離
+              lx = lp.x; ly = lp.y + 14; la = 'start';
+              vx = vp.x - 8; vy = vp.y - 4; va = 'end';
+            } else {
+              // 左下: ラベルを外下(anchor=end)、数値を頂点右(anchor=start)で分離
+              lx = lp.x; ly = lp.y + 14; la = 'end';
+              vx = vp.x + 8; vy = vp.y - 4; va = 'start';
+            }
+            labelsStr += '<text x="'+lx.toFixed(1)+'" y="'+ly.toFixed(1)+'" text-anchor="'+la+'" font-family="sans-serif" font-size="12" fill="#7e22ce" font-weight="700">'+p.label+'</text>';
+            labelsStr += '<text x="'+vx.toFixed(1)+'" y="'+vy.toFixed(1)+'" text-anchor="'+va+'" font-family="Lora,serif" font-size="13" fill="#6b21a8" font-weight="700">'+p.disp+'</text>';
           });
           // データ点
           let dotStr = '';
@@ -6705,9 +7136,9 @@ ${numContext}
             dotStr += '<circle cx="'+p.x.toFixed(1)+'" cy="'+p.y.toFixed(1)+'" r="4" fill="#7e22ce" opacity="0.9"/>';
           });
           return '<figure class="pr-compat-figure" style="margin:14px 0 10px;">'
-            + '<svg viewBox="0 0 260 240" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="3軸レーダーチャート" style="width:min(300px,100%);height:auto;overflow:visible;display:block;margin:0 auto;">'
-            + '<rect width="260" height="240" fill="#faf5ff" rx="12"/>'
-            + '<text x="130" y="15" text-anchor="middle" font-family="serif" font-size="12" fill="#9333ea" font-weight="700">3軸エネルギーバランス（個数）</text>'
+            + '<p style="text-align:center;font-family:serif;font-size:13px;color:#9333ea;font-weight:700;margin:0 0 4px;">3軸エネルギーバランス（個数）</p>'
+            + '<svg viewBox="0 0 320 290" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="3軸レーダーチャート" style="width:min(320px,100%);height:auto;overflow:visible;display:block;margin:0 auto;">'
+            + '<rect width="320" height="290" fill="#faf5ff" rx="12"/>'
             + gridSvg + axisLines
             + '<polygon points="'+polyStr+'" fill="rgba(126,34,206,0.18)" stroke="#7e22ce" stroke-width="1.8" stroke-linejoin="round"/>'
             + dotStr + labelsStr
@@ -6813,6 +7244,11 @@ ${numContext}
         const resonanceType = resonanceScore >= 80 ? '深共鳴型' : resonanceScore >= 65 ? '調和共鳴型' : resonanceScore >= 50 ? '補完成長型' : '対極成長型';
         const resonanceTagline = resonanceScore >= 80 ? '引き合う魂が持つ深い共鳴' : resonanceScore >= 65 ? '互いの光を引き出し合う縁' : resonanceScore >= 50 ? '違いが成長を呼ぶ組み合わせ' : '対極から学び合う対話の縁';
 
+        // 9タイプ体系による判定
+        const _9tLP  = compat9TypeInfo(r.lifePath, compatInfo.lifePath);
+        const _9tSp  = compat9TypeInfo(r.spirit,   compatInfo.spirit);
+        const _9tMat = compat9TypeInfo(r.maturity,  compatInfo.maturity);
+
         // Phase 3: 相性SVG対比図
         const myLP = r.lifePath, myMat = r.maturity, mySp = r.spirit;
         const thLP = compatInfo.lifePath, thMat = compatInfo.maturity, thSp = compatInfo.spirit;
@@ -6877,6 +7313,30 @@ ${numContext}
           }).join('')}
           ${sharedNums.length === 0 ? '<span class="pr-compat-shared-label">（共有なし）</span>' : ''}
         </div>
+        ${(function() {
+          if (!_9tLP) return '';
+          const s = COMPAT_9TYPES.toneStyle[_9tLP.tone] || COMPAT_9TYPES.toneStyle.neutral;
+          function prTypeRow(typeInfo, label) {
+            if (!typeInfo) return '';
+            const rs = COMPAT_9TYPES.toneStyle[typeInfo.tone] || COMPAT_9TYPES.toneStyle.neutral;
+            return `<div style="border-left:3px solid ${rs.barColor};padding:8px 10px;margin-bottom:6px;border-radius:0 8px 8px 0;background:#faf5ff;">
+              <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-bottom:2px;">
+                <span style="font-size:10px;color:#6b7280;">${prEsc(label)}</span>
+                <span style="font-family:'Lora',serif;font-size:14px;font-weight:700;color:${rs.barColor};">${prEsc(typeInfo.name)}</span>
+                <span style="font-size:10px;font-weight:600;border-radius:99px;padding:1px 7px;background:${rs.barColor}22;color:${rs.barColor};">${prEsc(typeInfo.relation)}</span>
+              </div>
+              <p style="font-size:12px;line-height:1.55;color:#374151;margin:0;">${prEsc(typeInfo.tagline)} — ${prEsc(typeInfo.description)}</p>
+            </div>`;
+          }
+          return `<div style="margin:12px 0 8px;">
+            <p style="font-size:11px;font-weight:700;color:#5b21b6;text-transform:uppercase;letter-spacing:0.05em;margin-bottom:6px;">9タイプ相性体系による読み</p>
+            ${prTypeRow(_9tLP,  '運命数同士（主軸）')}
+            <p style="font-size:10px;font-weight:700;color:#7c3aed;margin:8px 0 4px;">恋愛・結婚軸（誕生数 / 成長数 / 運命数）</p>
+            ${prTypeRow(_9tSp,  '成長数同士')}
+            <p style="font-size:10px;font-weight:700;color:#7c3aed;margin:8px 0 4px;">仕事・社会軸（成熟数 / 成長数 / 運命数）</p>
+            ${prTypeRow(_9tMat, '成熟数同士')}
+          </div>`;
+        })()}
         <p>どんな相性であっても、それは優劣ではなく「組み合わせ」の問題。あなたが相手のどこに惹かれ、どこに摩擦を感じるかを知ることが、関係を深める第一歩です。摩擦は「合わない」サインではなく、互いが成長するための摩石です。</p>
         <div class="pr-action-block" style="margin-top:12px;">
           <div class="pr-action-block-label">行動提言</div>
@@ -6971,6 +7431,35 @@ ${numContext}
           <div class="pr-action-block-label">行動提言</div>
           <p><strong>今週試してほしいこと：</strong>このレポートを読んで最も「これは私のことだ」と感じた言葉を一つ書き留め、なぜそう感じたかを三行で書いてみましょう。</p>
           <p><strong>自分への問い：</strong>「私の数のすべてが、私という物語を豊かにするために存在しているとしたら、今日の出来事をどう読み直せるか？」</p>
+        </div>
+      </div>`;
+
+      // ── 俯瞰 — 人生を一続きの物語として
+      const _ovPeriods = r.periods || {};
+      const _ovP1 = _ovPeriods.first || 35;
+      const _ovP2 = _ovPeriods.second || 53;
+      const _ovP3 = _ovPeriods.third || 71;
+      const _ovLifeCore = prGetTemplate(r.lifePath).core.split('。')[0];
+      const _ovLifeDir  = prGetTemplate(r.lifePath).direction.split('。')[0];
+      const _ovMatCore  = prGetTemplate(r.maturity).core ? prGetTemplate(r.maturity).core.split('。')[0] : '';
+      html += `<div class="pr-chapter pr-chapter--featured" id="pr-ch-overview" style="background:linear-gradient(135deg,#f0f9ff,#e0f2fe);border:1.5px solid #7dd3fc;">
+        <span class="pr-chapter-num">${nextChNum()}</span>
+        <h2>俯瞰 — 一つの物語としてのあなたの人生</h2>
+        <p>一歩高い場所に立ち、${prEsc(name)}さんという人生全体を、始まりから現在、そして未来の結実へと連なる一続きの物語として眺めてみましょう。あなたの数の配置は、偶然の組み合わせではなく、一つの物語が持つべき「序章・展開・転換・結実」を静かに示しています。</p>
+        <p><strong>序章期（0〜${prEsc(String(_ovP1))}歳ごろ）— 根を張る試練</strong><br>
+        この時期、あなたの内側に最初に刻まれたテーマは、克服数・挑戦数というかたちで現れます${r.ch1 ? `——特に克服数<strong>${prEsc(String(r.ch1))}</strong>という問いは、あなたが生まれながらに向き合うことを求められた最初の関門です` : ''}。これは弱さの証ではなく、物語が始まる前に主人公が受け取る「課題書き」のようなものです。序章期の試練を通じて、あなたは自分という素材の強度を知り、土台を深く張っていきます。幼少期から10代・20代にかけて感じた「うまくいかなさ」や「自分らしくいられない感覚」の多くは、このプロセスの一部です。</p>
+        <p><strong>展開期（〜${prEsc(String(_ovP2))}歳ごろ）— 物語が動き出す</strong><br>
+        序章期の根の上に、運命数<strong>${prEsc(String(r.lifePath))}</strong>という通奏低音が本格的に動き始めます。${prEsc(_ovLifeCore)}——この本質が、仕事・人間関係・挑戦のあらゆる場面を通じて試され、磨かれていく時期です。成長数<strong>${prEsc(String(r.spirit))}</strong>が幼少期から育んできた才能の土台と、人格数<strong>${prEsc(String(r.persona))}</strong>として外の世界に見せる顔が交差し、あなたは「自分が何者か」という問いに繰り返し向き合います。この時期の出会い・選択・挫折のすべてが、物語の展開を厚くする材料です。</p>
+        <p><strong>成熟期（〜${prEsc(String(_ovP3))}歳ごろ）— 役割が拡大する</strong><br>
+        この時期になると、社会数<strong>${prEsc(String(r.ground))}</strong>が示す「社会との接点」が本格的に開花します。個人の才能を超え、周囲や社会に対してどう貢献できるかというテーマが前景に出てきます。単に「自分が輝く」から「自分の光が誰かの道を照らす」へと、物語の重力が変わります。展開期に積み重ねた経験が、ここで初めて「意味のある歴史」として読み直されます。</p>
+        <p><strong>結実期（それ以降）— 成熟数への収斂</strong><br>
+        人生後半、成熟数<strong>${prEsc(String(r.maturity))}</strong>というテーマがあなたの物語に中心軸をもたらします。${_ovMatCore ? prEsc(_ovMatCore) + '——' : ''}これは単なる「老い」ではなく、序章期から積み重ねてきたすべての経験と試練が、一つの深みへと収斂していく過程です。人生の結実期に到達したとき、あなたは「こういう物語を生きてきた」という静かな確信を持てるはずです。</p>
+        <p><strong>現在地：${prEsc(String(r.age))}歳・${prEsc(stageLabel)}</strong><br>
+        今のあなたはこの大きな弧の中に立っています。${prEsc(_ovLifeDir)}——この方向性を意識して次の一歩を踏み出すとき、あなたは自分の物語の「正しい章」にいるという感覚を取り戻せるはずです。個人年<strong>${prEsc(String(r.pYear))}</strong>「${prEsc(pyDB.theme)}」の流れは、その物語の中でのページめくりのタイミングを示しています。</p>
+        <div class="pr-action-block" style="margin-top:12px;">
+          <div class="pr-action-block-label">人生を通してのひとつの指針</div>
+          <p>運命数${prEsc(String(r.lifePath))}を軸に、序章期の試練を根として、成熟数${prEsc(String(r.maturity))}という結実へ向かって——あなたの物語は「${prEsc(_ovLifeCore)}」というテーマを一生かけて深め、その深さそのものが周囲への贈り物になる旅です。</p>
+          <p><strong>俯瞰の問い：</strong>「もし自分の人生を一冊の物語として最後まで読み終えたとき、どんな主題が貫いていてほしいか？」</p>
         </div>
       </div>`;
 
@@ -7114,13 +7603,24 @@ ${numContext}
 - 個人年: ${r.pYear}（テーマ: ${pyDB.theme}）
 - 年齢: ${r.age}歳
 - 揃いライン: ${completedLines.length > 0 ? completedLines.map(l => l.name).join('、') : 'なし'}
+${r.birthDay && BIRTHDAY_NUMBERS[String(r.birthDay)] ? `- 誕生日の数(${r.birthDay}日)の特性: ${BIRTHDAY_NUMBERS[String(r.birthDay)].characteristics}。性格=${BIRTHDAY_NUMBERS[String(r.birthDay)].personality}／長所=${BIRTHDAY_NUMBERS[String(r.birthDay)].strengths}／短所=${BIRTHDAY_NUMBERS[String(r.birthDay)].weaknesses}／恋愛=${BIRTHDAY_NUMBERS[String(r.birthDay)].love_tendency}／適職=${BIRTHDAY_NUMBERS[String(r.birthDay)].suitable_jobs}／金運=${BIRTHDAY_NUMBERS[String(r.birthDay)].financial_fortune}` : ''}
+
+【マンダラ6ライン定義（分析に活用すること）】
+縦カラム（横行）= 物事へのアプローチの型:
+- PLAN（企画）数字1・2・3: 方向性を見極め計画・発想する力。企画力・独創性・インスピレーション。
+- ARRANGE（調整）数字4・5・6: 枠組みを見極め調整・実益をもたらす力。調整力・実利性・マーケティング。
+- DEVELOP（展開）数字7・8・9: 発展性を見極め応用展開する力。洞察力・実現力・クオリティー。
+横ロウ（縦列）= エネルギーの向き先:
+- 自分軸SELF数字1・4・7: 主体性・独立・自己完結力。革新的・合理的・職人気質。
+- 他人軸SHARE数字2・5・8: 対人関係・交流・パートナーシップ。人情的・外交的・適応性。
+- 導き軸SPIRIT数字3・6・9: 精神性・使命・美と調和。夢想的・芸術的センス・インスパイアー型。
 
 【分析すること】
 1. 各数の本質的な意味（運命数/成熟数を最も厚く）
 2. 運命数×成熟数の共鳴と相乗効果
 3. 運命数×克服数の葛藤・力学（人生の目的と最大の課題）
 4. 影響力上位3数の相互関係・摩擦
-5. 揃いラインが示す才能の型
+5. 揃いラインが示す才能の型（6ライン定義を参照して、その人の数がどのラインに乗っているか）
 6. 根（克服数・挑戦数）が幹（主要数）に与える影響
 
 分析メモとして詳細に記述してください。`;
@@ -7185,15 +7685,17 @@ ${vocationMemo}
 ## 社会数${r.ground}と人格数${r.persona}が語るもの
 ## 内なる力学 — 数同士の関係と葛藤
 ## 強みの構造 — マンダラが示すあなたの型
+（必ずマンダラ6ラインの意味を織り込むこと: 縦カラム=PLAN企画[1·2·3]／ARRANGE調整[4·5·6]／DEVELOP展開[7·8·9]、横ロウ=自分軸SELF[1·4·7]／他人軸SHARE[2·5·8]／導き軸SPIRIT[3·6·9]。その人の数がどのラインに乗っているかを語ること。）
 ## 3つの軸 — エネルギーの向き方
 ## 才能の発揮先 — 職業適性の可能性
 ## 縁と関係性
 ## 今の流れ — 個人年${r.pYear}のテーマ
 ## 統合章 — ${name}さんという物語
+## 俯瞰 — 一つの物語としてのあなたの人生
 ## 方向性 — これから歩む道
 ## 結び
 
-各章を600〜900字の地の文で、具体例・比喩・問いかけを含めて深く書いてください。各章末尾に「明日から/今週できる具体的行動2-3個」と「自分への問い1個」を入れること。`;
+各章を600〜900字の地の文で、具体例・比喩・問いかけを含めて深く書いてください。各章末尾に「明日から/今週できる具体的行動2-3個」と「自分への問い1個」を入れること。『俯瞰』章では、${name}さんの人生全体（序盤の試練＝克服数/挑戦数 → 生涯を貫く運命数 → 成熟数への結実）を、ライフサイクルの流れに沿った一続きの物語として高い視点から描き、人生レベルの指針を授けること。神や宗教の語は使わない。`;
 
       let editorDraft = '';
       editorDraft = await councilCall(editorSystem, editorPrompt, apiKey, 120000);
@@ -7289,6 +7791,7 @@ ${editorDraft}
 - 年齢・ステージ: ${r.age}歳
 ${compatInfo ? `- 相手の運命数: ${compatInfo.lifePath}` : '- 相手生年月日: 未入力'}
 ${completedLines.length > 0 ? `- 揃いライン: ${completedLines.map(l => l.name).join('、')}` : '- 揃いライン: なし'}
+${r.birthDay && BIRTHDAY_NUMBERS[String(r.birthDay)] ? `- 誕生日の数(${r.birthDay}日)の特性: ${BIRTHDAY_NUMBERS[String(r.birthDay)].characteristics}。性格=${BIRTHDAY_NUMBERS[String(r.birthDay)].personality}／長所=${BIRTHDAY_NUMBERS[String(r.birthDay)].strengths}／短所=${BIRTHDAY_NUMBERS[String(r.birthDay)].weaknesses}／恋愛=${BIRTHDAY_NUMBERS[String(r.birthDay)].love_tendency}／適職=${BIRTHDAY_NUMBERS[String(r.birthDay)].suitable_jobs}／金運=${BIRTHDAY_NUMBERS[String(r.birthDay)].financial_fortune}` : ''}
 
 【生成の3大方針】
 1. **数同士の関係・葛藤を立体的に読む**: 各数を単体で語るだけでなく、「運命数×成熟数の相乗」「運命数×克服数の葛藤（人生の目的と最大の課題の力学）」「影響力上位2-3の数の共鳴と摩擦」を専用の節や文として語ること。「この数の組み合わせが生む固有のドラマ」を明示すること。
@@ -7320,7 +7823,7 @@ ${completedLines.length > 0 ? `- 揃いライン: ${completedLines.map(l => l.na
 （★最重要章：①運命数${r.lifePath}×成熟数${r.maturity}の共鳴と相乗、②運命数${r.lifePath}×克服数${r.ch1}の葛藤（人生の目的と最大の課題の力学）、③影響力上位2数（運命数・成長数）の共鳴と摩擦、④揃いラインが生む数の連携、をそれぞれ小節として語ること。「この組み合わせがあなたの内側で生み出しているドラマ」を立体的に描くこと。）
 
 ## 強みの構造 — マンダラが示すあなたの型
-（揃いライン・数の分布から見えるあなた固有の才能の型・具体的行動提言・問い）
+（揃いライン・数の分布から見えるあなた固有の才能の型・具体的行動提言・問い。必ずマンダラ6ラインの意味を織り込むこと: 縦カラム=PLAN企画[1·2·3]／ARRANGE調整[4·5·6]／DEVELOP展開[7·8·9]、横ロウ=自分軸SELF[1·4·7]／他人軸SHARE[2·5·8]／導き軸SPIRIT[3·6·9]。その人の数がどのラインに乗っているかを具体的に語ること。）
 
 ## 3つの軸 — エネルギーの向き方
 （自分軸・他人軸・導き軸それぞれを丁寧に読む・具体的行動提言・問い）
@@ -7336,6 +7839,9 @@ ${completedLines.length > 0 ? `- 揃いライン: ${completedLines.map(l => l.na
 
 ## 統合章 — ${name}さんという物語
 （すべての数を一つの物語として束ねる。矛盾に見える数同士の必然の役割を語る。具体的行動提言・問い）
+
+## 俯瞰 — 一つの物語としてのあなたの人生
+（${name}さんの人生全体（序盤の試練＝克服数/挑戦数 → 生涯を貫く運命数 → 成熟数への結実）を、ライフサイクルの流れに沿った一続きの物語として高い視点から描き、人生レベルの指針を授けること。神や宗教の語は使わない。具体的行動提言・俯瞰の問い）
 
 ## 方向性 — これから歩む道
 （今の年齢・ステージ・個人年を踏まえた具体的な次の一手。明日からできる3つの行動を必ず書く。）
@@ -7522,10 +8028,96 @@ ${completedLines.length > 0 ? `- 揃いライン: ${completedLines.map(l => l.na
       }
 
       // ── 1. 数秘チャート図 を序章の直後に挿入 (Phase 1: figure+figcaption)
+      // captureChart: preserves grid layout + redraws SVG lines on the clone.
+      // Strategy: clone chart-area-inner with display:grid intact, append off-screen,
+      // re-run SVG coordinate calculation using the clone's own getBoundingClientRect(),
+      // then capture with html2canvas at windowWidth>767px to bypass mobile CSS.
+      async function captureChart(srcEl) {
+        if (!srcEl) return null;
+        const CONTAINER_W = 560; // >767px triggers desktop CSS (SVG lines visible)
+        const wrap = document.createElement('div');
+        wrap.style.cssText = `position:absolute;left:-9999px;top:0;width:${CONTAINER_W}px;background:#fff;padding:8px;box-sizing:border-box;`;
+        const clone = srcEl.cloneNode(true);
+        clone.style.position = 'relative';
+        // Do NOT override display — preserve display:grid so the 6-column layout is intact
+        clone.style.width = '100%';
+        clone.style.boxSizing = 'border-box';
+        // Remove IDs from clone's cells so they don't conflict with live DOM
+        // but keep the SVG element accessible via querySelector
+        wrap.appendChild(clone);
+        document.body.appendChild(wrap);
+        // Wait for grid to lay out
+        await new Promise(res => setTimeout(res, 150));
+        // Re-draw SVG lines on the clone using its own bounding rects
+        try {
+          const svgEl = clone.querySelector('.chart-lines');
+          const cellIds = ['cell-maturity','cell-target3','cell-spirit','cell-target2',
+                           'cell-persona','cell-destiny','cell-ground','cell-lifepath',
+                           'cell-ch1','cell-ch2','cell-ch3','cell-ch4'];
+          if (svgEl) {
+            const areaRect = clone.getBoundingClientRect();
+            const W = areaRect.width;
+            const H = areaRect.height;
+            svgEl.setAttribute('viewBox', '0 0 ' + W + ' ' + H);
+            svgEl.style.display = ''; // ensure visible (desktop mode)
+            function cloneCenter(dataId) {
+              const el = clone.querySelector('[id="' + dataId + '"]');
+              if (!el) return null;
+              const r = el.getBoundingClientRect();
+              return {
+                x: r.left - areaRect.left + r.width / 2,
+                y: r.top  - areaRect.top  + r.height / 2
+              };
+            }
+            const pairs = [
+              ['cell-maturity','cell-target3'],
+              ['cell-target3','cell-spirit'],
+              ['cell-target3','cell-target2'],
+              ['cell-spirit','cell-persona'],
+              ['cell-spirit','cell-destiny'],
+              ['cell-target2','cell-ground'],
+              ['cell-target2','cell-destiny'],
+              ['cell-persona','cell-destiny'],
+              ['cell-destiny','cell-ground'],
+              ['cell-ch1','cell-ch3'],
+              ['cell-ch2','cell-ch3'],
+              ['cell-ch3','cell-ch4'],
+              ['cell-persona','cell-ch1'],
+              ['cell-destiny','cell-ch1'],
+              ['cell-destiny','cell-ch2'],
+              ['cell-ground','cell-ch2'],
+            ];
+            let linesHTML = '';
+            pairs.forEach(([a, b]) => {
+              const ca = cloneCenter(a);
+              const cb = cloneCenter(b);
+              if (!ca || !cb) return;
+              linesHTML += `<line x1="${ca.x.toFixed(1)}" y1="${ca.y.toFixed(1)}" x2="${cb.x.toFixed(1)}" y2="${cb.y.toFixed(1)}"/>`;
+            });
+            svgEl.innerHTML = linesHTML;
+          }
+        } catch(svgErr) {
+          // SVG line redraw failed — chart will still render, just without lines
+        }
+        await new Promise(res => setTimeout(res, 60));
+        try {
+          const canvas = await html2canvas(wrap, {
+            scale: 1.5,
+            useCORS: true,
+            backgroundColor: '#ffffff',
+            windowWidth: CONTAINER_W + 16, // >767px → desktop CSS → SVG lines visible
+            logging: false,
+          });
+          return canvas.toDataURL('image/png');
+        } finally {
+          document.body.removeChild(wrap);
+        }
+      }
+
       try {
         const chartSrc = document.getElementById('chart-area-inner');
         if (chartSrc) {
-          const dataUrl = await captureElement(chartSrc, 460);
+          const dataUrl = await captureChart(chartSrc);
           if (dataUrl && dataUrl.length > 500) {
             const introChapter = contentEl.querySelector('#pr-ch-intro');
             if (introChapter) {
@@ -7548,10 +8140,42 @@ ${completedLines.length > 0 ? `- 揃いライン: ${completedLines.map(l => l.na
       }
 
       // ── 2. マンダラ図 を「強みの構造」章の冒頭に挿入 (Phase 1: figure+figcaption)
+      // NOTE: captureElement sets clone.style.display='block' which breaks CSS grid layout.
+      // For mandala we use a dedicated capture that preserves display:grid and uses
+      // containerWidth > 480px to bypass the mobile media query (max-width:480px → 4-col grid).
+      async function captureMandala(srcEl) {
+        if (!srcEl) return null;
+        const CONTAINER_W = 520; // >480px → desktop 5-col grid applies
+        const wrap = document.createElement('div');
+        wrap.style.cssText = `position:absolute;left:-9999px;top:0;width:${CONTAINER_W}px;background:#fff;padding:8px;box-sizing:border-box;`;
+        const clone = srcEl.cloneNode(true);
+        clone.style.position = 'relative';
+        // Do NOT override display — preserve display:grid so the 3×3 layout is intact
+        clone.style.width = '100%';
+        clone.style.boxSizing = 'border-box';
+        // Un-hide any mandala-hide-mobile elements so all labels render
+        clone.querySelectorAll('.mandala-hide-mobile').forEach(el => { el.style.display = ''; });
+        wrap.appendChild(clone);
+        document.body.appendChild(wrap);
+        await new Promise(res => setTimeout(res, 150));
+        try {
+          const canvas = await html2canvas(wrap, {
+            scale: 1.5,
+            useCORS: true,
+            backgroundColor: '#ffffff',
+            windowWidth: CONTAINER_W + 16, // >480px → desktop media query active
+            logging: false,
+          });
+          return canvas.toDataURL('image/png');
+        } finally {
+          document.body.removeChild(wrap);
+        }
+      }
+
       try {
         const mandalaSrc = document.getElementById('mandala-grid-wrap');
         if (mandalaSrc) {
-          const dataUrl = await captureElement(mandalaSrc, 340);
+          const dataUrl = await captureMandala(mandalaSrc);
           if (dataUrl && dataUrl.length > 500) {
             const mandalaChapter = contentEl.querySelector('#pr-ch-mandala');
             if (mandalaChapter) {
@@ -7573,18 +8197,68 @@ ${completedLines.length > 0 ? `- 揃いライン: ${completedLines.map(l => l.na
         console.warn('[PR] マンダラ図の埋め込みに失敗しました（テキストレポートは維持）:', e.message);
       }
 
-      // ── 3. Phase 3: 相性SVG図 をhtml2canvasで画像化してPDFに対応 (SVGはそのまま表示)
+      // Helper: SVG要素をoff-screen wrapでhtml2canvas化し、PNG dataURLを返す
+      async function captureSvgFigure(svgEl, targetW) {
+        const vbRaw = svgEl.getAttribute('viewBox') || '0 0 320 290';
+        const vbParts = vbRaw.split(/\s+/).map(Number);
+        const vbW = vbParts[2] || 320;
+        const vbH = vbParts[3] || 290;
+        const targetH = Math.round(targetW * vbH / vbW);
+        const PAD = 18;
+        const wrapW = targetW + PAD * 2;
+        const wrap = document.createElement('div');
+        wrap.style.cssText = `position:absolute;left:-9999px;top:0;width:${wrapW}px;background:#fff;padding:${PAD}px;box-sizing:content-box;`;
+        const clone = svgEl.cloneNode(true);
+        // 明示的な寸法を設定してmin()依存を排除
+        clone.style.width = targetW + 'px';
+        clone.style.height = targetH + 'px';
+        clone.style.maxWidth = 'none';
+        clone.style.margin = '0';
+        clone.style.display = 'block';
+        clone.setAttribute('width', targetW);
+        clone.setAttribute('height', targetH);
+        wrap.appendChild(clone);
+        document.body.appendChild(wrap);
+        await new Promise(res => setTimeout(res, 120));
+        try {
+          const canvas = await html2canvas(wrap, {
+            scale: 1.5,
+            useCORS: true,
+            backgroundColor: '#ffffff',
+            windowWidth: wrapW + 16,
+            logging: false,
+          });
+          return canvas.toDataURL('image/png');
+        } finally {
+          document.body.removeChild(wrap);
+        }
+      }
+
+      // ── 3. Phase 3: 3軸・個人年・相性SVG図を img に置換してPDFで正しく描画されるようにする
       try {
-        const compatFigEl = contentEl.querySelector('.pr-compat-figure svg');
-        if (compatFigEl) {
-          // SVGは表示上そのまま。PDF用にscreenshot化してimg差し込み済み構造を作る。
-          // html2canvas は既存の captureElement で SVGを含む親ごとキャプチャするので
-          // savePrecisionReportPdfがquerySelectorAll('.pr-chapter')でピックアップする際
-          // SVGがcanvas化されてPDFに乗る。追加処理不要。
-          // (SVG text のズレはhtmlCanvasで吸収される)
+        const svgFigs = contentEl.querySelectorAll('.pr-compat-figure');
+        for (const fig of svgFigs) {
+          const svg = fig.querySelector('svg');
+          if (!svg) continue;
+          const vbRaw = svg.getAttribute('viewBox') || '0 0 320 290';
+          const vbParts = vbRaw.split(/\s+/).map(Number);
+          const vbW = vbParts[2] || 320;
+          const TARGET_W = Math.min(Math.round(vbW), 320);
+          try {
+            const dataUrl = await captureSvgFigure(svg, TARGET_W);
+            if (dataUrl && dataUrl.length > 500) {
+              const img = document.createElement('img');
+              img.src = dataUrl;
+              img.alt = svg.getAttribute('aria-label') || '図';
+              img.style.cssText = `display:block;margin:6px auto;width:${TARGET_W}px;max-width:100%;height:auto;`;
+              svg.replaceWith(img);
+            }
+          } catch(inner) {
+            // このSVGは維持（表示は壊れない）
+          }
         }
       } catch(e) {
-        console.warn('[PR] 相性図のPDF対応処理でエラー（表示は維持）:', e.message);
+        console.warn('[PR] SVG図のimg化に失敗（表示は維持）:', e.message);
       }
     }
 
@@ -7626,16 +8300,43 @@ ${completedLines.length > 0 ? `- 揃いライン: ${completedLines.map(l => l.na
           pdfRoot.appendChild(clone);
         });
 
+        // バグ①修正: pdfRoot内の<details>を常時展開のdivブロックに変換し
+        // html2canvasがdetailsのレイアウト高さを誤って扱い後続ブロックが重なる問題を解消
+        // 画面側のDOMは変更しない（pdfRootはクローン内のみ操作）
+        pdfRoot.querySelectorAll('details').forEach(det => {
+          const summary = det.querySelector('summary');
+          const label = summary ? summary.textContent.replace(/^[▸▶\s]+/, '').trim() : '';
+          const wrap = document.createElement('div');
+          wrap.style.cssText = 'margin:8px 0;border:1px solid #c7d2fe;border-radius:8px;background:linear-gradient(135deg,#eef2ff,#f5f3ff);padding:8px 14px 12px;';
+          if (label) {
+            const h = document.createElement('div');
+            h.textContent = label;
+            h.style.cssText = 'font-size:11px;font-weight:700;color:#4338ca;margin-bottom:6px;';
+            wrap.appendChild(h);
+          }
+          // summaryを除く子ノード（展開された中身）を移送
+          Array.from(det.childNodes).forEach(n => { if (n !== summary) wrap.appendChild(n.cloneNode(true)); });
+          det.replaceWith(wrap);
+        });
+
         document.body.appendChild(pdfRoot);
         await new Promise(res => setTimeout(res, 300));
 
         const pdfRootRect = pdfRoot.getBoundingClientRect();
-        const candidateEls = pdfRoot.querySelectorAll('.pr-chapter');
+        // バグ①②修正: .pr-chapter だけでなく章内の各数ブロック・段落・小見出し・details も候補に追加し
+        // 行の途中で切れにくくする
+        const candidateEls = pdfRoot.querySelectorAll(
+          '.pr-chapter, .pr-chapter h2, .pr-chapter h3, .pr-chapter p, .pr-chapter > div, .pr-chapter details, [id^="pr-num-"]'
+        );
         const candidateYsPx = [];
         candidateEls.forEach(el => {
           const y = el.getBoundingClientRect().top - pdfRootRect.top;
           candidateYsPx.push(Math.round(y));
         });
+
+        // 本文 p の line-height を取得（フォールバック用行高計算）
+        const sampleP = pdfRoot.querySelector('.pr-chapter p');
+        const lhRaw = sampleP ? parseFloat(window.getComputedStyle(sampleP).lineHeight) : 0;
 
         const isMobile = window.innerWidth < 768;
         const canvas = await html2canvas(pdfRoot, {
@@ -7659,6 +8360,9 @@ ${completedLines.length > 0 ? `- 揃いライン: ${completedLines.map(l => l.na
         const pageContentH = ph - marginTop - marginBottom;
         const pageContentPx = Math.round((pageContentH / imgH) * canvasH);
 
+        // 行高をcanvasピクセルに換算（フォールバック用）
+        const lhPx = (lhRaw > 0) ? Math.round(lhRaw * scaleFactor) : 0;
+
         const candidatesPx = [...new Set(candidateYsPx)].sort((a,b)=>a-b)
           .map(py => Math.round(py * scaleFactor))
           .filter(p => p > 10);
@@ -7673,10 +8377,17 @@ ${completedLines.length > 0 ? `- 揃いライン: ${completedLines.map(l => l.na
           for (const cp of candidatesPx) {
             if (cp <= cursorPx + 5) continue;
             if (cp > pageEndPx + 5) break;
-            if (cp - cursorPx >= Math.round(pageContentPx * 0.25)) bestBreak = cp;
+            if (cp - cursorPx >= Math.round(pageContentPx * 0.15)) bestBreak = cp;
           }
           if (bestBreak > 0) { slicesPx.push({ startPx: cursorPx, heightPx: bestBreak - cursorPx }); cursorPx = bestBreak; }
-          else { slicesPx.push({ startPx: cursorPx, heightPx: pageContentPx }); cursorPx += pageContentPx; }
+          else {
+            // フォールバック: 行高の整数倍に丸めてテキスト行を半分で切らない
+            let cutH = pageContentPx;
+            if (lhPx > 0) cutH = Math.floor(pageContentPx / lhPx) * lhPx;
+            if (cutH <= 0) cutH = pageContentPx;
+            slicesPx.push({ startPx: cursorPx, heightPx: cutH });
+            cursorPx += cutH;
+          }
         }
 
         const pxToMm = px => (px / canvasH) * imgH;
@@ -7744,6 +8455,10 @@ ${completedLines.length > 0 ? `- 揃いライン: ${completedLines.map(l => l.na
         const bdate = document.getElementById('chart-birthdate').textContent;
         const pa = r.periods;
 
+        // 精密レポート発行済みか判定
+        const prContent = document.getElementById('precision-report-content');
+        const hasPrecision = !!prContent && !prContent.classList.contains('hidden') && prContent.querySelectorAll('.pr-chapter').length > 0;
+
         // Build a hidden render container for the full PDF content
         const pdfRoot = document.createElement('div');
         pdfRoot.id = 'pdf-render';
@@ -7775,11 +8490,107 @@ ${completedLines.length > 0 ? `- 揃いライン: ${completedLines.map(l => l.na
         };
 
         // 誕生日別の説明HTML
+        const _bdDetailSep = r.birthDay && BIRTHDAY_NUMBERS[String(r.birthDay)]
+          ? `<div style="font-size:10px;color:#9ca3af;margin:8px 0 2px;border-top:1px solid #e5e7eb;padding-top:6px;">── 詳細（${r.birthDay}日生まれの特性）</div>`
+          : '';
         const birthDayHtml = (r.birthDay && birthDayDB[r.birthDay])
           ? `<div style="background:linear-gradient(135deg,#fdf2f8,#faf5ff);border:1px solid #f9a8d4;border-radius:8px;padding:12px 14px;margin-top:8px;margin-bottom:4px;">
               <div style="font-size:11px;font-weight:600;color:#db2777;margin-bottom:4px;">${r.birthDay}日生まれのあなた:</div>
               <div style="font-size:12px;color:#4b5563;line-height:1.7;">${birthDayDB[r.birthDay]}</div>
-            </div>` : '';
+            </div>` + _bdDetailSep + buildBirthdayBlockPdf(r.birthDay)
+          : _bdDetailSep + buildBirthdayBlockPdf(r.birthDay);
+
+        // 精密レポートがない場合のみ出力するデータ駆動ナラティブ（数秘ナンバー詳細・ライフガイダンス等）
+        // テンプレートリテラルネストを避けるため事前変数化
+        const _narrativeNumberDetails = hasPrecision ? '' : (
+          '<!-- Number Details -->' +
+          '<div style="padding:40px;" data-pdf-break-candidate>' +
+          '<div style="font-size:22px;font-weight:700;color:#6b21a8;margin-bottom:20px;text-align:center;">数秘ナンバー詳細</div>' +
+          numBlock('成熟数', r.maturity, positionData['cell-maturity']) +
+          numBlock('成長数', r.spirit, positionData['cell-spirit']) +
+          numBlock('人格数', r.persona, positionData['cell-persona']) +
+          numBlock('誕生数', r.destiny, positionData['cell-destiny'], birthDayHtml) +
+          numBlock('社会数', r.ground, positionData['cell-ground']) +
+          numBlock('運命数', r.lifePath, positionData['cell-lifepath']) +
+          numBlock('克服数', r.ch1, positionData['cell-ch1']) +
+          '</div>' +
+          '<!-- Challenges & Goals -->' +
+          '<div style="padding:40px;" data-pdf-break-candidate>' +
+          '<div style="font-size:22px;font-weight:700;color:#6b21a8;margin-bottom:20px;text-align:center;">挑戦数 &amp; 目標数</div>' +
+          numBlock('第2目標数', r.target2, positionData['cell-target2']) +
+          numBlock('第3目標数', r.target3, positionData['cell-target3']) +
+          numBlock('第2挑戦数', r.ch2, positionData['cell-ch2']) +
+          numBlock('第3挑戦数', r.ch3, positionData['cell-ch3']) +
+          numBlock('第4挑戦数', r.ch4, positionData['cell-ch4']) +
+          '</div>'
+        );
+
+        // パーソナルライフガイダンス・ステージ・総合メッセージ（精密レポートがない場合のみ）
+        const _nb = (v) => (numDB[v] || numDB[Math.min(v, 9)]);
+        const _narrativeGuidanceHtml = hasPrecision ? '' : (
+          '<!-- ===== パーソナルライフガイダンス ===== -->' +
+          '<div style="padding:40px;" data-pdf-break-candidate>' +
+          '<div style="font-size:24px;font-weight:700;color:#6b21a8;margin-bottom:8px;text-align:center;">パーソナルライフガイダンス</div>' +
+          '<div style="font-size:12px;color:#9ca3af;text-align:center;margin-bottom:30px;">' + name + 'さんの数秘プロファイルに基づく人生の指針</div>' +
+          '<div data-pdf-break-candidate style="margin-bottom:24px;">' +
+          '<div style="font-size:16px;font-weight:700;color:#7c3aed;margin-bottom:8px;border-left:3px solid #7c3aed;padding-left:10px;">あなたの本質と使命</div>' +
+          '<div style="font-size:12px;color:#4b5563;line-height:1.8;">' +
+          '<p style="margin-bottom:8px;">' + name + 'さんの運命数は<strong style="color:#6b21a8;">' + r.lifePath + '</strong>です。' + _nb(r.lifePath).core + '</p>' +
+          '<p style="margin-bottom:8px;">誕生数<strong style="color:#6b21a8;">' + r.destiny + '</strong>が示すあなたの内面は、' + _nb(r.destiny).core.substring(0,80) + '…という特性を持っています。この内なる衝動こそが、あなたの行動の根源的な動機となります。</p>' +
+          '<p>成熟数<strong style="color:#6b21a8;">' + r.maturity + '</strong>は、人生の後半に向かって統合されるテーマです。' + _nb(r.maturity).core.substring(0,80) + '…という方向へ、あなたは自然と進化していくでしょう。</p>' +
+          '</div></div>' +
+          '<div data-pdf-break-candidate style="margin-bottom:24px;">' +
+          '<div style="font-size:16px;font-weight:700;color:#7c3aed;margin-bottom:8px;border-left:3px solid #7c3aed;padding-left:10px;">外面的な自分と内面的な自分</div>' +
+          '<div style="font-size:12px;color:#4b5563;line-height:1.8;">' +
+          '<p style="margin-bottom:8px;">人格数<strong style="color:#6b21a8;">' + r.persona + '</strong>は、周囲があなたに抱く第一印象を表します。' + _nb(r.persona).core.substring(0,80) + '…というエネルギーを外に放っています。</p>' +
+          '<p style="margin-bottom:8px;">一方、成長数<strong style="color:#6b21a8;">' + r.spirit + '</strong>は幼少期に形成された内面の性質です。' + _nb(r.spirit).core.substring(0,80) + '…という資質が、あなたの基盤を形作っています。</p>' +
+          '<p>社会数<strong style="color:#6b21a8;">' + r.ground + '</strong>は、あなたが生まれた時代のエネルギーです。' + _nb(r.ground).core.substring(0,80) + '…という時代の波に乗ることで、社会的な成功が加速します。</p>' +
+          '</div></div>' +
+          '<div data-pdf-break-candidate style="margin-bottom:24px;">' +
+          '<div style="font-size:16px;font-weight:700;color:#7c3aed;margin-bottom:8px;border-left:3px solid #7c3aed;padding-left:10px;">人生の課題と克服のテーマ</div>' +
+          '<div style="font-size:12px;color:#4b5563;line-height:1.8;">' +
+          '<p style="margin-bottom:8px;">克服数<strong style="color:#6b21a8;">' + r.ch1 + '</strong>は、あなたが人生で最初に直面する課題です。' + _nb(r.ch1).core.substring(0,60) + '…のエネルギーを正しく使いこなすことが、この課題の克服の鍵となります。</p>' +
+          '<p style="margin-bottom:8px;">第2挑戦数<strong style="color:#6b21a8;">' + r.ch2 + '</strong>は中期的な課題、第3挑戦数<strong style="color:#6b21a8;">' + r.ch3 + '</strong>はより深い内面の課題です。これらの課題はあなたを成長させるために存在し、乗り越えるたびに魂のレベルが上がります。</p>' +
+          '<p>第4挑戦数<strong style="color:#6b21a8;">' + r.ch4 + '</strong>は生涯を通じたテーマです。この数のエネルギーとの付き合い方を学ぶことが、あなたの人生の大きな意味の一つです。</p>' +
+          '</div></div>' +
+          '</div>' +
+          '<!-- ===== 人生のステージ ===== -->' +
+          '<div style="padding:40px;" data-pdf-break-candidate>' +
+          '<div style="font-size:16px;font-weight:700;color:#7c3aed;margin-bottom:8px;border-left:3px solid #7c3aed;padding-left:10px;">人生の4つのステージ</div>' +
+          '<div style="font-size:12px;color:#4b5563;line-height:1.8;">' +
+          '<div data-pdf-break-candidate style="background:#fce7f3;border-radius:8px;padding:14px;margin-bottom:10px;">' +
+          '<div style="font-weight:700;color:#be185d;margin-bottom:4px;">第1期: 成長期（0〜' + pa.first + '歳）</div>' +
+          '<p>この時期の目標は成長数<strong>' + r.spirit + '</strong>のエネルギーに導かれています。' + _nb(r.spirit).core.substring(0,60) + '…というテーマが幼少期から青年期を形作ります。克服数<strong>' + r.ch1 + '</strong>の課題と向き合いながら、自己の基盤を築く時期です。</p></div>' +
+          '<div data-pdf-break-candidate style="background:#f3e8ff;border-radius:8px;padding:14px;margin-bottom:10px;">' +
+          '<div style="font-weight:700;color:#7c3aed;margin-bottom:4px;">第2期: 発展期（' + (pa.first+1) + '〜' + pa.second + '歳）</div>' +
+          '<p>第2目標数<strong>' + r.target2 + '</strong>が示すように、' + _nb(r.target2).core.substring(0,60) + '…というエネルギーが強まります。社会的に活動の幅を広げ、才能を発揮する時期です。第2挑戦数<strong>' + r.ch2 + '</strong>の課題を通じてさらなる成長が促されます。</p></div>' +
+          '<div data-pdf-break-candidate style="background:#e0e7ff;border-radius:8px;padding:14px;margin-bottom:10px;">' +
+          '<div style="font-weight:700;color:#4f46e5;margin-bottom:4px;">第3期: 成熟期（' + (pa.second+1) + '〜' + pa.third + '歳）</div>' +
+          '<p>第3目標数<strong>' + r.target3 + '</strong>のもとで、人生の知恵が結実する時期。' + _nb(r.target3).core.substring(0,60) + '…というテーマが前面に出てきます。成熟数<strong>' + r.maturity + '</strong>への統合が始まり、人生の意味がより明確になります。</p></div>' +
+          '<div data-pdf-break-candidate style="background:#ccfbf1;border-radius:8px;padding:14px;margin-bottom:10px;">' +
+          '<div style="font-weight:700;color:#0d9488;margin-bottom:4px;">第4期: 完成期（' + pa.third + '歳〜）</div>' +
+          '<p>成熟数<strong>' + r.maturity + '</strong>のエネルギーが完全に花開く時期。' + _nb(r.maturity).core.substring(0,60) + '…というテーマが人生の集大成として現れます。蓄積した経験と叡智を次世代に伝える使命が生まれます。</p></div>' +
+          '</div>' +
+          '<div data-pdf-break-candidate style="margin-top:24px;margin-bottom:24px;">' +
+          '<div style="font-size:16px;font-weight:700;color:#7c3aed;margin-bottom:8px;border-left:3px solid #7c3aed;padding-left:10px;">今年のパーソナルサイクル</div>' +
+          '<div style="font-size:12px;color:#4b5563;line-height:1.8;">' +
+          '<div style="display:flex;gap:16px;margin-bottom:12px;">' +
+          '<div style="background:#f0fdfa;border-radius:8px;padding:12px;text-align:center;flex:1;"><div style="font-size:10px;color:#0d9488;">個人年</div><div style="font-family:Lora,serif;font-size:24px;font-weight:700;color:#0f766e;">' + r.pYear + '</div></div>' +
+          '<div style="background:#f0fdfa;border-radius:8px;padding:12px;text-align:center;flex:1;"><div style="font-size:10px;color:#0d9488;">個人月</div><div style="font-family:Lora,serif;font-size:24px;font-weight:700;color:#0f766e;">' + r.pMonth + '</div></div>' +
+          '<div style="background:#f0fdfa;border-radius:8px;padding:12px;text-align:center;flex:1;"><div style="font-size:10px;color:#0d9488;">個人日</div><div style="font-family:Lora,serif;font-size:24px;font-weight:700;color:#0f766e;">' + r.pDay + '</div></div>' +
+          '</div>' +
+          '<p>今年の個人年は<strong style="color:#0f766e;">' + r.pYear + '</strong>。' + (cycleDescriptions[r.pYear] || cycleDescriptions[Math.min(r.pYear,9)]) + '</p>' +
+          '</div></div>' +
+          '<div data-pdf-break-candidate style="background:linear-gradient(135deg,#f3e8ff,#fce7f3);border-radius:12px;padding:24px;text-align:center;">' +
+          '<div style="font-size:16px;font-weight:700;color:#6b21a8;margin-bottom:12px;">' + name + 'さんへのメッセージ</div>' +
+          '<div style="font-size:12px;color:#4b5563;line-height:1.9;">' +
+          'あなたは運命数' + r.lifePath + 'の持つ「' + (_nb(r.lifePath).traits.split('\n')[0]) + '」のエネルギーを軸に、誕生数' + r.destiny + 'の内なる衝動と、人格数' + r.persona + 'の外への表現力を組み合わせて、唯一無二の人生を歩んでいます。<br><br>' +
+          '今は' + r.age + '歳、ライフサイクルの' + (r.age <= pa.first ? '第1期（成長期）' : r.age <= pa.second ? '第2期（発展期）' : r.age <= pa.third ? '第3期（成熟期）' : '第4期（完成期）') + 'にいます。この時期のエネルギーを最大限に活かし、あなたらしい輝きを世界に届けてください。<br><br>' +
+          '数秘術は、あなたの可能性を照らす光です。数字が示すテーマを意識しながら、日々の選択を重ねていくことで、あなたの人生はさらに豊かで充実したものになるでしょう。' +
+          '</div></div>' +
+          '<div style="text-align:center;font-size:10px;color:#d1d5db;margin-top:40px;">&copy; 2026 数秘AIライフコンパス — Powered by Gemini</div>' +
+          '</div>'
+        );
 
         pdfRoot.innerHTML = `
           <!-- Cover -->
@@ -7798,27 +8609,7 @@ ${completedLines.length > 0 ? `- 揃いライン: ${completedLines.map(l => l.na
             <div id="pdf-chart-slot"></div>
           </div>
 
-          <!-- Number Details -->
-          <div style="padding:40px;" data-pdf-break-candidate>
-            <div style="font-size:22px;font-weight:700;color:#6b21a8;margin-bottom:20px;text-align:center;">数秘ナンバー詳細</div>
-            ${numBlock('成熟数', r.maturity, positionData['cell-maturity'])}
-            ${numBlock('成長数', r.spirit, positionData['cell-spirit'])}
-            ${numBlock('人格数', r.persona, positionData['cell-persona'])}
-            ${numBlock('誕生数', r.destiny, positionData['cell-destiny'], birthDayHtml)}
-            ${numBlock('社会数', r.ground, positionData['cell-ground'])}
-            ${numBlock('運命数', r.lifePath, positionData['cell-lifepath'])}
-            ${numBlock('克服数', r.ch1, positionData['cell-ch1'])}
-          </div>
-
-          <!-- Challenges & Goals -->
-          <div style="padding:40px;" data-pdf-break-candidate>
-            <div style="font-size:22px;font-weight:700;color:#6b21a8;margin-bottom:20px;text-align:center;">挑戦数 & 目標数</div>
-            ${numBlock('第2目標数', r.target2, positionData['cell-target2'])}
-            ${numBlock('第3目標数', r.target3, positionData['cell-target3'])}
-            ${numBlock('第2挑戦数', r.ch2, positionData['cell-ch2'])}
-            ${numBlock('第3挑戦数', r.ch3, positionData['cell-ch3'])}
-            ${numBlock('第4挑戦数', r.ch4, positionData['cell-ch4'])}
-          </div>
+          ${_narrativeNumberDetails}
 
           <!-- Life Cycles -->
           <div data-pdf-break-candidate style="padding:40px;">
@@ -7832,100 +8623,7 @@ ${completedLines.length > 0 ? `- 揃いライン: ${completedLines.map(l => l.na
             </div>
           </div>
 
-          <!-- ===== パーソナルライフガイダンス ===== -->
-          <div style="padding:40px;" data-pdf-break-candidate>
-            <div style="font-size:24px;font-weight:700;color:#6b21a8;margin-bottom:8px;text-align:center;">パーソナルライフガイダンス</div>
-            <div style="font-size:12px;color:#9ca3af;text-align:center;margin-bottom:30px;">${name}さんの数秘プロファイルに基づく人生の指針</div>
-
-            <!-- 1. あなたの本質 -->
-            <div data-pdf-break-candidate style="margin-bottom:24px;">
-              <div style="font-size:16px;font-weight:700;color:#7c3aed;margin-bottom:8px;border-left:3px solid #7c3aed;padding-left:10px;">あなたの本質と使命</div>
-              <div style="font-size:12px;color:#4b5563;line-height:1.8;">
-                <p style="margin-bottom:8px;">${name}さんの運命数は<strong style="color:#6b21a8;">${r.lifePath}</strong>です。${(numDB[r.lifePath]||numDB[Math.min(r.lifePath,9)]).core}</p>
-                <p style="margin-bottom:8px;">誕生数<strong style="color:#6b21a8;">${r.destiny}</strong>が示すあなたの内面は、${(numDB[r.destiny]||numDB[Math.min(r.destiny,9)]).core.substring(0,80)}…という特性を持っています。この内なる衝動こそが、あなたの行動の根源的な動機となります。</p>
-                <p>成熟数<strong style="color:#6b21a8;">${r.maturity}</strong>は、人生の後半に向かって統合されるテーマです。${(numDB[r.maturity]||numDB[Math.min(r.maturity,9)]).core.substring(0,80)}…という方向へ、あなたは自然と進化していくでしょう。</p>
-              </div>
-            </div>
-
-            <!-- 2. 外面と内面 -->
-            <div data-pdf-break-candidate style="margin-bottom:24px;">
-              <div style="font-size:16px;font-weight:700;color:#7c3aed;margin-bottom:8px;border-left:3px solid #7c3aed;padding-left:10px;">外面的な自分と内面的な自分</div>
-              <div style="font-size:12px;color:#4b5563;line-height:1.8;">
-                <p style="margin-bottom:8px;">人格数<strong style="color:#6b21a8;">${r.persona}</strong>は、周囲があなたに抱く第一印象を表します。${(numDB[r.persona]||numDB[Math.min(r.persona,9)]).core.substring(0,80)}…というエネルギーを外に放っています。</p>
-                <p style="margin-bottom:8px;">一方、成長数<strong style="color:#6b21a8;">${r.spirit}</strong>は幼少期に形成された内面の性質です。${(numDB[r.spirit]||numDB[Math.min(r.spirit,9)]).core.substring(0,80)}…という資質が、あなたの基盤を形作っています。</p>
-                <p>社会数<strong style="color:#6b21a8;">${r.ground}</strong>は、あなたが生まれた時代のエネルギーです。${(numDB[r.ground]||numDB[Math.min(r.ground,9)]).core.substring(0,80)}…という時代の波に乗ることで、社会的な成功が加速します。</p>
-              </div>
-            </div>
-
-            <!-- 3. 人生の課題と克服 -->
-            <div data-pdf-break-candidate style="margin-bottom:24px;">
-              <div style="font-size:16px;font-weight:700;color:#7c3aed;margin-bottom:8px;border-left:3px solid #7c3aed;padding-left:10px;">人生の課題と克服のテーマ</div>
-              <div style="font-size:12px;color:#4b5563;line-height:1.8;">
-                <p style="margin-bottom:8px;">克服数<strong style="color:#6b21a8;">${r.ch1}</strong>は、あなたが人生で最初に直面する課題です。${(numDB[r.ch1]||numDB[Math.min(r.ch1,9)]).core.substring(0,60)}…のエネルギーを正しく使いこなすことが、この課題の克服の鍵となります。</p>
-                <p style="margin-bottom:8px;">第2挑戦数<strong style="color:#6b21a8;">${r.ch2}</strong>は中期的な課題、第3挑戦数<strong style="color:#6b21a8;">${r.ch3}</strong>はより深い内面の課題です。これらの課題はあなたを成長させるために存在し、乗り越えるたびに魂のレベルが上がります。</p>
-                <p>第4挑戦数<strong style="color:#6b21a8;">${r.ch4}</strong>は生涯を通じたテーマです。この数のエネルギーとの付き合い方を学ぶことが、あなたの人生の大きな意味の一つです。</p>
-              </div>
-            </div>
-          </div>
-
-          <!-- ===== 人生のステージ ===== -->
-          <div style="padding:40px;" data-pdf-break-candidate>
-            <div style="font-size:16px;font-weight:700;color:#7c3aed;margin-bottom:8px;border-left:3px solid #7c3aed;padding-left:10px;">人生の4つのステージ</div>
-            <div style="font-size:12px;color:#4b5563;line-height:1.8;">
-              <div data-pdf-break-candidate style="background:#fce7f3;border-radius:8px;padding:14px;margin-bottom:10px;">
-                <div style="font-weight:700;color:#be185d;margin-bottom:4px;">第1期: 成長期（0〜${pa.first}歳）</div>
-                <p>この時期の目標は成長数<strong>${r.spirit}</strong>のエネルギーに導かれています。${(numDB[r.spirit]||numDB[Math.min(r.spirit,9)]).core.substring(0,60)}…というテーマが幼少期から青年期を形作ります。克服数<strong>${r.ch1}</strong>の課題と向き合いながら、自己の基盤を築く時期です。</p>
-              </div>
-              <div data-pdf-break-candidate style="background:#f3e8ff;border-radius:8px;padding:14px;margin-bottom:10px;">
-                <div style="font-weight:700;color:#7c3aed;margin-bottom:4px;">第2期: 発展期（${pa.first+1}〜${pa.second}歳）</div>
-                <p>第2目標数<strong>${r.target2}</strong>が示すように、${(numDB[r.target2]||numDB[Math.min(r.target2,9)]).core.substring(0,60)}…というエネルギーが強まります。社会的に活動の幅を広げ、才能を発揮する時期です。第2挑戦数<strong>${r.ch2}</strong>の課題を通じてさらなる成長が促されます。</p>
-              </div>
-              <div data-pdf-break-candidate style="background:#e0e7ff;border-radius:8px;padding:14px;margin-bottom:10px;">
-                <div style="font-weight:700;color:#4f46e5;margin-bottom:4px;">第3期: 成熟期（${pa.second+1}〜${pa.third}歳）</div>
-                <p>第3目標数<strong>${r.target3}</strong>のもとで、人生の知恵が結実する時期。${(numDB[r.target3]||numDB[Math.min(r.target3,9)]).core.substring(0,60)}…というテーマが前面に出てきます。成熟数<strong>${r.maturity}</strong>への統合が始まり、人生の意味がより明確になります。</p>
-              </div>
-              <div data-pdf-break-candidate style="background:#ccfbf1;border-radius:8px;padding:14px;margin-bottom:10px;">
-                <div style="font-weight:700;color:#0d9488;margin-bottom:4px;">第4期: 完成期（${pa.third}歳〜）</div>
-                <p>成熟数<strong>${r.maturity}</strong>のエネルギーが完全に花開く時期。${(numDB[r.maturity]||numDB[Math.min(r.maturity,9)]).core.substring(0,60)}…というテーマが人生の集大成として現れます。蓄積した経験と叡智を次世代に伝える使命が生まれます。</p>
-              </div>
-            </div>
-
-            <!-- 今年のテーマ -->
-            <div data-pdf-break-candidate style="margin-top:24px;margin-bottom:24px;">
-              <div style="font-size:16px;font-weight:700;color:#7c3aed;margin-bottom:8px;border-left:3px solid #7c3aed;padding-left:10px;">今年のパーソナルサイクル</div>
-              <div style="font-size:12px;color:#4b5563;line-height:1.8;">
-                <div style="display:flex;gap:16px;margin-bottom:12px;">
-                  <div style="background:#f0fdfa;border-radius:8px;padding:12px;text-align:center;flex:1;">
-                    <div style="font-size:10px;color:#0d9488;">個人年</div>
-                    <div style="font-family:Lora,serif;font-size:24px;font-weight:700;color:#0f766e;">${r.pYear}</div>
-                  </div>
-                  <div style="background:#f0fdfa;border-radius:8px;padding:12px;text-align:center;flex:1;">
-                    <div style="font-size:10px;color:#0d9488;">個人月</div>
-                    <div style="font-family:Lora,serif;font-size:24px;font-weight:700;color:#0f766e;">${r.pMonth}</div>
-                  </div>
-                  <div style="background:#f0fdfa;border-radius:8px;padding:12px;text-align:center;flex:1;">
-                    <div style="font-size:10px;color:#0d9488;">個人日</div>
-                    <div style="font-family:Lora,serif;font-size:24px;font-weight:700;color:#0f766e;">${r.pDay}</div>
-                  </div>
-                </div>
-                <p>今年の個人年は<strong style="color:#0f766e;">${r.pYear}</strong>。${cycleDescriptions[r.pYear] || cycleDescriptions[Math.min(r.pYear,9)]}</p>
-              </div>
-            </div>
-
-            <!-- 総合メッセージ -->
-            <div data-pdf-break-candidate style="background:linear-gradient(135deg,#f3e8ff,#fce7f3);border-radius:12px;padding:24px;text-align:center;">
-              <div style="font-size:16px;font-weight:700;color:#6b21a8;margin-bottom:12px;">${name}さんへのメッセージ</div>
-              <div style="font-size:12px;color:#4b5563;line-height:1.9;">
-                あなたは運命数${r.lifePath}の持つ「${(numDB[r.lifePath]||numDB[Math.min(r.lifePath,9)]).traits.split('\\n')[0]}」のエネルギーを軸に、誕生数${r.destiny}の内なる衝動と、人格数${r.persona}の外への表現力を組み合わせて、唯一無二の人生を歩んでいます。
-                <br><br>
-                今は${r.age}歳、ライフサイクルの${r.age <= pa.first ? '第1期（成長期）' : r.age <= pa.second ? '第2期（発展期）' : r.age <= pa.third ? '第3期（成熟期）' : '第4期（完成期）'}にいます。この時期のエネルギーを最大限に活かし、あなたらしい輝きを世界に届けてください。
-                <br><br>
-                数秘術は、あなたの可能性を照らす光です。数字が示すテーマを意識しながら、日々の選択を重ねていくことで、あなたの人生はさらに豊かで充実したものになるでしょう。
-              </div>
-            </div>
-
-            <div style="text-align:center;font-size:10px;color:#d1d5db;margin-top:40px;">&copy; 2026 数秘AIライフコンパス — Powered by Gemini</div>
-          </div>
+          ${_narrativeGuidanceHtml}
 
           <!-- ===== 手相鑑定レポート ===== -->
           ${(() => {
@@ -8136,6 +8834,92 @@ ${palmAnalysisResult?.findings ? '- AI画像分析所見: ' + palmAnalysisResult
           }
         }
 
+        // ===== 追加コンテンツ埋め込み: 精密レポート章・各タブ =====
+
+        // ヘルパ: ライブDOM要素をpdfRootに取り込む（hiddenチェック付き）
+        function appendLiveSection(root, title, srcEl) {
+          if (!srcEl) return;
+          const clone = srcEl.cloneNode(true);
+          clone.classList.remove('hidden');
+          clone.style.display = '';
+          clone.style.maxHeight = 'none';
+          clone.style.width = '100%';
+          // アコーディオン展開
+          clone.querySelectorAll('.ds-accordion-body,[style*="max-height"]').forEach(b => {
+            b.style.maxHeight = 'none';
+            b.style.display = '';
+          });
+          // details展開
+          clone.querySelectorAll('details').forEach(d => { d.open = true; });
+          // hidden子要素を可視化
+          clone.querySelectorAll('.hidden').forEach(el => el.classList.remove('hidden'));
+          const sec = document.createElement('div');
+          sec.setAttribute('data-pdf-break-candidate', '');
+          sec.style.cssText = 'padding:30px 40px;';
+          sec.innerHTML = '<div style="font-size:22px;font-weight:700;color:#6b21a8;margin-bottom:16px;text-align:center;">' + title + '</div>';
+          sec.appendChild(clone);
+          root.appendChild(sec);
+        }
+
+        // 精密レポート章の取り込み（hasPrecision時）
+        if (hasPrecision) {
+          const prSeparator = document.createElement('div');
+          prSeparator.setAttribute('data-pdf-break-candidate', '');
+          prSeparator.style.cssText = 'padding:30px 40px 0;font-size:24px;font-weight:700;color:#6b21a8;text-align:center;';
+          prSeparator.textContent = '精密統合レポート';
+          pdfRoot.appendChild(prSeparator);
+
+          prContent.querySelectorAll('.pr-chapter').forEach(ch => {
+            // pr-ch-chart-visual（チャート図章）は重複するためスキップ
+            if (ch.id === 'pr-ch-chart-visual') return;
+            const chClone = ch.cloneNode(true);
+            // details を常時展開div に変換（savePrecisionReportPdf と同じ処理）
+            chClone.querySelectorAll('details').forEach(det => {
+              const sumEl = det.querySelector('summary');
+              const label = sumEl ? sumEl.textContent.replace(/^[▸▶\s]+/, '').trim() : '';
+              const wrap = document.createElement('div');
+              wrap.style.cssText = 'margin:8px 0;border:1px solid #c7d2fe;border-radius:8px;background:linear-gradient(135deg,#eef2ff,#f5f3ff);padding:8px 14px 12px;';
+              if (label) {
+                const h = document.createElement('div');
+                h.textContent = label;
+                h.style.cssText = 'font-size:11px;font-weight:700;color:#4338ca;margin-bottom:6px;';
+                wrap.appendChild(h);
+              }
+              Array.from(det.childNodes).forEach(n => { if (n !== sumEl) wrap.appendChild(n.cloneNode(true)); });
+              det.replaceWith(wrap);
+            });
+            const wrapper = document.createElement('div');
+            wrapper.style.cssText = 'padding:0 40px;';
+            wrapper.appendChild(chClone);
+            pdfRoot.appendChild(wrapper);
+          });
+        }
+
+        // 強み診断タブ
+        const strEl = document.getElementById('str-results-area');
+        if (strEl && !strEl.classList.contains('hidden')) {
+          appendLiveSection(pdfRoot, '強み診断', strEl);
+        }
+
+        // ブランド設計タブ
+        const bkResult = document.getElementById('bk-result');
+        if (bkResult && !bkResult.classList.contains('hidden')) {
+          appendLiveSection(pdfRoot, '自分ブランド設計', bkResult);
+          const bkGate = document.getElementById('bk-gate-reveal');
+          if (bkGate && !bkGate.classList.contains('hidden')) {
+            appendLiveSection(pdfRoot, '自分ブランド設計（続き）', bkGate);
+          }
+        }
+
+        // 詳細鑑定タブ（section-dataset は常にデータあり）
+        const datasetEl = document.getElementById('section-dataset');
+        if (datasetEl) {
+          appendLiveSection(pdfRoot, '詳細鑑定（数秘データ）', datasetEl);
+        }
+
+        // 検証用参照（html2canvas実行前のpdfRoot構造を保持）
+        window.__lastPdfRoot = pdfRoot;
+
         // Wait for fonts/rendering
         await new Promise(r => setTimeout(r, 500));
 
@@ -8144,14 +8928,18 @@ ${palmAnalysisResult?.findings ? '- AI画像分析所見: ' + palmAnalysisResult
         const isMobile = window.innerWidth < 768;
 
         // Collect Y positions of ALL break candidates using getBoundingClientRect
-        // This is more reliable than offsetTop for position:absolute containers
+        // バグ②修正: [data-pdf-break-candidate] に加えて段落・小見出しも候補に追加し行途中切断を防ぐ
         const pdfRootRect = pdfRoot.getBoundingClientRect();
-        const candidateEls = pdfRoot.querySelectorAll('[data-pdf-break-candidate]');
+        const candidateEls = pdfRoot.querySelectorAll('[data-pdf-break-candidate], p, h2, h3');
         const candidateYsPx = [];
         candidateEls.forEach(el => {
           const y = el.getBoundingClientRect().top - pdfRootRect.top;
           candidateYsPx.push(Math.round(y));
         });
+
+        // 本文 p の line-height を取得（フォールバック用行高計算）
+        const samplePEl = pdfRoot.querySelector('p');
+        const lhRawPdf = samplePEl ? parseFloat(window.getComputedStyle(samplePEl).lineHeight) : 0;
 
         const canvasPromise = html2canvas(pdfRoot, {
           scale: isMobile ? 1.0 : 1.5,
@@ -8188,12 +8976,15 @@ ${palmAnalysisResult?.findings ? '- AI画像分析所見: ' + palmAnalysisResult
           .map(py => Math.round(py * scaleFactor))
           .filter(p => p > 10);
 
+        // 行高をcanvasピクセルに換算（フォールバック用）
+        const lhPxPdf = (lhRawPdf > 0) ? Math.round(lhRawPdf * scaleFactor) : 0;
+
         // Page content area in canvas pixels
         const imgW = contentW; // mm
         const imgH = (canvasH / canvasW) * imgW; // total image height in mm
         const pageContentH = ph - marginTop - marginBottom - headerHeight - footerHeight; // mm
         const pageContentPx = Math.round((pageContentH / imgH) * canvasH); // canvas px per page
-        const minSlicePx = Math.round(pageContentPx * 0.25);
+        const minSlicePx = Math.round(pageContentPx * 0.15);
 
         // Build page slices in canvas pixel coordinates
         const slicesPx = [];
@@ -8231,9 +9022,12 @@ ${palmAnalysisResult?.findings ? '- AI画像分析所見: ' + palmAnalysisResult
               slicesPx.push({ startPx: cursorPx, heightPx: nextCandidatePx - cursorPx });
               cursorPx = nextCandidatePx;
             } else {
-              // Absolute last resort: mechanical cut
-              slicesPx.push({ startPx: cursorPx, heightPx: pageContentPx });
-              cursorPx += pageContentPx;
+              // フォールバック: 行高の整数倍に丸めてテキスト行を半分で切らない
+              let cutH = pageContentPx;
+              if (lhPxPdf > 0) cutH = Math.floor(pageContentPx / lhPxPdf) * lhPxPdf;
+              if (cutH <= 0) cutH = pageContentPx;
+              slicesPx.push({ startPx: cursorPx, heightPx: cutH });
+              cursorPx += cutH;
             }
           }
         }
