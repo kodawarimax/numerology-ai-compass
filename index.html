@@ -3839,7 +3839,22 @@
             <p class="text-[11px] font-semibold text-purple-700 mb-1">基本的な特性:</p>
             <p class="text-xs text-gray-600 leading-relaxed whitespace-pre-line">${esc(nd.traits)}</p>
           </div>
-          <p class="text-[11px] text-gray-400 mb-3">対応カラー：${esc(nd.color)}</p>`;
+          <p class="text-[11px] text-gray-400 mb-3">対応カラー：${esc(nd.color)}</p>
+          ${(() => {
+            // 三態ブロック（マスター数は1桁にフォールバック）
+            const _pVal = (numVal > 9) ? (numVal === 11 ? 2 : numVal === 22 ? 4 : numVal === 33 ? 6 : null) : numVal;
+            if (_pVal === null || !POLARITY_AXES[_pVal]) return '';
+            const _pa = POLARITY_AXES[_pVal];
+            const _pEsc = (s) => String(s == null ? '' : s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+            return `<div class="bg-gradient-to-br from-yellow-50 to-green-50 rounded-xl p-4 mb-3 border border-green-100">
+              <p class="text-[11px] font-semibold text-green-700 mb-2">陽・中庸・陰（${_pVal}）— 三態</p>
+              <div class="grid grid-cols-1 gap-1 text-[11px]">
+                <div class="rounded-md px-2 py-1" style="background:#fef9c3;"><span class="font-semibold" style="color:#b45309;">陽（過剰）</span>：${_pEsc(_pa.yang)}</div>
+                <div class="rounded-md px-2 py-1" style="background:#dcfce7;"><span class="font-semibold" style="color:#15803d;">中庸（理想）</span>：${_pEsc(_pa.ideal)}</div>
+                <div class="rounded-md px-2 py-1" style="background:#e0e7ff;"><span class="font-semibold" style="color:#4338ca;">陰（欠乏）</span>：${_pEsc(_pa.yin)}</div>
+              </div>
+            </div>`;
+          })()}`;
       } else {
         content.innerHTML = `
           <div class="flex items-center justify-between mb-3">
@@ -5630,6 +5645,44 @@ ${r.birthDay && BIRTHDAY_NUMBERS[String(r.birthDay)] ? `- 誕生日の数(${r.bi
       9: { theme: '手放し・完成・浄化', recommend: ['整理・慈善・卒業に取り組む', '古い習慣・関係の見直し', '次のサイクルへの準備'], avoid: ['PY9で新規開始（翌年PY1で）', '手放すべきものへの執着'] },
     };
 
+    // =========================================================
+    // 極性軸データ（THE MATRIX CODE 正典。成長数=培う/克服数=阻まれる の表裏。陽=過剰/陰=欠乏/中庸=理想形）
+    // =========================================================
+    const POLARITY_AXES = {
+      0: { axis:"内なる障壁（特定のカルマなし）", ideal:"自分軸を自分の手で築く", theme:"新たに克服する内なる障壁", yang:"—", yin:"—",
+           growth:"", challenge:"特定の業カルマ（過去生の課題）を持たず、今世で新たに克服すべき『内なる障壁』を示す。出会う数のバランスを自分自身で築いていく自由がある。" },
+      1: { axis:"自己信頼 ⇄ 自己不信", ideal:"ありのままの自分を信じて生きる", theme:"新たな可能性・主体性・自分の意見", yang:"自信過剰で独断的になり、高慢さが目立つ。", yin:"自信喪失で臆病になり、すべてに尻込みする。",
+           growth:"父親（的）な影響のもと『自己証明』の条件付けを受けやすい。自立した意識と独創的な発想を培い、新たな可能性の扉を開く。", challenge:"自己主張や自立への怖れから、自分を駆り立てて証明しようとする（業・カルマ）。克服の鍵は、証明をやめて自己信頼を高め、ありのままの自分を受け入れて新たな可能性を開拓すること。" },
+      2: { axis:"自己親愛 ⇄ 自己嫌悪", ideal:"愛と慈しみに包まれて生きる", theme:"ハートの繊細さ・内なる声を聴く", yang:"神経過敏でお節介になり、依存度が高く相手本位になる。", yin:"無神経で反依存的になり、言葉や態度がぶっきらぼうになる。",
+           growth:"母親（的）な影響のもと『必要性意識』の条件付けを受けやすい。繊細な心と慈愛、豊かな感受性・直感力を培う。", challenge:"愛すること・傷つくことの怖れから、必要性に応えることで関係を保とうとする。克服の鍵は、相手に依存せず、素直な心の自分を慈しむこと。" },
+      3: { axis:"自己肯定 ⇄ 自己否定", ideal:"愛と歓びに生きる", theme:"ハートの歓び・ワクワク好奇心", yang:"楽観的で何もかも安易になり、承認意識が目立つ。", yin:"悲観的で何もかも深刻になり、気難しさが目立つ。",
+           growth:"内なる子供の影響のもと『承認意識』の条件付けを受けやすい。無邪気さ・創造性・遊び心を培う。", challenge:"認められない・期待に応えられない怖れから、頑張り続けようとする。克服の鍵は、承認を気にせず、歓びと好奇心から自己表現すること。" },
+      4: { axis:"自己存在 ⇄ 自己不在", ideal:"あるがままの現実を真摯に生きる", theme:"いのちの繋がり・地に足をつける", yang:"融通が利かず思い込みが強く、頑固で堅苦しくなる。", yin:"夢想的で取り留めがなく、現実離れした考えに囚われる。",
+           growth:"身体・家庭の影響のもと『安定志向』の条件付けを受けやすい。現実を見極める洞察力と揺るぎない信念を培う。", challenge:"安心感の欠如から、実利に偏るか夢見がちになる。克服の鍵は、精神的な不安定さを克服し、あるがままの現実に地に足をつけること。" },
+      5: { axis:"自己発見 ⇄ 自己喪失", ideal:"今この瞬間を全身全霊で生きる", theme:"新たな冒険・マインドフルネス", yang:"注意力散漫で衝動的になり、気まぐれで自由奔放になる。", yin:"変化を避けて停滞し、殻にこもって退屈な人になる。",
+           growth:"制限・抑止の影響のもと『逃避志向』の条件付けを受けやすい。冒険心・探求心・研ぎ澄ました五感を培う。", challenge:"人生への怖れから、刺激を求めて彷徨うか逃避する。克服の鍵は、怖れを越えて『今ここ』を十全に生きること。" },
+      6: { axis:"自己責任 ⇄ 自己犠牲", ideal:"無償の愛に満ちて生きる", theme:"ハートの真実・無償の愛", yang:"相手への期待感が強く、独善的で口うるさくなる。", yin:"犠牲者意識が強くなり、人との関わりが面倒になる。",
+           growth:"家族・仲間の影響のもと『役割意識』の条件付けを受けやすい。寛容さと真の責任感、美と調和の感性を培う。", challenge:"自己愛の欠如から、自他に厳しくなるか尽くしすぎて疲れ果てる。克服の鍵は、義務感ではなく無償の愛で、自分自身も愛すること。" },
+      7: { axis:"自己変革 ⇄ 自己批判", ideal:"己の道を信じて生きる", theme:"独りの時間・直観の目覚め", yang:"批判精神で辛辣になり、相手に冷たい態度になる。", yin:"思慮が足りず、怠惰でいい加減な態度になる。",
+           growth:"常識・精神性の影響のもと『優劣意識』の条件付けを受けやすい。先見性・直観・独創的な発想を培う。", challenge:"謙虚さの欠如から、周囲と分離するか懐疑心・劣等感に陥る。克服の鍵は、固執した考えを手放し、謙虚に未知を探究すること。" },
+      8: { axis:"自己実現 ⇄ 自己欺瞞", ideal:"真の望みに向かって真摯に生きる", theme:"真の豊かさ・無限の可能性", yang:"野心や損得勘定が強くなり、物事を操ろうとする。", yin:"不平不満や無力感が強くなり、投げやりな態度になる。",
+           growth:"金銭・パワーの影響のもと『勝敗意識』の条件付けを受けやすい。揺るぎない信念とチャレンジ精神、内なるバランスを培う。", challenge:"パワーの欠如から、支配やこだわりに走るか卑屈になる。克服の鍵は、摩擦を生まず内なるバランスを整え、真の望みに生きること。" },
+      9: { axis:"自己変容 ⇄ 自己放棄", ideal:"自己を赦し、自然の流れに身を委ねる", theme:"共感能力・広い視野", yang:"理想や感傷に酔い、他者の問題まで背負い込み境界が溶ける。", yin:"無関心・投げやりになり、関係や物事を放棄する。",
+           growth:"別離・運命の影響のもと『境界線』の条件付けを受けやすい。高潔な精神と共感力、広い視野を培う。", challenge:"" }
+    };
+    function paxis(n){ const k = Math.min(Math.max(Math.round(n)||0,0),9); return POLARITY_AXES[k] || POLARITY_AXES[1]; }
+
+    // 陽/中庸/陰 三態の小ブロック（テンプレートレポート用 prEsc を使う）
+    function buildPolarityTriad(num){
+      const p = paxis(num); if(!p) return '';
+      const yang = String(p.yang||''); const ideal = String(p.ideal||''); const yin = String(p.yin||'');
+      return `<div class="mt-2 grid grid-cols-1 gap-1 text-[11px]">
+        <div class="rounded-md px-2 py-1" style="background:#fef9c3;"><span class="font-semibold" style="color:#b45309;">陽（過剰）</span>：${prEsc(yang)}</div>
+        <div class="rounded-md px-2 py-1" style="background:#dcfce7;"><span class="font-semibold" style="color:#15803d;">中庸（理想）</span>：${prEsc(ideal)}</div>
+        <div class="rounded-md px-2 py-1" style="background:#e0e7ff;"><span class="font-semibold" style="color:#4338ca;">陰（欠乏）</span>：${prEsc(yin)}</div>
+      </div>`;
+    }
+
     function renderPersonalYearForecast(pYear) {
       const container = document.getElementById('personal-year-forecast');
       if (!container) return;
@@ -6887,20 +6940,21 @@ ${r.birthDay && BIRTHDAY_NUMBERS[String(r.birthDay)] ? `- 誕生日の数(${r.bi
 
       // ── 章目次（全体像と現在地 / P1: RIOルーブリック / D4: アンカーリンク化）
       html += `<div class="pr-toc">
-        <div class="pr-toc__label">目次 — 全 12 章 ＋ 図</div>
+        <div class="pr-toc__label">目次 — 全 13 章 ＋ 図</div>
         <ul class="pr-toc__list">
           <li class="pr-toc__item"><a href="#pr-ch-intro" class="pr-toc__link"><span class="pr-toc__num">01</span>序章 — ${prEsc(name)}さんという存在</a></li>
           <li class="pr-toc__item"><a href="#pr-ch-numbers" class="pr-toc__link"><span class="pr-toc__num">02</span>各数が語るあなたの姿（6ポジション）</a></li>
           <li class="pr-toc__item"><a href="#pr-ch-dynamics" class="pr-toc__link"><span class="pr-toc__num">03</span>内なる力学 — 数同士の関係と葛藤</a></li>
-          <li class="pr-toc__item"><a href="#pr-ch-mandala" class="pr-toc__link"><span class="pr-toc__num">04</span>数秘マンダラ — 9マスの羅針盤</a></li>
-          <li class="pr-toc__item"><a href="#pr-ch-axes" class="pr-toc__link"><span class="pr-toc__num">05</span>3つの軸 — エネルギーの向き方（図付き）</a></li>
-          <li class="pr-toc__item"><a href="#pr-ch-career" class="pr-toc__link"><span class="pr-toc__num">06</span>天職 — あなたが輝く場所</a></li>
-          <li class="pr-toc__item"><a href="#pr-ch-compat" class="pr-toc__link"><span class="pr-toc__num">07</span>相性 — 関係性の読み方（図付き）</a></li>
-          <li class="pr-toc__item"><a href="#pr-ch-pyear" class="pr-toc__link"><span class="pr-toc__num">08</span>今の流れ — 個人年のテーマ（図付き）</a></li>
-          <li class="pr-toc__item"><a href="#pr-ch-integration" class="pr-toc__link"><span class="pr-toc__num">09</span>統合章 — ${prEsc(name)}さんという物語</a></li>
-          <li class="pr-toc__item"><a href="#pr-ch-overview" class="pr-toc__link"><span class="pr-toc__num">10</span>俯瞰 — 一つの物語としてのあなたの人生</a></li>
-          <li class="pr-toc__item"><a href="#pr-ch-direction" class="pr-toc__link"><span class="pr-toc__num">11</span>方向性 — これから歩む道</a></li>
-          <li class="pr-toc__item"><a href="#pr-ch-closing" class="pr-toc__link"><span class="pr-toc__num">12</span>結び</a></li>
+          <li class="pr-toc__item"><a href="#pr-ch-core-axes" class="pr-toc__link"><span class="pr-toc__num">04</span>人生の課題の9割 — 成長数と克服数</a></li>
+          <li class="pr-toc__item"><a href="#pr-ch-mandala" class="pr-toc__link"><span class="pr-toc__num">05</span>数秘マンダラ — 9マスの羅針盤</a></li>
+          <li class="pr-toc__item"><a href="#pr-ch-axes" class="pr-toc__link"><span class="pr-toc__num">06</span>3つの軸 — エネルギーの向き方（図付き）</a></li>
+          <li class="pr-toc__item"><a href="#pr-ch-career" class="pr-toc__link"><span class="pr-toc__num">07</span>天職 — あなたが輝く場所</a></li>
+          <li class="pr-toc__item"><a href="#pr-ch-compat" class="pr-toc__link"><span class="pr-toc__num">08</span>相性 — 関係性の読み方（図付き）</a></li>
+          <li class="pr-toc__item"><a href="#pr-ch-pyear" class="pr-toc__link"><span class="pr-toc__num">09</span>今の流れ — 個人年のテーマ（図付き）</a></li>
+          <li class="pr-toc__item"><a href="#pr-ch-integration" class="pr-toc__link"><span class="pr-toc__num">10</span>統合章 — ${prEsc(name)}さんという物語</a></li>
+          <li class="pr-toc__item"><a href="#pr-ch-overview" class="pr-toc__link"><span class="pr-toc__num">11</span>俯瞰 — 一つの物語としてのあなたの人生</a></li>
+          <li class="pr-toc__item"><a href="#pr-ch-direction" class="pr-toc__link"><span class="pr-toc__num">12</span>方向性 — これから歩む道</a></li>
+          <li class="pr-toc__item"><a href="#pr-ch-closing" class="pr-toc__link"><span class="pr-toc__num">13</span>結び</a></li>
         </ul>
       </div>`;
 
@@ -6966,6 +7020,10 @@ ${r.birthDay && BIRTHDAY_NUMBERS[String(r.birthDay)] ? `- 誕生日の数(${r.bi
               ).join('')}
             </div>
           </details>` : ''}
+          <details style="margin-top:8px;border:1px solid #d1fae5;border-radius:8px;background:linear-gradient(135deg,#f0fdf4,#ecfdf5);">
+            <summary style="cursor:pointer;user-select:none;padding:8px 14px;font-size:0.73rem;font-weight:600;color:#15803d;">▸ ${prEsc(pos.label)} ${prEsc(String(val))} の陽・中庸・陰</summary>
+            <div style="padding:4px 10px 10px;">${buildPolarityTriad(val)}</div>
+          </details>
           <hr class="pr-divider">
         </div>`;
       }
@@ -6989,6 +7047,47 @@ ${r.birthDay && BIRTHDAY_NUMBERS[String(r.birthDay)] ? `- 誕生日の数(${r.bi
           <p><strong>自分への問い：</strong>「克服数・挑戦数という根がしっかりすることで、私の幹・枝葉はどう広がるだろうか？」</p>
         </div>
       </div>`;
+
+      // ── 人生の課題の9割 — 成長数と克服数（新章 #pr-ch-core-axes）
+      {
+        const sp = paxis(r.spirit);
+        const cp = paxis(r.ch1);
+        const spNum = r.spirit; const chNum = r.ch1;
+        html += `<div class="pr-chapter pr-chapter--featured" id="pr-ch-core-axes" style="background:linear-gradient(135deg,#faf5ff,#f0fdf4);border-color:#c4b5fd;">
+          <span class="pr-chapter-num">${nextChNum()}</span>
+          <h2>人生の課題の9割 — 成長数と克服数</h2>
+          <p>数秘では、人生で出会う悩みや問題の9割以上が「成長数（スピリットナンバー）」と「克服数（カオスナンバー＝業・カルマ）」という2つの数に宿るとされます。両者は表裏一体——成長数は人間関係や環境を通して<strong>「培われる」</strong>理想の資質であり、克服数は同じ資質が<strong>「阻まれた」</strong>ときに生まれる怖れや業・カルマです。この2つの数を深く知ることが、繰り返すパターンの根本を理解し、人生を本質的に変える入り口になります。（出典: THE MATRIX CODE / Lina Eda）</p>
+
+          <div style="border-left:4px solid #a78bfa;padding-left:14px;margin:16px 0;">
+            <h3 style="color:#6d28d9;margin-bottom:6px;">成長数 ${prEsc(String(spNum))}（スピリットナンバー）— 培われる資質</h3>
+            <p><strong>極性軸：</strong>「${prEsc(sp.axis)}」。あなたが人間関係や環境を通して培う理想の在り方は「<strong>${prEsc(sp.ideal)}</strong>」です。</p>
+            <p>${prEsc(sp.growth)}</p>
+            <p style="font-size:0.83rem;font-weight:600;color:#7c3aed;margin:8px 0 4px;">成長数 ${prEsc(String(spNum))} の陽・中庸・陰</p>
+            ${buildPolarityTriad(spNum)}
+          </div>
+
+          <div style="border-left:4px solid #34d399;padding-left:14px;margin:16px 0;">
+            <h3 style="color:#065f46;margin-bottom:6px;">克服数 ${prEsc(String(chNum))}（カオスナンバー）— 阻まれる怖れ・業・カルマ</h3>
+            ${chNum === 0
+              ? `<p>${prEsc(cp.challenge)}</p>`
+              : `<p><strong>極性軸：</strong>「${prEsc(cp.axis)}」。同じ軸の資質が「阻まれた」怖れとして現れるとき、業・カルマとなります。</p>
+                 <p>${prEsc(cp.challenge)}</p>
+                 <p style="font-size:0.83rem;font-weight:600;color:#065f46;margin:8px 0 4px;">克服数 ${prEsc(String(chNum))} の陽・中庸・陰</p>
+                 ${buildPolarityTriad(chNum)}`
+            }
+          </div>
+
+          <div class="pr-highlight" style="margin-top:14px;">
+            <p><strong>統合の視点：</strong>成長数${prEsc(String(spNum))}が示す「培う方向（中庸：${prEsc(sp.ideal)}）」と、克服数${prEsc(String(chNum))}が示す「阻まれる怖れ」は、同じ極性軸の上にあります。克服数の怖れが刺激されるたびに、あなたは成長数の理想の在り方を試されています。克服数の根（業・カルマ）を丁寧に整えることで、成長数の枝葉はより豊かに花開く——この2数を「中庸」へ戻し続けることが、あなたの人生の中心的な仕事です。</p>
+          </div>
+
+          <div class="pr-action-block" style="margin-top:14px;">
+            <div class="pr-action-block-label">行動提言</div>
+            <p><strong>今週の実践：</strong>今日の自分が「陽に傾いている（過剰）」か「陰に傾いている（欠乏）」かを一度静かに観察してみましょう。そして、中庸（${prEsc(sp.ideal)}）に一歩戻す具体的な行動を1つだけ選んで実行してみてください。</p>
+            <p><strong>自分への問い：</strong>「克服数${prEsc(String(chNum))}の怖れが動くとき、私はどんな状況にいるか？そのとき、成長数${prEsc(String(spNum))}の理想の在り方を選ぶとしたら何ができるか？」</p>
+          </div>
+        </div>`;
+      }
 
       // ── 強みの構造（マンダラ）(Phase 2: 章番号)
       // 6ライン情報: あなたの保有数がどのラインに属するか特定
@@ -7684,6 +7783,7 @@ ${vocationMemo}
 ## 誕生数${r.destiny}が語るもの
 ## 社会数${r.ground}と人格数${r.persona}が語るもの
 ## 内なる力学 — 数同士の関係と葛藤
+## 人生の課題の9割 — 成長数と克服数
 ## 強みの構造 — マンダラが示すあなたの型
 （必ずマンダラ6ラインの意味を織り込むこと: 縦カラム=PLAN企画[1·2·3]／ARRANGE調整[4·5·6]／DEVELOP展開[7·8·9]、横ロウ=自分軸SELF[1·4·7]／他人軸SHARE[2·5·8]／導き軸SPIRIT[3·6·9]。その人の数がどのラインに乗っているかを語ること。）
 ## 3つの軸 — エネルギーの向き方
@@ -7695,7 +7795,7 @@ ${vocationMemo}
 ## 方向性 — これから歩む道
 ## 結び
 
-各章を600〜900字の地の文で、具体例・比喩・問いかけを含めて深く書いてください。各章末尾に「明日から/今週できる具体的行動2-3個」と「自分への問い1個」を入れること。『俯瞰』章では、${name}さんの人生全体（序盤の試練＝克服数/挑戦数 → 生涯を貫く運命数 → 成熟数への結実）を、ライフサイクルの流れに沿った一続きの物語として高い視点から描き、人生レベルの指針を授けること。神や宗教の語は使わない。`;
+各章を600〜900字の地の文で、具体例・比喩・問いかけを含めて深く書いてください。各章末尾に「明日から/今週できる具体的行動2-3個」と「自分への問い1個」を入れること。『人生の課題の9割』章では、成長数${r.spirit}（培う理想）と克服数${r.ch1}（阻まれる怖れ）を中心に、各数の「陽に傾く（過剰）／中庸（理想形）／陰に傾く（欠乏）」の三態を明示して深く解説し、中庸へ戻す道筋を示すこと。他の各数解説でも可能な場面では陽・中庸・陰の三態に触れること。出典はTHE MATRIX CODE。『俯瞰』章では、${name}さんの人生全体（序盤の試練＝克服数/挑戦数 → 生涯を貫く運命数 → 成熟数への結実）を、ライフサイクルの流れに沿った一続きの物語として高い視点から描き、人生レベルの指針を授けること。神や宗教の語は使わない。`;
 
       let editorDraft = '';
       editorDraft = await councilCall(editorSystem, editorPrompt, apiKey, 120000);
@@ -7821,6 +7921,9 @@ ${r.birthDay && BIRTHDAY_NUMBERS[String(r.birthDay)] ? `- 誕生日の数(${r.bi
 
 ## 内なる力学 — 数同士の関係と葛藤
 （★最重要章：①運命数${r.lifePath}×成熟数${r.maturity}の共鳴と相乗、②運命数${r.lifePath}×克服数${r.ch1}の葛藤（人生の目的と最大の課題の力学）、③影響力上位2数（運命数・成長数）の共鳴と摩擦、④揃いラインが生む数の連携、をそれぞれ小節として語ること。「この組み合わせがあなたの内側で生み出しているドラマ」を立体的に描くこと。）
+
+## 人生の課題の9割 — 成長数と克服数
+（成長数${r.spirit}と克服数${r.ch1}の極性軸・表裏の関係を深く解説。各数の「陽に傾く（過剰）／中庸（理想形）／陰に傾く（欠乏）」の三態を明示し、中庸へ戻す道筋を示すこと。出典はTHE MATRIX CODE。他の各数解説でも可能な場面では三態に触れること。）
 
 ## 強みの構造 — マンダラが示すあなたの型
 （揃いライン・数の分布から見えるあなた固有の才能の型・具体的行動提言・問い。必ずマンダラ6ラインの意味を織り込むこと: 縦カラム=PLAN企画[1·2·3]／ARRANGE調整[4·5·6]／DEVELOP展開[7·8·9]、横ロウ=自分軸SELF[1·4·7]／他人軸SHARE[2·5·8]／導き軸SPIRIT[3·6·9]。その人の数がどのラインに乗っているかを具体的に語ること。）
