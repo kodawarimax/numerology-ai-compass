@@ -61,6 +61,117 @@
     .pr-mode-badge { display: inline-block; font-size: 0.65rem; font-weight: 600; border-radius: 99px; padding: 2px 8px; margin-left: 6px; vertical-align: middle; }
     .pr-mode-ai { background: #fef3c7; color: #92400e; }
     .pr-mode-template { background: #f0f9ff; color: #0369a1; }
+    .pr-mode-council { background: #ecfdf5; color: #065f46; }
+
+    /* ===== 4-Agent Council Panel ===== */
+    #council-panel {
+      background: #fff;
+      border: 1px solid #e9d5ff;
+      border-radius: var(--radius-card);
+      padding: 16px 18px;
+      margin-bottom: 16px;
+      box-shadow: var(--shadow-card);
+    }
+    .council-panel__label {
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: #9ca3af;
+      margin-bottom: 12px;
+    }
+    .council-agents {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      margin-bottom: 12px;
+    }
+    .council-agent {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      padding: 10px 12px;
+      border-radius: 10px;
+      background: #f9f7ff;
+      border: 1px solid #ede9fe;
+      transition: background 0.2s, border-color 0.2s;
+    }
+    .council-agent.ca-active {
+      background: linear-gradient(135deg, #faf5ff, #fce7f3);
+      border-color: #d8b4fe;
+    }
+    .council-agent.ca-done {
+      background: #f0fdf4;
+      border-color: #bbf7d0;
+    }
+    .council-agent__icon {
+      flex-shrink: 0;
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: 'Lora', serif;
+      font-size: 12px;
+      font-weight: 700;
+      color: #fff;
+      background: #c4b5fd;
+    }
+    .council-agent.ca-active .council-agent__icon { background: #7c3aed; }
+    .council-agent.ca-done .council-agent__icon { background: #059669; }
+    .council-agent__body { flex: 1; min-width: 0; }
+    .council-agent__name {
+      font-size: 12px;
+      font-weight: 700;
+      color: #6b21a8;
+      margin-bottom: 1px;
+    }
+    .council-agent.ca-done .council-agent__name { color: #065f46; }
+    .council-agent__badge {
+      display: inline-block;
+      font-size: 10px;
+      font-weight: 600;
+      padding: 1px 7px;
+      border-radius: 99px;
+      margin-left: 5px;
+      vertical-align: middle;
+    }
+    .badge-wait { background: #f3f4f6; color: #9ca3af; }
+    .badge-thinking { background: #fef3c7; color: #92400e; }
+    .badge-done { background: #dcfce7; color: #166534; }
+    .council-agent__excerpt {
+      font-size: 11px;
+      color: #4b5563;
+      line-height: 1.5;
+      margin-top: 4px;
+      display: none;
+    }
+    .council-agent.ca-done .council-agent__excerpt { display: block; }
+    .council-chat {
+      border-top: 1px solid #ede9fe;
+      padding-top: 10px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .council-chat-msg {
+      font-size: 11px;
+      line-height: 1.55;
+      padding: 6px 10px;
+      border-radius: 8px;
+      max-width: 100%;
+    }
+    .council-chat-msg.msg-critic {
+      background: #fef3c7;
+      color: #78350f;
+      border-left: 3px solid #f59e0b;
+    }
+    .council-chat-msg.msg-editor {
+      background: #ecfdf5;
+      color: #065f46;
+      border-left: 3px solid #34d399;
+    }
     /* Phase 2: 章番号装飾 */
     .pr-chapter-num { display: block; font-size: 11px; font-weight: 700; color: #a8a29e; letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 4px; }
     /* Phase 2: 重点章カード */
@@ -1282,7 +1393,17 @@
       <div id="section-precision-report" class="hidden mt-4 space-y-1" aria-live="polite">
         <!-- Loading state -->
         <div id="precision-report-loading" class="hidden bg-white rounded-xl border border-purple-100 p-6 text-center">
-          <div class="flex flex-col items-center gap-3">
+          <!-- Council panel (shown when API key present; hidden otherwise) -->
+          <div id="council-panel" class="hidden text-left">
+            <div class="council-panel__label">4名の専門家が協議しています</div>
+            <div class="council-agents" id="council-agents-list">
+              <!-- injected by JS -->
+            </div>
+            <div class="council-chat" id="council-chat-log" style="display:none;">
+              <!-- chat messages injected by JS -->
+            </div>
+          </div>
+          <div class="flex flex-col items-center gap-3" id="council-spinner-area">
             <svg class="w-8 h-8 animate-spin text-purple-500" fill="none" viewBox="0 0 24 24">
               <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
               <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path>
@@ -6884,6 +7005,270 @@ ${numContext}
     }
 
     // ------- AI-BASED REPORT BUILDER (Gemini) -------
+    // ===== 4-AGENT COUNCIL REPORT =====
+    // Council panel DOM helpers
+    const COUNCIL_AGENTS_DEF = [
+      { key: 'analyst',  initial: 'A', label: '数秘分析官',      role: '各数の意味・根→幹枝葉の力学を分析' },
+      { key: 'vocation', initial: 'V', label: '天職・縁の鑑定士', role: '才能の発揮先・縁・流れを分析' },
+      { key: 'editor',   initial: 'E', label: '編集長',            role: '統合本文を執筆（温かく上質な語り口）' },
+      { key: 'critic',   initial: 'C', label: '批評家',            role: '最も重要な改善点を1つ指摘' },
+    ];
+
+    function councilBuildPanel() {
+      const panel = document.getElementById('council-panel');
+      const list = document.getElementById('council-agents-list');
+      if (!panel || !list) return;
+      list.innerHTML = COUNCIL_AGENTS_DEF.map(ag => `
+        <div class="council-agent" id="council-agent-${ag.key}">
+          <div class="council-agent__icon">${ag.initial}</div>
+          <div class="council-agent__body">
+            <div class="council-agent__name">${ag.label}
+              <span class="council-agent__badge badge-wait" id="badge-${ag.key}">待機</span>
+            </div>
+            <div class="council-agent__excerpt" id="excerpt-${ag.key}"></div>
+          </div>
+        </div>`).join('');
+      panel.classList.remove('hidden');
+    }
+
+    function councilSetAgentState(key, state, excerpt) {
+      const el = document.getElementById('council-agent-' + key);
+      const badge = document.getElementById('badge-' + key);
+      const excEl = document.getElementById('excerpt-' + key);
+      if (!el || !badge) return;
+      el.classList.remove('ca-active', 'ca-done');
+      badge.className = 'council-agent__badge';
+      if (state === 'thinking') {
+        el.classList.add('ca-active');
+        badge.classList.add('badge-thinking');
+        badge.textContent = '思考中…';
+      } else if (state === 'done') {
+        el.classList.add('ca-done');
+        badge.classList.add('badge-done');
+        badge.textContent = '完了';
+        if (excerpt && excEl) excEl.textContent = excerpt;
+      } else {
+        badge.classList.add('badge-wait');
+        badge.textContent = '待機';
+      }
+    }
+
+    function councilAddChat(type, text) {
+      const log = document.getElementById('council-chat-log');
+      if (!log) return;
+      log.style.display = 'flex';
+      const msg = document.createElement('div');
+      msg.className = 'council-chat-msg ' + (type === 'critic' ? 'msg-critic' : 'msg-editor');
+      const prefix = type === 'critic' ? '[批評家] ' : '[編集長] ';
+      msg.textContent = prefix + text;
+      log.appendChild(msg);
+    }
+
+    // Gemini call: same model / endpoint / pattern as buildAIReport
+    function councilGeminiUrl(apiKey) {
+      return 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=' + apiKey;
+    }
+
+    async function councilCall(systemRole, userPrompt, apiKey, timeoutMs) {
+      const url = councilGeminiUrl(apiKey);
+      const resp = await fetchWithRetry(url, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          contents: [{ parts: [{ text: systemRole + '\n\n' + userPrompt }] }],
+          generationConfig: { temperature: 0.80, maxOutputTokens: 65536 }
+        })
+      }, 1, timeoutMs || 120000);
+      const result = await resp.json();
+      const c0 = result.candidates && result.candidates[0];
+      const rawText = (c0 && c0.content && c0.content.parts && c0.content.parts[0] && c0.content.parts[0].text) || '';
+      if (!rawText) throw new Error('AI応答が空でした');
+      return rawText;
+    }
+
+    // Main council orchestrator — returns final report HTML (same format as buildAIReport)
+    async function generateCouncilReport(r, name, apiKey) {
+      const compatInfo = prGetCompatInfo();
+      const completedLines = prGetMandalaLines(r);
+      const pyBase = (r.pYear > 9) ? (r.pYear === 11 ? 2 : r.pYear === 22 ? 4 : r.pYear === 33 ? 6 : r.pYear % 9 || 9) : r.pYear;
+      const pyDB = PERSONAL_YEAR_DB[pyBase] || PERSONAL_YEAR_DB[1];
+      const voc = computeVocation(r);
+      const axes = classifyAxes(r);
+
+      // Build council panel UI
+      councilBuildPanel();
+
+      // ── Agent 1: 数秘分析官 ──
+      councilSetAgentState('analyst', 'thinking');
+      const analystSystem = `あなたは数秘術の深い分析を行う専門家「数秘分析官」です。他のエージェントが読む分析メモを作成します。構造化されたテキストで出力してください。`;
+      const analystPrompt = `以下のデータを分析し、各数の意味・関係性・「根→幹→枝葉」の力学を専門的に記述してください。
+
+【数秘データ】
+- 運命数（影響力5・最重要）: ${r.lifePath}
+- 成熟数（影響力5・最重要）: ${r.maturity}
+- 成長数（影響力4）: ${r.spirit}
+- 誕生数（影響力3.5）: ${r.destiny}
+- 社会数（影響力3）: ${r.ground}
+- 人格数（影響力1）: ${r.persona}
+- 克服数（最大の課題）: ${r.ch1}
+- 個人年: ${r.pYear}（テーマ: ${pyDB.theme}）
+- 年齢: ${r.age}歳
+- 揃いライン: ${completedLines.length > 0 ? completedLines.map(l => l.name).join('、') : 'なし'}
+
+【分析すること】
+1. 各数の本質的な意味（運命数/成熟数を最も厚く）
+2. 運命数×成熟数の共鳴と相乗効果
+3. 運命数×克服数の葛藤・力学（人生の目的と最大の課題）
+4. 影響力上位3数の相互関係・摩擦
+5. 揃いラインが示す才能の型
+6. 根（克服数・挑戦数）が幹（主要数）に与える影響
+
+分析メモとして詳細に記述してください。`;
+
+      let analystMemo = '';
+      analystMemo = await councilCall(analystSystem, analystPrompt, apiKey, 90000);
+      councilSetAgentState('analyst', 'done', analystMemo.slice(0, 80).trim() + '…');
+
+      // Small gap for rate limit courtesy
+      await new Promise(res => setTimeout(res, 400));
+
+      // ── Agent 2: 天職・縁の鑑定士 ──
+      councilSetAgentState('vocation', 'thinking');
+      const vocSystem = `あなたは天職・縁・人生の流れを鑑定する専門家「天職・縁の鑑定士」です。才能の発揮先・縁・個人年の流れを分析するメモを作成します。`;
+      const vocPrompt = `以下のデータを使って、才能の発揮先・縁の傾向・個人年の流れを分析してください。
+
+【天職データ（computeVocation結果）】
+- 系統A天職: ${voc.sysA && voc.sysA.cellPair ? JSON.stringify(voc.sysA.cellPair) : 'なし'}
+- 系統B天職: ${voc.sysB && voc.sysB.cellPair ? JSON.stringify(voc.sysB.cellPair) : 'なし'}
+- 天職コア: ${Array.isArray(voc.core) ? voc.core.join('・') : '（算出中）'}
+
+【軸分類（classifyAxes）】
+- 自分軸の数: ${Array.isArray(axes.self) ? axes.self.join('・') : ''}
+- 他人軸の数: ${Array.isArray(axes.share) ? axes.share.join('・') : ''}
+- 導き軸の数: ${Array.isArray(axes.spirit) ? axes.spirit.join('・') : ''}
+
+【縁・流れ】
+- 個人年: ${r.pYear}（${pyDB.theme}）
+- 相手の運命数: ${compatInfo ? compatInfo.lifePath : '未入力'}
+${compatInfo ? `- 相手の成熟数: ${compatInfo.maturity}、成長数: ${compatInfo.spirit}` : ''}
+
+【分析すること】
+1. 才能の発揮先（職業・役割・活動の方向性）を具体的に
+2. 縁のパターン（どんな人・関係性を引き寄せやすいか）
+3. 個人年${r.pYear}の今年の流れ・乗るべき波・避けるべきこと
+${compatInfo ? '4. 相手との縁の質・相性の力学' : ''}
+
+分析メモとして詳細に記述してください。`;
+
+      let vocationMemo = '';
+      vocationMemo = await councilCall(vocSystem, vocPrompt, apiKey, 90000);
+      councilSetAgentState('vocation', 'done', vocationMemo.slice(0, 80).trim() + '…');
+
+      await new Promise(res => setTimeout(res, 400));
+
+      // ── Agent 3: 編集長（初稿） ──
+      councilSetAgentState('editor', 'thinking');
+      const editorSystem = `あなたは精密数秘レポートを執筆する「編集長」です。数秘分析官と天職・縁の鑑定士の分析メモを受け取り、${name}さんへの精密統合数秘レポートを日本語で執筆します。二人称「あなた」を使い、温かく上質な語り口で、スピリチュアルに偏らず現実の行動への橋渡しも入れてください。各章600〜900字を目安とし、全体で12,000字以上を目指します。`;
+      const editorPrompt = `【数秘分析官の分析メモ】
+${analystMemo}
+
+【天職・縁の鑑定士の分析メモ】
+${vocationMemo}
+
+上記2つの分析メモをもとに、${name}さんへの「精密統合数秘レポート」を以下の章構成で執筆してください。各章は「## 章タイトル」で始めること。
+
+## 序章 — ${name}さんという存在
+## 運命数${r.lifePath}が語るもの
+## 成熟数${r.maturity}が語るもの
+## 成長数${r.spirit}が語るもの
+## 誕生数${r.destiny}が語るもの
+## 社会数${r.ground}と人格数${r.persona}が語るもの
+## 内なる力学 — 数同士の関係と葛藤
+## 強みの構造 — マンダラが示すあなたの型
+## 3つの軸 — エネルギーの向き方
+## 才能の発揮先 — 職業適性の可能性
+## 縁と関係性
+## 今の流れ — 個人年${r.pYear}のテーマ
+## 統合章 — ${name}さんという物語
+## 方向性 — これから歩む道
+## 結び
+
+各章を600〜900字の地の文で、具体例・比喩・問いかけを含めて深く書いてください。各章末尾に「明日から/今週できる具体的行動2-3個」と「自分への問い1個」を入れること。`;
+
+      let editorDraft = '';
+      editorDraft = await councilCall(editorSystem, editorPrompt, apiKey, 120000);
+      councilSetAgentState('editor', 'done', '初稿を執筆しました。');
+
+      await new Promise(res => setTimeout(res, 400));
+
+      // ── Agent 4: 批評家 ──
+      councilSetAgentState('critic', 'thinking');
+      const criticSystem = `あなたは数秘レポートの品質を見る「批評家」です。編集長の初稿を読み、最も重要な改善点を1つだけ端的に指摘してください。50字以内で指摘すること。`;
+      const criticPrompt = `以下は編集長の初稿です。最も重要な改善点を1つだけ指摘してください（50字以内）。
+
+${editorDraft.slice(0, 3000)}
+（...以下省略）`;
+
+      let criticFeedback = '';
+      criticFeedback = await councilCall(criticSystem, criticPrompt, apiKey, 30000);
+      // Trim to first line / 60 chars
+      criticFeedback = criticFeedback.trim().split('\n')[0].slice(0, 80);
+      councilSetAgentState('critic', 'done', criticFeedback);
+      councilAddChat('critic', criticFeedback);
+
+      await new Promise(res => setTimeout(res, 400));
+
+      // ── Editor revision (Agent 3 round 2) ──
+      councilSetAgentState('editor', 'thinking');
+      const editorRevSystem = `あなたは精密数秘レポートを執筆する「編集長」です。批評家の指摘を受けて初稿の1点だけを改善し、最終版を出力してください。それ以外は変えないこと。同じ章構成（## 見出し形式）を維持し、全体の質と深さを保つこと。`;
+      const editorRevPrompt = `【批評家の指摘】
+${criticFeedback}
+
+【初稿】
+${editorDraft}
+
+上記指摘の1点だけを改善した最終版を出力してください。章構成・文体・「## 見出し」形式は維持してください。`;
+
+      let finalText = '';
+      finalText = await councilCall(editorRevSystem, editorRevPrompt, apiKey, 120000);
+      councilAddChat('editor', '指摘を反映しました。最終版を確定します。');
+      councilSetAgentState('editor', 'done', '最終版を確定しました。');
+
+      // Convert ## headings → pr-chapter divs (same as buildAIReport)
+      const sections = finalText.split(/\n(?=##\s)/);
+      let html = '';
+      const chapterIds = [
+        'intro','lifepath','maturity','spirit','destiny','persona-ground',
+        'dynamics','mandala','axes','career','compat','pyear','integration','direction','closing'
+      ];
+      const chapterStyles = {
+        'dynamics': ' style="background:linear-gradient(135deg,#fefce8,#fff7ed);border-color:#fde68a;"',
+        'integration': ' style="background:linear-gradient(135deg,#fdf4ff,#fce7f3);border-color:#f0abfc;"',
+        'closing': ' style="text-align:center;background:linear-gradient(135deg,#f3e8ff,#fce7f3,#e0e7ff);"'
+      };
+      const h2Styles = {
+        'closing': ' style="text-align:center;border-left:none;padding-left:0;"'
+      };
+      let chapIdx = 0;
+      for (const sec of sections) {
+        const trimmed = sec.trim();
+        if (!trimmed) continue;
+        const headMatch = trimmed.match(/^##\s+(.+)/);
+        if (!headMatch) { html += `<div class="pr-chapter"><p>${prEsc(trimmed)}</p></div>`; continue; }
+        const title = headMatch[1];
+        const body = trimmed.slice(headMatch[0].length).trim();
+        const cidKey = chapterIds[chapIdx] || String(chapIdx);
+        const cid = `pr-ch-${cidKey}`;
+        chapIdx++;
+        const chStyle = chapterStyles[cidKey] || '';
+        const h2Style = h2Styles[cidKey] || '';
+        const paras = body.split(/\n+/).filter(p => p.trim()).map(p => `<p>${prEsc(p.trim())}</p>`).join('\n');
+        html += `<div class="pr-chapter" id="${cid}"${chStyle}><h2${h2Style}>${prEsc(title)}</h2>${paras}</div>`;
+      }
+      return html;
+    }
+    // ===== END 4-AGENT COUNCIL REPORT =====
+
     async function buildAIReport(r, name, apiKey) {
       const compatInfo = prGetCompatInfo();
       const completedLines = prGetMandalaLines(r);
@@ -7054,20 +7439,32 @@ ${completedLines.length > 0 ? `- 揃いライン: ${completedLines.map(l => l.na
       let isAI = false;
 
       if (apiKey) {
+        // Show council panel; hide plain spinner text
+        const spinnerArea = document.getElementById('council-spinner-area');
+        if (spinnerArea) spinnerArea.style.display = 'none';
         try {
-          setStep('① 数を読み解いています...');
-          await new Promise(res => setTimeout(res, 200));
-          setStep('② Gemini AI が内なる力学を分析中...');
-          reportHtml = await buildAIReport(r, name, apiKey);
+          setStep('4名の専門家が協議中です...');
+          reportHtml = await generateCouncilReport(r, name, apiKey);
           isAI = true;
-          setStep('③ チャート図を描いています...');
+          setStep('チャート図を描いています...');
+          if (spinnerArea) spinnerArea.style.display = '';
         } catch(e) {
-          console.warn('AI report generation failed, falling back to template:', e.message);
+          console.warn('Council report generation failed, falling back to template:', e.message);
+          if (spinnerArea) spinnerArea.style.display = '';
+          // Hide council panel on failure
+          const cp = document.getElementById('council-panel');
+          if (cp) cp.classList.add('hidden');
           setStep('テンプレート版で生成中...');
           reportHtml = buildTemplateReport(r, name);
-          setStep('③ チャート図を描いています...');
+          setStep('チャート図を描いています...');
         }
       } else {
+        // No API key: show key hint in council panel area
+        const cp = document.getElementById('council-panel');
+        if (cp) {
+          cp.classList.remove('hidden');
+          cp.innerHTML = '<div class="council-panel__label" style="margin-bottom:0;color:#6b21a8;">Gemini APIキーを設定すると、4名の専門家が協議する本格レポートが生成されます。</div>';
+        }
         setStep('① 数を読み解いています...');
         await new Promise(res => setTimeout(res, 150));
         setStep('② 内なる力学を分析中...');
@@ -7078,7 +7475,7 @@ ${completedLines.length > 0 ? `- 揃いライン: ${completedLines.map(l => l.na
 
       // Inject mode badge after first h2
       const modeBadge = isAI
-        ? '<span class="pr-mode-badge pr-mode-ai">AI生成</span>'
+        ? '<span class="pr-mode-badge pr-mode-council">4専門家協議</span>'
         : '<span class="pr-mode-badge pr-mode-template">標準版</span>';
       reportHtml = reportHtml.replace(/(<h2[^>]*>)/, `$1${modeBadge} `);
 
