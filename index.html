@@ -6129,10 +6129,18 @@ ${r.birthDay && BIRTHDAY_NUMBERS[String(r.birthDay)] ? `- 誕生日の数(${r.bi
         chalDiv.innerHTML = '';
         const chalData = t['挑戦数'] || {};
         const chalNums = [
-          { label: '克服数 (第1挑戦)', num: r.ch1 },
-          { label: '第2挑戦数',         num: r.ch2 },
-          { label: '第3挑戦数',         num: r.ch3 },
-          { label: '第4挑戦数',         num: r.ch4 },
+          { label: '克服数 (第1挑戦)', num: r.ch1,
+            period: '人生前半（幼少期〜30代前半）',
+            lens: 'この課題は、あなたが大人になるまでに繰り返し問われる、最も根深いテーマです。同じ数でも、ここでは「自分という土台をどう築くか」という問いとして現れます。' },
+          { label: '第2挑戦数',         num: r.ch2,
+            period: '自立・確立期（30〜40代）',
+            lens: '社会の中で自分の足場を築こうとするこの時期、同じ課題は「責任」と「人との関わり」という形をまとって、より具体的に現れます。' },
+          { label: '第3挑戦数',         num: r.ch3,
+            period: '人生の正午（40〜50代）',
+            lens: '成熟と責任が深まるこの時期、この課題は人生全体を貫く中心軸として、最も強く問われます。若い頃と同じ数でも、その重さはまるで違うのではないでしょうか。' },
+          { label: '第4挑戦数',         num: r.ch4,
+            period: '円熟・手放しの時期（50代以降）',
+            lens: '多くを成し遂げたのちのこの時期、同じ課題は「掴むこと」から「手放すこと」へ、そして智慧への昇華を促す形で現れます。' },
         ];
         chalNums.forEach(cn => {
           const rec = chalData[String(cn.num)];
@@ -6143,6 +6151,18 @@ ${r.birthDay && BIRTHDAY_NUMBERS[String(r.birthDay)] ? `- 誕生日の数(${r.bi
           title.className = 'text-sm font-bold text-rose-700 mb-2';
           title.textContent = cn.label + ': ' + cn.num + ' — ' + (rec['テーマ'] || '');
           card.appendChild(title);
+          if (cn.period) {
+            const per = document.createElement('p');
+            per.className = 'text-[10px] font-semibold text-rose-400 mb-1';
+            per.textContent = '時期: ' + cn.period;
+            card.appendChild(per);
+          }
+          if (cn.lens) {
+            const ln = document.createElement('p');
+            ln.className = 'text-[11px] text-rose-500 italic leading-relaxed mb-2';
+            ln.textContent = cn.lens;
+            card.appendChild(ln);
+          }
           if (rec['課題の本質']) {
             const body = document.createElement('p');
             body.className = 'text-xs text-gray-600 leading-relaxed mb-2';
@@ -7078,13 +7098,20 @@ ${r.birthDay && BIRTHDAY_NUMBERS[String(r.birthDay)] ? `- 誕生日の数(${r.bi
           </div>
 
           <div class="pr-highlight" style="margin-top:14px;">
-            <p><strong>統合の視点：</strong>成長数${prEsc(String(spNum))}が示す「培う方向（中庸：${prEsc(sp.ideal)}）」と、克服数${prEsc(String(chNum))}が示す「阻まれる怖れ」は、同じ極性軸の上にあります。克服数の怖れが刺激されるたびに、あなたは成長数の理想の在り方を試されています。克服数の根（業・カルマ）を丁寧に整えることで、成長数の枝葉はより豊かに花開く——この2数を「中庸」へ戻し続けることが、あなたの人生の中心的な仕事です。</p>
+            ${chNum === 0
+              ? `<p><strong>統合の視点：</strong>あなたの克服数は<strong>0</strong>——特定の業（カルマ）に縛られない、まだ色のついていない『自由な根』です。他の数のように決まった怖れを背負わない代わりに、成長数${prEsc(String(spNum))}が示す理想（中庸：${prEsc(sp.ideal)}）を、あなた自身の手でどの方向にも育てていける自由があります。型がないことは、空白ではなく可能性です。出会う数や人との関わりの中で、自分軸のバランスを一つずつ選び取っていく——その自由な創造こそが、あなたの人生の中心的な仕事です。</p>`
+              : `<p><strong>統合の視点：</strong>成長数${prEsc(String(spNum))}が示す「培う方向（中庸：${prEsc(sp.ideal)}）」と、克服数${prEsc(String(chNum))}が示す「阻まれる怖れ」は、同じ極性軸の上にあります。克服数の怖れが刺激されるたびに、あなたは成長数の理想の在り方を試されています。克服数の根（業・カルマ）を丁寧に整えることで、成長数の枝葉はより豊かに花開く——この2数を「中庸」へ戻し続けることが、あなたの人生の中心的な仕事です。</p>`
+            }
           </div>
 
           <div class="pr-action-block" style="margin-top:14px;">
             <div class="pr-action-block-label">行動提言</div>
-            <p><strong>今週の実践：</strong>今日の自分が「陽に傾いている（過剰）」か「陰に傾いている（欠乏）」かを一度静かに観察してみましょう。そして、中庸（${prEsc(sp.ideal)}）に一歩戻す具体的な行動を1つだけ選んで実行してみてください。</p>
-            <p><strong>自分への問い：</strong>「克服数${prEsc(String(chNum))}の怖れが動くとき、私はどんな状況にいるか？そのとき、成長数${prEsc(String(spNum))}の理想の在り方を選ぶとしたら何ができるか？」</p>
+            ${chNum === 0
+              ? `<p><strong>今週の実践：</strong>克服数0のあなたには「直すべき決まった癖」がありません。だからこそ、成長数${prEsc(String(spNum))}の理想（${prEsc(sp.ideal)}）に近づく在り方を、今日ひとつ自由に選んで試してみましょう。</p>
+                 <p><strong>自分への問い：</strong>「決まった型に縛られないこの自由を、私は何を育てるために使いたいか？成長数${prEsc(String(spNum))}の理想を、自分の手でどう形にしていけるか？」</p>`
+              : `<p><strong>今週の実践：</strong>今日の自分が「陽に傾いている（過剰）」か「陰に傾いている（欠乏）」かを一度静かに観察してみましょう。そして、中庸（${prEsc(sp.ideal)}）に一歩戻す具体的な行動を1つだけ選んで実行してみてください。</p>
+                 <p><strong>自分への問い：</strong>「克服数${prEsc(String(chNum))}の怖れが動くとき、私はどんな状況にいるか？そのとき、成長数${prEsc(String(spNum))}の理想の在り方を選ぶとしたら何ができるか？」</p>`
+            }
           </div>
         </div>`;
       }
