@@ -3624,6 +3624,60 @@
     };
 
     // =========================================================
+    // Thoth Tarot Correspondence Data (Crowley / Kabbalah system)
+    // =========================================================
+    const TAROT_DATA = {
+      1: { card_jp: '魔術師', card_en: 'The Magician', number_roman: 'I', hebrew_letter: 'ベート (ב)', hebrew_meaning: '家・器・意志の乗り物', tree_path: '経路12（ケテル → ビナー）', astrology: '水星 ♀', element: '風', gematria: 'ベート = 2（二元性を創造する一者）', thoth_keyword: '技巧・意志・顕現', essence: 'ゼロから1を生み出す創造の意志。4元素（火水風土）すべてを操り、上位からの意図を現実へ降ろす橋渡し役。', shadow: '操作・詐欺・力の誇示', lina_message: 'あなたの内に宿る創造の衝動は、まだ現れていない何かを世界に生み出そうとしています。その「手」をどう使うかが、問いです。' },
+      2: { card_jp: '女祭司', card_en: 'The High Priestess', number_roman: 'II', hebrew_letter: 'ギメル (ג)', hebrew_meaning: 'ラクダ・砂漠を渡る橋渡し', tree_path: '経路13（ケテル → ティファレト）', astrology: '月 ☽', element: '水', gematria: 'ギメル = 3（動きと道）', thoth_keyword: '直観・内なる知識・沈黙', essence: '言葉にならない知を守る聖域。月の満ち欠けのように、見える世界と見えない世界を往来する存在。', shadow: '孤立・秘密主義・感情の閉塞', lina_message: '答えはすでにあなたの内側に宿っています。沈黙の中に降りていくとき、水面に映る真実が見えてくるでしょう。' },
+      3: { card_jp: '女帝', card_en: 'The Empress', number_roman: 'III', hebrew_letter: 'ダレット (ד)', hebrew_meaning: '扉・開口・豊かさへの入口', tree_path: '経路14（コクマー → ビナー）', astrology: '金星 ♀', element: '地（豊穣の地）', gematria: 'ダレット = 4（物質世界の扉）', thoth_keyword: '創造・豊穣・愛の顕現', essence: '自然の循環そのもの。愛が形となって溢れ出す力。創造・産出・育む喜び——宇宙の母性原理。', shadow: '過剰な依存・消耗・境界の喪失', lina_message: 'あなたから溢れ出るものは何でしょうか？創造とは与えることです。与えるほど、扉はさらに大きく開きます。' },
+      4: { card_jp: '皇帝', card_en: 'The Emperor', number_roman: 'IV', hebrew_letter: 'ツァディ (צ)※クロウリー変更', hebrew_meaning: '釣り針・引き寄せる力（クロウリーはヘーを星と入替）', tree_path: '経路15（コクマー → ティファレト）', astrology: '牡羊座 ♈', element: '火（意志の火）', gematria: 'ツァディ = 90（大いなる釣り針）', thoth_keyword: '構造・権威・意志の具現', essence: '混沌に秩序をもたらす建設者。4は物質世界の基盤——4方位・4元素・4季。権威は恐れからではなく、責任から生まれる。', shadow: '独裁・硬直・変化への抵抗', lina_message: 'あなたが築こうとしている構造は、どんな価値観の上に立っていますか？土台の問いこそが、皇帝の真の使命です。' },
+      5: { card_jp: '法王', card_en: 'The Hierophant', number_roman: 'V', hebrew_letter: 'ヴァヴ (ו)', hebrew_meaning: '釘・繋ぐ・上と下をつなぐフック', tree_path: '経路16（コクマー → ケサド）', astrology: '牡牛座 ♉', element: '地（具体化する知）', gematria: 'ヴァヴ = 6（均衡の釘）', thoth_keyword: '伝達・教義・橋渡し', essence: '天上の智慧を地上の言葉へ翻訳する者。伝統と革新の狭間に立ち、時代を越えた真理を伝える。5は自由と変化——既存の틀を問い直す力。', shadow: '教条主義・服従の強要・閉塞した権威', lina_message: 'あなたが受け継いだ知恵と、あなた自身が発見した真実——どちらもあなたの声です。その声で、誰かの扉を開けるとしたら？' },
+      6: { card_jp: '恋人', card_en: 'The Lovers', number_roman: 'VI', hebrew_letter: 'ザイン (ז)', hebrew_meaning: '剣・識別の刃・切り分ける知性', tree_path: '経路17（ビナー → ティファレト）', astrology: '双子座 ♊', element: '風', gematria: 'ザイン = 7（剣の数）', thoth_keyword: '選択・統合・愛による識別', essence: '「恋人」とは恋愛だけでなく、対立するもの（光と影・自己と他者）の統合。剣（ザイン）で何を選び、何を手放すかが問われる。', shadow: '優柔不断・依存・価値観の分裂', lina_message: '今あなたの前にある選択は、どんな内なる声に従って生きるかという問いかもしれません。愛とは識別する勇気です。' },
+      7: { card_jp: '戦車', card_en: 'The Chariot', number_roman: 'VII', hebrew_letter: 'ヘット (ח)', hebrew_meaning: '柵・境界・聖域', tree_path: '経路18（ビナー → ゲブラー）', astrology: '蟹座 ♋', element: '水', gematria: 'ヘット = 8（生命の囲い）', thoth_keyword: '勝利・統御・意志による前進', essence: '相反するスフィンクスを意志の手綱で制御しながら進む。7は探究と内省——内なる戦場で対立を統合し、前へ動く力。', shadow: '支配欲・方向性の喪失・力の空回り', lina_message: '矛盾する二つの力が同時にあなたの内にある——それは弱さではなく、戦車の持つ構造です。どちらを制御し、どちらに走らせますか？' },
+      8: { card_jp: '調整（審判）', card_en: 'Adjustment (Justice)', number_roman: 'VIII', hebrew_letter: 'ラメッド (ל)', hebrew_meaning: '牛追いの棒・学び・道具', tree_path: '経路22（ゲブラー → ティファレト）', astrology: '天秤座 ♎', element: '風', gematria: 'ラメッド = 30（学びの数）', thoth_keyword: '因果・均衡・精算', essence: 'クロウリーはこのカードをVIII（ウェイトのXIと入替）に置いた。天秤が揺れ、種が刈り取られる。8は物質的達成——しかし真の達成は、正直な重さの精算から始まる。', shadow: '不公平への固執・完璧主義・厳格な裁き', lina_message: '天秤は嘘をつきません。今あなたが感じる重さは、何を正直に見つめよと告げていますか？精算は終わりではなく、次の創造への準備です。' },
+      9: { card_jp: '隠者', card_en: 'The Hermit', number_roman: 'IX', hebrew_letter: 'ヨッド (י)', hebrew_meaning: '手・創造の道具・神が世界を編んだ文字', tree_path: '経路20（ケサド → ティファレト）', astrology: '乙女座 ♍', element: '地', gematria: 'ヨッド = 10（完全への一歩手前）/ 全ヘブライ文字の源（全てにヨッドが含まれる）', thoth_keyword: '内なる光・智慧・沈思', essence: '9は1〜8すべての経験の総合。高みに登り、後から来る者のためにランタンを掲げる。完成を前に立ち止まり、光を内へ向ける成熟した探究者。', shadow: '孤立・社会からの離脱・変化への無関心', lina_message: 'あなたが独り登ってきた山の高さは、後から来る誰かへの光となります。その光を手放すことを恐れなくていいのです。' },
+    };
+
+    function renderTarotSection(num) {
+      const base = (num > 9) ? (num === 11 ? 2 : num === 22 ? 4 : num === 33 ? 6 : null) : num;
+      const t = TAROT_DATA[base];
+      if (!t) return '';
+      return `<div class="tarot-section mt-4 p-3 rounded-xl bg-gradient-to-br from-purple-50 to-indigo-50 border border-purple-100">
+        <div class="flex items-center gap-2 mb-2">
+          <span class="text-base">&#x1F0CF;</span>
+          <span class="text-xs font-bold text-purple-700 tracking-widest uppercase">Thoth Tarot</span>
+        </div>
+        <div class="text-center mb-2">
+          <span class="text-xl font-bold text-purple-800">${esc(t.card_jp)}</span>
+          <span class="text-xs text-purple-500 ml-2">${esc(t.card_en)} ${esc(t.number_roman)}</span>
+        </div>
+        <div class="grid grid-cols-2 gap-1 text-[10px] mb-2">
+          <div class="bg-white rounded px-2 py-1">
+            <span class="text-purple-400 font-semibold">ヘブライ文字</span>
+            <div class="text-gray-700">${esc(t.hebrew_letter)}</div>
+          </div>
+          <div class="bg-white rounded px-2 py-1">
+            <span class="text-purple-400 font-semibold">占星術</span>
+            <div class="text-gray-700">${esc(t.astrology)}</div>
+          </div>
+          <div class="bg-white rounded px-2 py-1">
+            <span class="text-purple-400 font-semibold">生命の樹</span>
+            <div class="text-gray-700">${esc(t.tree_path)}</div>
+          </div>
+          <div class="bg-white rounded px-2 py-1">
+            <span class="text-purple-400 font-semibold">元素</span>
+            <div class="text-gray-700">${esc(t.element)}</div>
+          </div>
+        </div>
+        <p class="text-[11px] text-gray-700 leading-relaxed mb-2">${esc(t.essence)}</p>
+        <div class="bg-purple-100 rounded-lg px-2 py-1">
+          <span class="text-[10px] text-purple-500 font-semibold">&#x1F49C; Linaより</span>
+          <p class="text-[11px] text-purple-800 italic leading-relaxed">${esc(t.lina_message)}</p>
+        </div>
+      </div>`;
+    }
+
+    // =========================================================
     // Position & Number Detail Data (from original app)
     // =========================================================
     const positionData = {
@@ -3854,7 +3908,8 @@
                 <div class="rounded-md px-2 py-1" style="background:#e0e7ff;"><span class="font-semibold" style="color:#4338ca;">陰（欠乏）</span>：${_pEsc(_pa.yin)}</div>
               </div>
             </div>`;
-          })()}`;
+          })()}
+          ${renderTarotSection(numVal)}`;
       } else {
         content.innerHTML = `
           <div class="flex items-center justify-between mb-3">
@@ -3867,7 +3922,8 @@
             <p class="text-xs font-bold text-purple-700">より深い洞察をアンロック</p>
             <p class="text-[11px] text-gray-500 leading-relaxed">プレミアムプランで、あなたの数秘が持つ全ての意味と、具体的なアドバイスにアクセスしましょう。</p>
             <button class="btn-activate-premium w-full gradient-cta text-white rounded-full py-2.5 text-xs font-semibold">今すぐ全特典を体験する (DEVモード)</button>
-          </div>`;
+          </div>
+          ${renderTarotSection(numVal)}`;
       }
 
       content.querySelector('.close-detail').addEventListener('click', () => {
@@ -4705,7 +4761,9 @@ JSONのみ返してください（\`\`\`不要）:
 発達している丘: ${mounts.length ? mounts.join(', ') : 'なし'}
 ${palmAnalysisResult?.findings ? 'AI分析所見: ' + palmAnalysisResult.findings : ''}`;
 
-      const numContext = lastResults ? `【数秘術データ】運命数: ${lastResults.lifePath}, 誕生数: ${lastResults.destiny}` : '';
+      const tarotLifePath = lastResults ? TAROT_DATA[lastResults.lifePath <= 9 ? lastResults.lifePath : (lastResults.lifePath === 11 ? 2 : lastResults.lifePath === 22 ? 4 : lastResults.lifePath === 33 ? 6 : null)] : null;
+      const tarotDestiny = lastResults ? TAROT_DATA[lastResults.destiny <= 9 ? lastResults.destiny : (lastResults.destiny === 11 ? 2 : lastResults.destiny === 22 ? 4 : lastResults.destiny === 33 ? 6 : null)] : null;
+      const numContext = lastResults ? `【数秘術データ】運命数: ${lastResults.lifePath}（タロット: ${tarotLifePath?.card_jp || ''}）, 誕生数: ${lastResults.destiny}（タロット: ${tarotDestiny?.card_jp || ''}）` : '';
 
       const systemPrompt = `あなたは手相占いと数秘術の専門家です。以下のデータを踏まえてユーザーの質問に親切・丁寧に答えてください。
 
@@ -4830,6 +4888,22 @@ ${numContext}
         }
       }
 
+      // Tarot context for numerology chat
+      const _toBase = n => n <= 9 ? n : (n === 11 ? 2 : n === 22 ? 4 : n === 33 ? 6 : null);
+      const _tLP      = TAROT_DATA[_toBase(r.lifePath)];
+      const _tDest    = TAROT_DATA[_toBase(r.destiny)];
+      const _tMat     = TAROT_DATA[_toBase(r.maturity)];
+      const _tCh1     = TAROT_DATA[_toBase(r.ch1)];
+      const _tGround  = TAROT_DATA[_toBase(r.ground)];
+      const _tarotLine = (label, num, t) => t ? `- ${label}${num}のタロット: ${t.card_jp}（${t.card_en}）/ ${t.thoth_keyword} / ${t.essence.slice(0,40)}…` : '';
+      const tarotContext = `\n\n【トートタロット対応（クロウリー体系）】
+${_tarotLine('運命数', r.lifePath, _tLP)}
+${_tarotLine('誕生数', r.destiny, _tDest)}
+${_tarotLine('成熟数', r.maturity, _tMat)}
+${_tarotLine('克服数', r.ch1, _tCh1)}
+${_tarotLine('社会数', r.ground, _tGround)}
+タロットと数秘を統合して、このユーザーの魂の課題・社会での使命・将来の到達点を読むこと。`;
+
       const systemPrompt = `あなたは数秘術の専門家です。以下の数秘データを踏まえてユーザーの質問に親切・丁寧に答えてください。
 
 【数秘プロファイル】
@@ -4842,7 +4916,7 @@ ${numContext}
 - 克服数: ${r.ch1}
 - 個人年: ${r.pYear || '不明'}
 - 個人月: ${r.pMonth || '不明'}
-${r.birthDay && BIRTHDAY_NUMBERS[String(r.birthDay)] ? `- 誕生日の数(${r.birthDay}日)の特性: ${BIRTHDAY_NUMBERS[String(r.birthDay)].characteristics}。性格=${BIRTHDAY_NUMBERS[String(r.birthDay)].personality}／長所=${BIRTHDAY_NUMBERS[String(r.birthDay)].strengths}／短所=${BIRTHDAY_NUMBERS[String(r.birthDay)].weaknesses}／恋愛=${BIRTHDAY_NUMBERS[String(r.birthDay)].love_tendency}／適職=${BIRTHDAY_NUMBERS[String(r.birthDay)].suitable_jobs}／金運=${BIRTHDAY_NUMBERS[String(r.birthDay)].financial_fortune}` : ''}${dsContext}
+${r.birthDay && BIRTHDAY_NUMBERS[String(r.birthDay)] ? `- 誕生日の数(${r.birthDay}日)の特性: ${BIRTHDAY_NUMBERS[String(r.birthDay)].characteristics}。性格=${BIRTHDAY_NUMBERS[String(r.birthDay)].personality}／長所=${BIRTHDAY_NUMBERS[String(r.birthDay)].strengths}／短所=${BIRTHDAY_NUMBERS[String(r.birthDay)].weaknesses}／恋愛=${BIRTHDAY_NUMBERS[String(r.birthDay)].love_tendency}／適職=${BIRTHDAY_NUMBERS[String(r.birthDay)].suitable_jobs}／金運=${BIRTHDAY_NUMBERS[String(r.birthDay)].financial_fortune}` : ''}${dsContext}${tarotContext}
 
 具体的でパーソナルな回答を200〜300文字で答えてください。一般論ではなく、この人の数字の組み合わせに基づいた独自のアドバイスにしてください。`;
 
@@ -5705,6 +5779,20 @@ ${r.birthDay && BIRTHDAY_NUMBERS[String(r.birthDay)] ? `- 誕生日の数(${r.bi
       themeEl.textContent = db.theme;
       recList.innerHTML = db.recommend.map(t => `<li class="text-[11px] text-green-700 flex items-start gap-1"><span class="mt-0.5 flex-shrink-0">+</span>${esc(t)}</li>`).join('');
       avoidList.innerHTML = db.avoid.map(t => `<li class="text-[11px] text-rose-700 flex items-start gap-1"><span class="mt-0.5 flex-shrink-0">-</span>${esc(t)}</li>`).join('');
+
+      // Append tarot section for personal year number
+      const pyrTarotId = 'pyr-tarot-section';
+      let pyrTarotEl = container.querySelector('#' + pyrTarotId);
+      const pyrTarotHtml = renderTarotSection(pyBase);
+      if (pyrTarotHtml) {
+        if (!pyrTarotEl) {
+          pyrTarotEl = document.createElement('div');
+          pyrTarotEl.id = pyrTarotId;
+          container.querySelector('.bg-indigo-50').insertAdjacentElement('afterend', pyrTarotEl);
+        }
+        pyrTarotEl.innerHTML = pyrTarotHtml;
+      }
+
       container.classList.remove('hidden');
     }
 
